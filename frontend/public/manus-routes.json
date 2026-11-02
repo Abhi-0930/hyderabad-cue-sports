@@ -1,0 +1,7 @@
+{
+  "routes": [
+    { "path": "/", "title": "Hyderabad Cue Sports — Premium Snooker Tables" },
+    { "path": "/shop", "title": "Shop Snooker Tables & Equipment" },
+    { "path": "/products/:slug", "title": "Snooker Table Product Detail" }
+  ]
+}
