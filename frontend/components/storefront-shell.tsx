@@ -189,18 +189,7 @@ export function SiteHeader() {
 
   return (
     <>
-      {/* 1. Top Announcement Bar */}
-      <div className="announcement-bar">
-        <div className="announcement-inner">
-          <span>HYDERABAD CUE SPORTS</span>
-          <span className="announcement-dot">•</span>
-          <span>PREMIUM EQUIPMENT &amp; CLUB APPAREL</span>
-          <span className="announcement-dot">•</span>
-          <span>SERVING CUSTOMERS ACROSS INDIA</span>
-        </div>
-      </div>
-
-      {/* 2. Middle Row: Main Header */}
+      {/* Main Header */}
       <header className="site-header-main">
         <div className="site-header-container">
           <button
