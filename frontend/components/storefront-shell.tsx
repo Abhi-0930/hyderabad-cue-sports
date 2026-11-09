@@ -105,7 +105,6 @@ export function SiteHeader() {
   const router = useRouter();
   const { cart, openCart, wishlist, showNotice } = useStorefront();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [search, setSearch] = useState("");
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -238,48 +237,6 @@ export function SiteHeader() {
       {/* 3. Bottom Category Navigation Bar */}
       <nav className="category-nav-bar" aria-label="Category navigation">
         <div className="category-nav-container">
-          {/* Shop by Category Dropdown Button */}
-          <div
-            className="category-dropdown-wrapper"
-            onMouseEnter={() => setCategoryDropdownOpen(true)}
-            onMouseLeave={() => setCategoryDropdownOpen(false)}
-          >
-            <button
-              type="button"
-              className={`shop-category-btn ${categoryDropdownOpen ? "active" : ""}`}
-              onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-              aria-expanded={categoryDropdownOpen}
-            >
-              <Menu size={16} />
-              <span>Shop by category</span>
-              <ChevronDown size={14} className={categoryDropdownOpen ? "rotated" : ""} />
-            </button>
-
-            {categoryDropdownOpen && (
-              <div className="category-dropdown-menu">
-                <div className="category-dropdown-header">
-                  <span>Browse by Category</span>
-                </div>
-                <div className="category-dropdown-grid">
-                  {categories.map((cat) => (
-                    <Link
-                      key={cat.label}
-                      href={cat.href}
-                      className="category-dropdown-item"
-                      onClick={() => setCategoryDropdownOpen(false)}
-                    >
-                      <div className="category-item-text">
-                        <strong>{cat.label}</strong>
-                        <span>{cat.desc}</span>
-                      </div>
-                      <ArrowRight size={14} />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Direct Horizontal Links */}
           <div className="category-nav-links">
             {bottomNavLinks.map((link) => (
