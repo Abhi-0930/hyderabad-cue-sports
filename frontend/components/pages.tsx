@@ -135,15 +135,16 @@ export function HomePage() {
       </svg>
 
       <div className="container featured-products-container">
-        {/* Header with Centered — FEATURED PRODUCTS — and View All → */}
+        {/* Header with Featured Products title and View All / arrow */}
         <div className="featured-header">
           <div className="featured-title-wrap">
             <span className="featured-gold-rule" />
-            <h2 className="featured-title">FEATURED PRODUCTS</h2>
+            <h2 className="featured-title">Featured Products</h2>
             <span className="featured-gold-rule" />
           </div>
-          <Link href="/shop" className="featured-view-all">
-            View All <ArrowRight size={14} />
+          <Link href="/shop" className="featured-view-all" aria-label="View all featured products">
+            <span className="view-all-text">View All</span>
+            <ArrowRight size={16} className="view-all-arrow" />
           </Link>
         </div>
 
