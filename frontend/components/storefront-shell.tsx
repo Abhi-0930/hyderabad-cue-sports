@@ -8,16 +8,20 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  CircleDot,
   Heart,
   Instagram,
   Mail,
   Menu,
   Minus,
   Plus,
+  RectangleHorizontal,
   Search,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
+  Target,
+  Trophy,
   Truck,
   UserRound,
   X,
@@ -117,6 +121,7 @@ export function SiteHeader() {
       href: "/shop?category=Snooker+Tables",
       image: "/images/categories/snooker-tables.jpg",
       imageTitle: "12ft Tables | Riley England | Dubai",
+      icon: RectangleHorizontal,
       items: [
         { label: "All Snooker Tables", href: "/shop?category=Snooker+Tables" },
         { label: "8 FT Snooker Tables", href: "/shop?category=Snooker+Tables&size=8+FT" },
@@ -131,6 +136,7 @@ export function SiteHeader() {
       href: "/shop?category=Cues",
       image: "/images/categories/cue-equipment.jpg",
       imageTitle: "Maple Emperor Professional Snooker Cue Set - Baize Master – Cue + Case",
+      icon: Target,
       items: [
         { label: "All Cue Equipment", href: "/shop?category=Cues" },
         { label: "Snooker Cue Sticks", href: "/shop?category=Cues&query=sticks" },
@@ -145,6 +151,7 @@ export function SiteHeader() {
       href: "/shop?category=Table+Accessories",
       image: "/images/categories/table-accessories.jpg",
       imageTitle: "Star Champion Tournament Snooker Table - 12 Feet",
+      icon: CircleDot,
       items: [
         { label: "All Table Accessories", href: "/shop?category=Table+Accessories" },
         { label: "Snooker Table Cloth", href: "/shop?category=Table+Accessories&query=cloth" },
@@ -160,6 +167,7 @@ export function SiteHeader() {
       href: "/shop?category=Scoreboards",
       image: "/images/categories/scoreboards.jpg",
       imageTitle: "Edwardian Mahogany Riley Snooker/Billiards Scoreboard",
+      icon: Trophy,
       items: [
         { label: "All Scoreboards", href: "/shop?category=Scoreboards" },
         { label: "Manual Points Boards", href: "/shop?category=Scoreboards&query=manual" },
@@ -291,7 +299,10 @@ export function SiteHeader() {
                   href={cat.href}
                   className={`category-nav-link ${pathname.includes(cat.href) || activeDropdown === cat.id ? "active" : ""}`}
                 >
-                  <span>{cat.label}</span>
+                  <div className="cat-nav-content">
+                    <cat.icon size={20} className="cat-nav-mobile-icon" />
+                    <span className="cat-nav-text">{cat.label}</span>
+                  </div>
                   <ChevronDown size={13} className={`cat-chevron ${activeDropdown === cat.id ? "rotated" : ""}`} />
                 </Link>
 
