@@ -372,6 +372,15 @@
   cursor: pointer;
   white-space: nowrap;
 }
+.cat-nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.cat-nav-mobile-icon {
+  display: none;
+}
 .category-nav-link:hover, .category-nav-link.active {
   color: #dfc181;
   background: rgba(255, 255, 255, 0.05);
@@ -655,6 +664,9 @@
 }
 
 @media (max-width: 960px) {
+  .announcement-bar {
+    display: none;
+  }
   .site-header-container {
     height: 72px;
   }
@@ -664,31 +676,75 @@
   .mobile-menu-toggle {
     display: grid;
   }
+  .category-nav-bar {
+    display: block;
+    box-shadow: 0 4px 14px rgba(18, 58, 42, 0.16);
+  }
+  .category-nav-container {
+    width: 100%;
+    height: 66px;
+    padding: 0 6px;
+  }
   .category-nav-links {
-    display: flex;
-    gap: 18px;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding-bottom: 3px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    height: 100%;
+    gap: 0;
+  }
+  .category-nav-dropdown-item {
+    height: 100%;
   }
   .category-nav-dropdown-item:not(:last-child)::after {
+    display: block;
+    height: 42%;
+    top: 29%;
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .category-nav-link {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 2px;
+    height: 100%;
+    white-space: normal;
+  }
+  .cat-nav-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-align: center;
+  }
+  .cat-nav-mobile-icon {
+    display: block;
+    color: var(--gold);
+    width: 20px;
+    height: 20px;
+  }
+  .cat-nav-text {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.15;
+    color: rgba(255, 255, 255, 0.95);
+    max-width: 80px;
+    display: block;
+    text-align: center;
+  }
+  .cat-chevron {
+    display: none;
+  }
+  .cat-mega-dropdown {
     display: none;
   }
 }
 @media (max-width: 680px) {
   .announcement-bar {
-    height: 32px;
-    font-size: 9px;
-    letter-spacing: 0.08em;
-  }
-  .announcement-inner {
-    gap: 8px;
+    display: none;
   }
   .hcs-header-actions .hcs-action-item:nth-child(1),
   .hcs-header-actions .hcs-action-item:nth-child(2) {
-    display: none;
-  }
-  .category-nav-bar {
     display: none;
   }
   .floating-whatsapp-btn .whatsapp-floating-label {
