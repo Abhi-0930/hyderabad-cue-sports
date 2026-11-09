@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import { ArrowDown, ArrowRight, Check, ChevronDown, Filter, Heart, Minus, Plus, Ruler, Search, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles, Star, Truck, X } from "lucide-react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowDown, ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, Filter, Heart, Minus, Plus, Ruler, Search, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles, Star, Truck, X } from "lucide-react";
 import { accessoryCategories, collectionCards, formatInr, getProduct, Product, products } from "@/lib/products";
 import { ArrowLink, ProductCard, QuickViewModal, SectionHeading, SliderArrows, useStorefront } from "@/components/storefront-shell";
 
@@ -12,6 +12,17 @@ export function HomePage() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const { showNotice, addToCart, wishlist, toggleWishlist } = useStorefront();
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  const slide = (direction: "left" | "right") => {
+    if (!sliderRef.current) return;
+    const cardWidth = 285;
+    const offset = sliderRef.current.clientWidth > 700 ? cardWidth * 2 : cardWidth;
+    sliderRef.current.scrollBy({
+      left: direction === "left" ? -offset : offset,
+      behavior: "smooth"
+    });
+  };
 
   const submitNewsletter = (event: FormEvent) => {
     event.preventDefault();
@@ -112,55 +123,66 @@ export function HomePage() {
           </Link>
         </div>
 
-        {/* 4 Cards Grid */}
-        <div className="featured-cards-grid">
-          {products.slice(0, 4).map((product) => {
-            const isSaved = wishlist.includes(product.id);
-            return (
-              <div key={product.id} className="featured-product-card">
-                <div className="featured-card-media">
-                  <Link href={`/products/${product.slug}`} className="featured-media-link">
-                    <img src={product.image} alt={product.name} />
-                  </Link>
-                  <button
-                    className={`featured-wishlist-btn ${isSaved ? "saved" : ""}`}
-                    onClick={() => toggleWishlist(product.id)}
-                    aria-label={isSaved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
-                  >
-                    <Heart size={16} fill={isSaved ? "#d12c2c" : "none"} color={isSaved ? "#d12c2c" : "#2b332d"} />
-                  </button>
-                </div>
+        {/* 1-Row Continuous Gesture Sliding Container with Desktop Arrow Controls */}
+        <div className="featured-slider-wrapper">
+          <button
+            className="featured-slide-nav prev"
+            onClick={() => slide("left")}
+            aria-label="Slide previous products"
+          >
+            <ChevronLeft size={20} />
+          </button>
 
-                <div className="featured-card-body">
-                  <h3 className="featured-product-name">
-                    <Link href={`/products/${product.slug}`}>{product.name}</Link>
-                  </h3>
-                  <div className="featured-product-price">
-                    {formatInr(product.price)}
-                  </div>
-                  <div className="featured-stock-badge">
-                    <span className="stock-dot" /> In Stock
-                  </div>
-
-                  <div className="featured-card-actions">
-                    <button
-                      className="featured-add-cart-btn"
-                      onClick={() => addToCart(product)}
-                    >
-                      <ShoppingCart size={15} /> Add to Cart
-                    </button>
-                    <Link
-                      href={`/products/${product.slug}`}
-                      className="featured-arrow-btn"
-                      aria-label={`View details of ${product.name}`}
-                    >
-                      <ArrowRight size={16} />
+          <div className="featured-cards-grid" ref={sliderRef}>
+            {products.slice(0, 8).map((product) => {
+              const isSaved = wishlist.includes(product.id);
+              return (
+                <div key={product.id} className="featured-product-card">
+                  <div className="featured-card-media">
+                    <Link href={`/products/${product.slug}`} className="featured-media-link">
+                      <img src={product.image} alt={product.name} />
                     </Link>
+                    <button
+                      className={`featured-wishlist-btn ${isSaved ? "saved" : ""}`}
+                      onClick={() => toggleWishlist(product.id)}
+                      aria-label={isSaved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+                    >
+                      <Heart size={16} fill={isSaved ? "#d12c2c" : "none"} color={isSaved ? "#d12c2c" : "#2b332d"} />
+                    </button>
+                  </div>
+
+                  <div className="featured-card-body">
+                    <h3 className="featured-product-name">
+                      <Link href={`/products/${product.slug}`}>{product.name}</Link>
+                    </h3>
+                    <div className="featured-product-price">
+                      {formatInr(product.price)}
+                    </div>
+                    <div className="featured-stock-badge">
+                      <span className="stock-dot" /> In Stock
+                    </div>
+
+                    <div className="featured-card-actions">
+                      <button
+                        className="featured-add-cart-btn button-full"
+                        onClick={() => addToCart(product)}
+                      >
+                        <ShoppingCart size={15} /> Add to Cart
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          <button
+            className="featured-slide-nav next"
+            onClick={() => slide("right")}
+            aria-label="Slide next products"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
 
         {/* Pagination Dots */}
