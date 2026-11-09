@@ -756,3 +756,192 @@
     right: 20px;
   }
 }
+
+/* =========================================================
+   COMPACT PANORAMIC HERO BANNER (MATCHING REFERENCE IMAGE)
+   ========================================================= */
+
+.hero-section {
+  height: clamp(370px, 31vw, 440px) !important;
+  min-height: 360px !important;
+  max-height: 460px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background: #f7f8f6;
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-media {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1;
+}
+
+.hero-media img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: right 40% !important;
+}
+
+.hero-media-fade {
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    rgba(255, 255, 255, 0.98) 22%,
+    rgba(255, 255, 255, 0.9) 32%,
+    rgba(255, 255, 255, 0.5) 44%,
+    rgba(255, 255, 255, 0.12) 54%,
+    transparent 65%
+  ) !important;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-content {
+  height: 100% !important;
+  position: relative !important;
+  z-index: 3 !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-bottom: 0 !important;
+}
+
+.hero-copy {
+  max-width: 480px !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+.hero-copy h1 {
+  font-family: var(--serif) !important;
+  font-weight: 500 !important;
+  font-size: clamp(34px, 3.2vw, 46px) !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 0 24px 0 !important;
+  color: #174b35 !important;
+}
+
+.hero-copy h1 em {
+  font-style: italic !important;
+  color: #c6a15b !important;
+  font-weight: 500 !important;
+}
+
+.hero-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 !important;
+}
+
+.hero-actions .button {
+  min-height: 42px !important;
+  height: 42px !important;
+  padding: 0 22px !important;
+  border-radius: 4px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  text-transform: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.hero-actions .button-dark {
+  background: #174b35 !important;
+  color: #ffffff !important;
+  border: 1px solid #174b35 !important;
+}
+
+.hero-actions .button-dark:hover {
+  background: #0f3525 !important;
+  border-color: #0f3525 !important;
+  transform: translateY(-1px) !important;
+}
+
+.hero-actions .button-light {
+  background: #ffffff !important;
+  color: #174b35 !important;
+  border: 1px solid #c9d5cd !important;
+}
+
+.hero-actions .button-light:hover {
+  background: #f4f7f5 !important;
+  border-color: #174b35 !important;
+  transform: translateY(-1px) !important;
+}
+
+.hero-scroll-note {
+  display: none !important;
+}
+
+@media (max-width: 960px) {
+  .hero-section {
+    height: auto !important;
+    min-height: 350px !important;
+    padding: 44px 0 !important;
+  }
+  .hero-content {
+    align-items: center !important;
+    padding-bottom: 0 !important;
+  }
+  .hero-media img {
+    object-position: 75% center !important;
+  }
+  .hero-media-fade {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(255, 255, 255, 0.92) 48%,
+      rgba(255, 255, 255, 0.6) 75%,
+      rgba(255, 255, 255, 0.3) 100%
+    ) !important;
+  }
+  .hero-copy h1 {
+    font-size: clamp(30px, 4.5vw, 40px) !important;
+    line-height: 1.16 !important;
+  }
+}
+
+@media (max-width: 580px) {
+  .hero-section {
+    min-height: 330px !important;
+    padding: 36px 0 !important;
+  }
+  .hero-media-fade {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.96) 0%,
+      rgba(255, 255, 255, 0.92) 60%,
+      rgba(255, 255, 255, 0.65) 85%,
+      rgba(255, 255, 255, 0.4) 100%
+    ) !important;
+  }
+  .hero-copy h1 {
+    font-size: 30px !important;
+  }
+  .hero-actions {
+    gap: 10px !important;
+  }
+  .hero-actions .button {
+    padding: 0 16px !important;
+    font-size: 12.5px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .hero-actions .button {
+    width: 100% !important;
+  }
+}
