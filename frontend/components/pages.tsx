@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { ArrowDown, ArrowRight, Check, ChevronDown, Filter, Heart, Minus, Plus, Ruler, Search, ShieldCheck, ShoppingBag, Sparkles, Star, Truck, X } from "lucide-react";
+import { ArrowDown, ArrowRight, Check, ChevronDown, Filter, Heart, Minus, Plus, Ruler, Search, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles, Star, Truck, X } from "lucide-react";
 import { accessoryCategories, collectionCards, formatInr, getProduct, Product, products } from "@/lib/products";
 import { ArrowLink, ProductCard, QuickViewModal, SectionHeading, SliderArrows, useStorefront } from "@/components/storefront-shell";
 
@@ -11,7 +11,7 @@ export function HomePage() {
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
-  const { showNotice } = useStorefront();
+  const { showNotice, addToCart, wishlist, toggleWishlist } = useStorefront();
 
   const submitNewsletter = (event: FormEvent) => {
     event.preventDefault();
@@ -88,9 +88,89 @@ export function HomePage() {
       </div>
     </section>
 
-    <section className="section collection-section" id="collections"><div className="container"><SectionHeading eyebrow="Find your scale" title="Explore our snooker tables" description="Find the right table for your space, your rhythm and your playing requirements." action={<ArrowLink href="/shop">View all tables</ArrowLink>} /><div className="collection-grid">{collectionCards.map((collection, index) => <Link key={collection.title} href={`/shop?size=${encodeURIComponent(collection.filter)}`} className={`collection-card collection-card-${index + 1}`}><img src={collection.image} alt={collection.title} /><div className="collection-card-overlay" /><div className="collection-card-copy"><span>{collection.eyebrow}</span><h3>{collection.title}</h3><p>{collection.description}</p><span className="collection-explore">Explore collection <ArrowRight size={15} /></span></div></Link>)}</div></div></section>
+    <section className="featured-products-section">
+      {/* Corner Decorative Waves with Gold Trim */}
+      <svg className="featured-corner-tl" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M0 0 H180 C130 35 75 75 25 115 C10 132 0 148 0 160 Z" fill="#113a27" />
+        <path d="M180 0 C130 35 75 75 25 115 C10 132 0 148 0 160" stroke="#c6a15b" strokeWidth="2.5" />
+      </svg>
+      <svg className="featured-corner-br" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M200 160 H20 C70 125 125 85 175 45 C190 28 200 12 200 0 Z" fill="#113a27" />
+        <path d="M20 160 C70 125 125 85 175 45 C190 28 200 12 200 0" stroke="#c6a15b" strokeWidth="2.5" />
+      </svg>
 
-    <section className="section featured-section"><div className="container"><SectionHeading eyebrow="The first frame" title="Featured snooker tables" description="A small selection of premium playing tables from the illustrative sample range." action={<ArrowLink href="/shop">Shop the collection</ArrowLink>} /><div className="product-grid home-product-grid">{products.slice(0, 4).map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div></div></section>
+      <div className="container featured-products-container">
+        {/* Header with Centered — FEATURED PRODUCTS — and View All → */}
+        <div className="featured-header">
+          <div className="featured-title-wrap">
+            <span className="featured-gold-rule" />
+            <h2 className="featured-title">FEATURED PRODUCTS</h2>
+            <span className="featured-gold-rule" />
+          </div>
+          <Link href="/shop" className="featured-view-all">
+            View All <ArrowRight size={14} />
+          </Link>
+        </div>
+
+        {/* 4 Cards Grid */}
+        <div className="featured-cards-grid">
+          {products.slice(0, 4).map((product) => {
+            const isSaved = wishlist.includes(product.id);
+            return (
+              <div key={product.id} className="featured-product-card">
+                <div className="featured-card-media">
+                  <Link href={`/products/${product.slug}`} className="featured-media-link">
+                    <img src={product.image} alt={product.name} />
+                  </Link>
+                  <button
+                    className={`featured-wishlist-btn ${isSaved ? "saved" : ""}`}
+                    onClick={() => toggleWishlist(product.id)}
+                    aria-label={isSaved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+                  >
+                    <Heart size={16} fill={isSaved ? "#d12c2c" : "none"} color={isSaved ? "#d12c2c" : "#2b332d"} />
+                  </button>
+                </div>
+
+                <div className="featured-card-body">
+                  <h3 className="featured-product-name">
+                    <Link href={`/products/${product.slug}`}>{product.name}</Link>
+                  </h3>
+                  <div className="featured-product-price">
+                    {formatInr(product.price)}
+                  </div>
+                  <div className="featured-stock-badge">
+                    <span className="stock-dot" /> In Stock
+                  </div>
+
+                  <div className="featured-card-actions">
+                    <button
+                      className="featured-add-cart-btn"
+                      onClick={() => addToCart(product)}
+                    >
+                      <ShoppingCart size={15} /> Add to Cart
+                    </button>
+                    <Link
+                      href={`/products/${product.slug}`}
+                      className="featured-arrow-btn"
+                      aria-label={`View details of ${product.name}`}
+                    >
+                      <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Pagination Dots */}
+        <div className="featured-pagination-dots" aria-hidden="true">
+          <span className="dot dot-active" />
+          <span className="dot" />
+          <span className="dot" />
+        </div>
+      </div>
+    </section>
 
     <section className="editorial-section" id="about"><div className="editorial-image"><img src="/images/snooker-room.jpg" alt="Elegant modern snooker room" /></div><div className="editorial-copy"><span className="eyebrow">The Hyderabad Cue Sports point of view</span><h2>Built around the game. <em>Designed for excellence.</em></h2><p>We believe the best playing rooms are made of more than measurements. They are shaped by proportion, material, light and the feeling that the next frame could be the one you remember.</p><div className="editorial-points"><div><span className="point-number">01</span><div><strong>Thoughtful product selection</strong><p>Curated sample pieces with a clear sense of place.</p></div></div><div><span className="point-number">02</span><div><strong>Professional playing experience</strong><p>Designed around the ritual and rhythm of the game.</p></div></div><div><span className="point-number">03</span><div><strong>Quality-focused design</strong><p>A calm visual language for serious spaces.</p></div></div><div><span className="point-number">04</span><div><strong>Customer-centric support</strong><p>A considered hand at every stage of the journey.</p></div></div></div><Link href="/#contact" className="text-button">Meet the brand <ArrowRight size={16} /></Link></div></section>
 
