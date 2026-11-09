@@ -45,6 +45,49 @@ export function HomePage() {
       </div>
     </section>
 
+    <section className="category-showcase-section">
+      <div className="container">
+        <div className="category-showcase-grid">
+          <Link href="/shop?category=Snooker+Tables" className="category-showcase-card">
+            <div className="category-showcase-media">
+              <img src="/images/categories/cat-snooker-tables.jpg" alt="Snooker Tables" />
+              <div className="category-showcase-overlay" />
+            </div>
+            <div className="category-showcase-content">
+              <span>Snooker Tables <ArrowRight size={15} /></span>
+            </div>
+          </Link>
+          <Link href="/shop?category=Cue+Equipment" className="category-showcase-card">
+            <div className="category-showcase-media">
+              <img src="/images/categories/cat-cue-equipment.jpg" alt="Cue Equipment" />
+              <div className="category-showcase-overlay" />
+            </div>
+            <div className="category-showcase-content">
+              <span>Cue Equipment <ArrowRight size={15} /></span>
+            </div>
+          </Link>
+          <Link href="/shop?category=Table+Accessories" className="category-showcase-card">
+            <div className="category-showcase-media">
+              <img src="/images/categories/cat-table-accessories.jpg" alt="Table Accessories" />
+              <div className="category-showcase-overlay" />
+            </div>
+            <div className="category-showcase-content">
+              <span>Table Accessories <ArrowRight size={15} /></span>
+            </div>
+          </Link>
+          <Link href="/shop?category=Scoreboards" className="category-showcase-card">
+            <div className="category-showcase-media">
+              <img src="/images/categories/cat-scoreboards.jpg" alt="Scoreboards" />
+              <div className="category-showcase-overlay" />
+            </div>
+            <div className="category-showcase-content">
+              <span>Scoreboards <ArrowRight size={15} /></span>
+            </div>
+          </Link>
+        </div>
+      </div>
+    </section>
+
     <section className="section collection-section" id="collections"><div className="container"><SectionHeading eyebrow="Find your scale" title="Explore our snooker tables" description="Find the right table for your space, your rhythm and your playing requirements." action={<ArrowLink href="/shop">View all tables</ArrowLink>} /><div className="collection-grid">{collectionCards.map((collection, index) => <Link key={collection.title} href={`/shop?size=${encodeURIComponent(collection.filter)}`} className={`collection-card collection-card-${index + 1}`}><img src={collection.image} alt={collection.title} /><div className="collection-card-overlay" /><div className="collection-card-copy"><span>{collection.eyebrow}</span><h3>{collection.title}</h3><p>{collection.description}</p><span className="collection-explore">Explore collection <ArrowRight size={15} /></span></div></Link>)}</div></div></section>
 
     <section className="section featured-section"><div className="container"><SectionHeading eyebrow="The first frame" title="Featured snooker tables" description="A small selection of premium playing tables from the illustrative sample range." action={<ArrowLink href="/shop">Shop the collection</ArrowLink>} /><div className="product-grid home-product-grid">{products.slice(0, 4).map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div></div></section>
