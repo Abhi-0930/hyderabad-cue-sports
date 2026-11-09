@@ -192,7 +192,6 @@
 }
 .hcs-action-item:hover {
   color: var(--forest);
-  transform: translateY(-1px);
 }
 .hcs-action-icon-box {
   position: relative;
@@ -481,7 +480,7 @@
   transition: transform 0.4s ease;
 }
 .cat-mega-preview-card:hover .cat-preview-image img {
-  transform: scale(1.04);
+  transform: none;
 }
 .cat-preview-info {
   margin-top: 12px;
@@ -540,7 +539,6 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .floating-whatsapp-btn:hover {
-  transform: translateY(-3px) scale(1.02);
   box-shadow: 0 12px 32px rgba(37, 211, 102, 0.55);
 }
 .whatsapp-icon-circle {
@@ -863,7 +861,7 @@
 .hero-actions .button-dark:hover {
   background: #0f3525 !important;
   border-color: #0f3525 !important;
-  transform: translateY(-1px) !important;
+  transform: none !important;
 }
 
 .hero-actions .button-light {
@@ -875,7 +873,7 @@
 .hero-actions .button-light:hover {
   background: #f4f7f5 !important;
   border-color: #174b35 !important;
-  transform: translateY(-1px) !important;
+  transform: none !important;
 }
 
 .hero-scroll-note {
@@ -972,13 +970,12 @@
   border: 0;
   outline: 0;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-  transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.28s ease;
+  transition: box-shadow 0.25s ease;
   aspect-ratio: 240 / 126;
 }
 
 .category-showcase-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .category-showcase-media {
@@ -996,11 +993,6 @@
   object-fit: cover;
   border: 0;
   border-radius: 14px;
-  transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
-}
-
-.category-showcase-card:hover .category-showcase-media img {
-  transform: scale(1.04);
 }
 
 .category-showcase-overlay {
@@ -1045,7 +1037,7 @@
 }
 
 .category-showcase-card:hover .category-showcase-content span svg {
-  transform: translateX(4px);
+  transform: none;
 }
 
 @media (max-width: 960px) {
@@ -1182,7 +1174,7 @@
 .featured-view-all:hover {
   background: #174b35;
   color: #ffffff;
-  transform: translateY(-50%) translateX(2px);
+  transform: translateY(-50%);
 }
 
 /* 1-Row Slider Wrapper & Desktop Navigation Arrows */
@@ -1206,13 +1198,29 @@
   place-items: center;
   cursor: pointer;
   z-index: 10;
-  transition: all 0.2s ease;
+  transition: opacity 0.25s ease, transform 0.2s ease, background 0.2s ease, visibility 0.25s ease;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.featured-slide-nav.hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transform: translateY(-50%) scale(0.85);
+}
+
+.featured-slide-nav.visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
 }
 
 .featured-slide-nav:hover {
   background: #174b35;
   color: #ffffff;
-  transform: translateY(-50%) scale(1.08);
+  transform: translateY(-50%);
 }
 
 .featured-slide-nav.prev {
@@ -1260,8 +1268,7 @@
 }
 
 .featured-product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .featured-card-media {
@@ -1288,7 +1295,7 @@
 }
 
 .featured-product-card:hover .featured-card-media img {
-  transform: scale(1.035);
+  transform: none;
 }
 
 .featured-wishlist-btn {
@@ -1309,7 +1316,8 @@
 }
 
 .featured-wishlist-btn:hover {
-  transform: scale(1.1);
+  background: #f4f7f5;
+  transform: none;
 }
 
 /* Card Body */
@@ -1396,7 +1404,7 @@
 
 .featured-add-cart-btn:hover {
   background: #0e3323;
-  transform: translateY(-1px);
+  transform: none;
 }
 
 /* Pagination Dots */
@@ -1545,3 +1553,25 @@
     display: none !important;
   }
 }
+
+/* =========================================================
+   GLOBAL HOVER STABILITY RESET (DISABLE BOUNCE / SCALE)
+   ========================================================= */
+.button:hover,
+button:hover {
+  transform: none !important;
+}
+
+.product-card:hover,
+.product-card:hover .product-image-wrap img,
+.collection-card:hover,
+.collection-card:hover img,
+.accessory-card:hover,
+.accessory-card:hover img,
+.category-showcase-card:hover,
+.category-showcase-card:hover img,
+.featured-product-card:hover,
+.featured-product-card:hover img {
+  transform: none !important;
+}
+
