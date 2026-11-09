@@ -224,19 +224,21 @@
   color: #3b453e;
 }
 
-/* Tier 3: Bottom Category Navigation Bar (Dark Green) */
+/* Tier 3: Flipkart-Style Category Navigation Bar (Clean White) */
 .category-nav-bar {
-  background: var(--forest);
-  color: #ffffff;
+  background: #ffffff;
+  color: #1d2520;
   position: sticky;
   top: 0;
   z-index: 45;
-  box-shadow: 0 4px 18px rgba(18, 58, 42, 0.18);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 .category-nav-container {
   width: min(1280px, calc(100% - 48px));
   margin: 0 auto;
-  height: 48px;
+  height: 66px;
   display: flex;
   align-items: center;
 }
@@ -349,47 +351,87 @@
   content: "";
   position: absolute;
   right: 0;
-  top: 25%;
-  height: 50%;
+  top: 22%;
+  height: 56%;
   width: 1px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.06);
 }
 .category-nav-link {
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   width: 100%;
   height: 100%;
-  color: rgba(255, 255, 255, 0.94);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  padding: 8px 12px;
   text-decoration: none;
-  transition: color 0.2s, background 0.2s;
-  padding: 0 16px;
   cursor: pointer;
-  white-space: nowrap;
+  position: relative;
+  transition: background 0.2s;
+  user-select: none;
 }
 .cat-nav-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 5px;
 }
-.cat-nav-mobile-icon {
-  display: none;
+.cat-nav-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  width: 34px;
 }
-.category-nav-link:hover, .category-nav-link.active {
-  color: #dfc181;
-  background: rgba(255, 255, 255, 0.05);
+.cat-nav-flipkart-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  display: block;
+}
+.cat-nav-label-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.cat-nav-text {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #212722;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition: color 0.2s;
 }
 .cat-chevron {
-  transition: transform 0.2s ease;
-  opacity: 0.8;
+  color: #717d74;
+  transition: transform 0.2s ease, color 0.2s ease;
+  opacity: 0.75;
 }
 .cat-chevron.rotated {
   transform: rotate(180deg);
+}
+.category-nav-link:hover .cat-nav-text,
+.category-nav-link.active .cat-nav-text {
+  color: #174b35;
+}
+.category-nav-link:hover .cat-chevron,
+.category-nav-link.active .cat-chevron {
+  color: #174b35;
+  opacity: 1;
+}
+/* Flipkart-style signature active indicator under selected category */
+.category-nav-link.active::after,
+.category-nav-link:hover::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background: #174b35;
+  border-radius: 3px 3px 0 0;
 }
 
 /* Mega dropdown menu */
@@ -676,12 +718,12 @@
   }
   .category-nav-bar {
     display: block;
-    box-shadow: 0 4px 14px rgba(18, 58, 42, 0.16);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
   .category-nav-container {
     width: 100%;
-    height: 66px;
-    padding: 0 6px;
+    height: 68px;
+    padding: 0 4px;
   }
   .category-nav-links {
     display: grid;
@@ -695,9 +737,9 @@
   }
   .category-nav-dropdown-item:not(:last-child)::after {
     display: block;
-    height: 42%;
-    top: 29%;
-    background: rgba(255, 255, 255, 0.12);
+    height: 40%;
+    top: 30%;
+    background: rgba(0, 0, 0, 0.06);
   }
   .category-nav-link {
     flex-direction: column;
@@ -712,26 +754,40 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 3px;
     text-align: center;
   }
-  .cat-nav-mobile-icon {
-    display: block;
-    color: var(--gold);
-    width: 20px;
-    height: 20px;
+  .cat-nav-icon-wrapper {
+    height: 26px;
+    width: 26px;
+  }
+  .cat-nav-flipkart-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
   }
   .cat-nav-text {
-    font-size: 10px;
-    font-weight: 500;
+    font-size: 10.5px;
+    font-weight: 600;
     line-height: 1.15;
-    color: rgba(255, 255, 255, 0.95);
+    color: #1d2520;
     max-width: 80px;
     display: block;
     text-align: center;
   }
   .cat-chevron {
     display: none;
+  }
+  .mobile-acc-label-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mobile-acc-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    flex-shrink: 0;
   }
   .cat-mega-dropdown {
     display: none;
@@ -1356,29 +1412,8 @@
   font-size: 17px;
   font-weight: 700;
   color: #1d2520;
-  margin: 0 0 8px 0;
+  margin: 0 0 14px 0;
   font-family: var(--sans);
-}
-
-.featured-stock-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #eaf3ec;
-  color: #174b35;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  width: max-content;
-  margin-bottom: 14px;
-}
-
-.stock-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #174b35;
 }
 
 .featured-card-actions {
@@ -1387,7 +1422,9 @@
   margin-top: auto;
 }
 
-.featured-add-cart-btn {
+.featured-add-cart-btn,
+.hcs-anim-cart-btn {
+  position: relative;
   width: 100%;
   height: 42px;
   background: #174B35;
@@ -1401,36 +1438,193 @@
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  overflow: hidden;
+  user-select: none;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.featured-add-cart-btn:hover {
+.featured-add-cart-btn:hover,
+.hcs-anim-cart-btn:hover {
   background: #0e3323;
-  transform: none;
+  transform: none !important;
 }
 
-/* Pagination Dots */
-.featured-pagination-dots {
-  display: flex;
+.hcs-anim-cart-btn.animating {
+  pointer-events: none;
+}
+
+.hcs-anim-cart-btn.added {
+  background: #0e3323;
+  box-shadow: 0 0 16px rgba(198, 161, 91, 0.4);
+}
+
+/* Default content: Cart icon + text */
+.hcs-cart-btn-default {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 26px;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.featured-pagination-dots .dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #c6cfc8;
-  transition: all 0.25s;
+.hcs-anim-cart-btn.animating .hcs-cart-btn-default,
+.hcs-anim-cart-btn.added .hcs-cart-btn-default {
+  opacity: 0;
+  transform: translateY(14px);
 }
 
-.featured-pagination-dots .dot-active {
-  width: 24px;
-  border-radius: 999px;
-  background: #174b35;
+/* Animation Track: Rolling Cart + Snooker Ball Drop */
+.hcs-cart-btn-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
 }
+
+.hcs-anim-cart-btn.animating .hcs-cart-btn-track {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hcs-cart-chassis {
+  position: relative;
+  width: 48px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hcs-anim-cart-btn.animating .hcs-cart-chassis {
+  animation: hcsCartDrive 1.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Glossy Red Snooker Ball */
+.hcs-snooker-ball {
+  position: absolute;
+  top: -14px;
+  left: 17px;
+  width: 14px;
+  height: 14px;
+}
+
+.hcs-anim-cart-btn.animating .hcs-snooker-ball {
+  animation: hcsBallDrop 1.35s ease-out forwards;
+}
+
+/* Rotating Cart Wheels */
+.hcs-cart-wheel {
+  transform-origin: center;
+}
+
+.hcs-anim-cart-btn.animating .hcs-cart-wheel {
+  animation: hcsSpinWheel 1.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Success Confirmation State */
+.hcs-cart-btn-success {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.92);
+  color: #dfc181;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hcs-anim-cart-btn.added .hcs-cart-btn-success {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+.hcs-success-check {
+  stroke: #dfc181;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+}
+
+.hcs-anim-cart-btn.added .hcs-success-check {
+  animation: hcsDrawCheck 0.35s ease 0.05s forwards;
+}
+
+/* Animations */
+@keyframes hcsCartDrive {
+  0% {
+    transform: translateX(-140px);
+  }
+  28% {
+    transform: translateX(0px); /* Centers in the button */
+  }
+  55% {
+    transform: translateX(0px); /* Catches snooker ball */
+  }
+  65% {
+    transform: translateX(-6px) rotate(-6deg); /* Windup recoil */
+  }
+  100% {
+    transform: translateX(180px) rotate(4deg); /* Drives off to right */
+  }
+}
+
+@keyframes hcsBallDrop {
+  0%, 25% {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.6);
+  }
+  32% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(14px) scale(1); /* Lands in cart */
+    opacity: 1;
+  }
+  56% {
+    transform: translateY(11px) scale(1); /* Soft cue felt bounce */
+    opacity: 1;
+  }
+  60%, 100% {
+    transform: translateY(14px) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes hcsSpinWheel {
+  0% {
+    transform: rotate(0deg);
+  }
+  28% {
+    transform: rotate(360deg);
+  }
+  55% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(1080deg);
+  }
+}
+
+@keyframes hcsDrawCheck {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+
 
 /* =========================================================
    RESPONSIVE: SINGLE LINE HEADER + TOUCH SWIPING RAIL
@@ -1492,9 +1686,7 @@
     max-width: 235px !important;
   }
 
-  .featured-pagination-dots {
-    margin-top: 14px;
-  }
+
 }
 
 @media (max-width: 520px) {
@@ -1538,14 +1730,10 @@
   }
   .featured-product-price {
     font-size: 15px !important;
-    margin-bottom: 6px !important;
-  }
-  .featured-stock-badge {
-    font-size: 10px !important;
-    padding: 2px 7px !important;
     margin-bottom: 10px !important;
   }
-  .featured-add-cart-btn {
+  .featured-add-cart-btn,
+  .hcs-anim-cart-btn {
     height: 36px !important;
     font-size: 12px !important;
     padding: 0 10px !important;
