@@ -337,13 +337,6 @@ export function SiteHeader() {
                 )}
               </div>
             ))}
-
-            <Link href="/#about" className="category-nav-link static-nav-link">
-              Our story
-            </Link>
-            <Link href="/#contact" className="category-nav-link static-nav-link">
-              Support
-            </Link>
           </div>
         </div>
       </nav>
@@ -414,8 +407,6 @@ export function SiteHeader() {
             <div className="mobile-quick-links">
               <Link href="/" onClick={() => setMobileOpen(false)}>Home</Link>
               <Link href="/shop" onClick={() => setMobileOpen(false)}>All Products</Link>
-              <Link href="/#about" onClick={() => setMobileOpen(false)}>Our Story</Link>
-              <Link href="/#contact" onClick={() => setMobileOpen(false)}>Support</Link>
             </div>
 
             <div className="mobile-drawer-footer">
