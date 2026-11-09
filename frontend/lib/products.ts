@@ -21,6 +21,95 @@ export type Product = {
 
 export const products: Product[] = [
   {
+    id: "table-12ft-featured",
+    slug: "12-ft-tournament-snooker-table",
+    name: "12 FT Snooker Table",
+    category: "Snooker Tables",
+    type: "table",
+    size: "12 FT",
+    price: 425000,
+    image: "/images/products/featured-table-12ft.jpg",
+    gallery: ["/images/products/featured-table-12ft.jpg", "/images/snooker-hero.jpg", "/images/snooker-room.jpg"],
+    badge: "Tournament",
+    availability: "In stock",
+    description: "Official 12 FT tournament specification snooker table featuring precision diamond-honed 45mm Italian slate, English Strachan 6811 pure wool baize, hand-carved mahogany underframe, and solid brass pocket irons with genuine leather nets.",
+    details: ["Full-size 12 FT x 6 FT regulation tournament dimensions", "5-piece precision diamond-honed 45mm Italian slate", "Handcrafted solid mahogany legs with micro-adjustable brass levelers", "Official Strachan 6811 100% pure wool English baize"],
+    specs: [
+      { label: "Playing size", value: "12 FT (366cm x 183cm)" },
+      { label: "Slate", value: "5-piece 45mm precision Italian slate" },
+      { label: "Cloth", value: "Strachan 6811 Tournament Baize" },
+      { label: "Timber", value: "Selected plantation mahogany" },
+      { label: "Availability", value: "In stock" }
+    ],
+    tags: ["12 FT", "tables", "tournament", "featured", "snooker tables"]
+  },
+  {
+    id: "cue-stick-featured",
+    slug: "professional-snooker-cue-stick",
+    name: "Snooker Cue Stick",
+    category: "Cue Equipment",
+    type: "accessory",
+    size: "Standard 58 inch",
+    price: 14500,
+    image: "/images/products/featured-cue-stick.jpg",
+    gallery: ["/images/products/featured-cue-stick.jpg", "/images/categories/cue-equipment.jpg"],
+    badge: "Best Seller",
+    availability: "In stock",
+    description: "Master-crafted hand-spliced ash cue stick with precision balance point, vacuum brass joint, and premium North American ash shaft with distinctive grain arrows.",
+    details: ["Grade AAA North American straight-grain ash", "Genuine ebony 4-point hand splice butt", "9.5mm pressed leather tip with brass ferrule", "Quick-release brass vacuum joint"],
+    specs: [
+      { label: "Length", value: "58 inches (147cm)" },
+      { label: "Weight", value: "18.2 oz" },
+      { label: "Tip size", value: "9.5mm laminated leather" },
+      { label: "Joint", value: "Precision machined brass" }
+    ],
+    tags: ["cues", "sticks", "cue equipment", "ash cue", "featured"]
+  },
+  {
+    id: "snooker-balls-15-featured",
+    slug: "tournament-snooker-balls-set-of-15",
+    name: "Snooker Balls (Set of 15)",
+    category: "Table Accessories",
+    type: "accessory",
+    size: "Standard 2 1/16 inch",
+    price: 6800,
+    image: "/images/products/featured-balls-15.jpg",
+    gallery: ["/images/products/featured-balls-15.jpg", "/images/categories/table-accessories.jpg"],
+    badge: "Official",
+    availability: "In stock",
+    description: "Match-grade phenolic resin 15-red snooker ball set engineered for true roll, high impact resistance, and perfect weight uniformity across all balls.",
+    details: ["Precision calibrated 2 1/16 inch diameter", "High-density phenolic resin construction", "Scratch-resistant mirror polish finish", "Includes luxury partitioned presentation storage box"],
+    specs: [
+      { label: "Diameter", value: "2 1/16 inches (52.5mm)" },
+      { label: "Material", value: "Pure phenolic resin" },
+      { label: "Weight tolerance", value: "±0.5g calibrated balance" },
+      { label: "Contents", value: "15 Red match balls" }
+    ],
+    tags: ["balls", "accessories", "table accessories", "featured", "in stock"]
+  },
+  {
+    id: "table-cloth-featured",
+    slug: "premium-wool-snooker-table-cloth",
+    name: "Snooker Table Cloth",
+    category: "Table Accessories",
+    type: "accessory",
+    size: "12 FT Bed & Cushions",
+    price: 7200,
+    image: "/images/products/featured-table-cloth.jpg",
+    gallery: ["/images/products/featured-table-cloth.jpg", "/images/categories/table-accessories.jpg"],
+    badge: "Fast Pace",
+    availability: "In stock",
+    description: "Premium fast-paced 100% pure wool snooker bed and cushion baize cloth treated for smooth, predictable ball trajectory and long service life.",
+    details: ["100% fine worsted pure wool baize", "Pre-cut for 12 FT bed cloth plus 6 matching cushion strips", "Directional directional nap for true ball control", "Stain and spill resistant treatment"],
+    specs: [
+      { label: "Material", value: "100% Pure English Wool" },
+      { label: "Weight", value: "30 oz / yard" },
+      { label: "Cut", value: "Bed cloth + 6 cushion rails" },
+      { label: "Compatibility", value: "12 FT, 10 FT, or 8 FT tables" }
+    ],
+    tags: ["cloth", "baize", "accessories", "table accessories", "featured"]
+  },
+  {
     id: "classic-12",
     slug: "professional-classic-snooker-table-12-ft",
     name: "Professional Classic Snooker Table",
