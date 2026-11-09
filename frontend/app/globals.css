@@ -36,12 +36,25 @@
   font-size: 12px;
 }
 
+/* Sticky Header Container (Pins both Header and Categories Bar) */
+.hcs-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #ffffff;
+  width: 100%;
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hcs-sticky-header.scrolled {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
 /* Tier 2: Main Brand & Search Bar (White Row) */
 .site-header-main {
   background: #ffffff;
   border-bottom: 1px solid #e7ede8;
   position: relative;
-  z-index: 40;
+  z-index: 2;
 }
 .site-header-container {
   width: min(1280px, calc(100% - 48px));
@@ -228,12 +241,10 @@
 .category-nav-bar {
   background: #ffffff;
   color: #1d2520;
-  position: sticky;
-  top: 0;
-  z-index: 45;
+  position: relative;
+  z-index: 1;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 .category-nav-container {
   width: min(1280px, calc(100% - 48px));
@@ -241,6 +252,10 @@
   height: 66px;
   display: flex;
   align-items: center;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hcs-sticky-header.scrolled .category-nav-container {
+  height: 42px;
 }
 .category-dropdown-wrapper {
   position: relative;
@@ -355,6 +370,11 @@
   height: 56%;
   width: 1px;
   background: rgba(0, 0, 0, 0.06);
+  transition: top 0.3s ease, height 0.3s ease;
+}
+.hcs-sticky-header.scrolled .category-nav-dropdown-item:not(:last-child)::after {
+  top: 18%;
+  height: 64%;
 }
 .category-nav-link {
   display: flex;
@@ -367,8 +387,11 @@
   text-decoration: none;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s;
+  transition: background 0.2s, padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
+}
+.hcs-sticky-header.scrolled .category-nav-link {
+  padding: 4px 12px;
 }
 .cat-nav-content {
   display: flex;
@@ -376,6 +399,10 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
+  transition: gap 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hcs-sticky-header.scrolled .cat-nav-content {
+  gap: 0;
 }
 .cat-nav-icon-wrapper {
   display: flex;
@@ -383,6 +410,10 @@
   justify-content: center;
   height: 24px;
   width: 24px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hcs-sticky-header.scrolled .cat-nav-icon-wrapper {
+  transform: scale(1.05);
 }
 .cat-nav-flipkart-icon {
   width: 22px;
@@ -395,6 +426,21 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
+  max-height: 24px;
+  opacity: 1;
+  transform: translateY(0);
+  overflow: hidden;
+  transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              margin 0.25s ease;
+}
+.hcs-sticky-header.scrolled .cat-nav-label-row {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.92);
+  pointer-events: none;
+  margin: 0;
 }
 .cat-nav-text {
   font-size: 13px;
@@ -432,6 +478,12 @@
   height: 3px;
   background: #174b35;
   border-radius: 3px 3px 0 0;
+  transition: left 0.3s ease, right 0.3s ease;
+}
+.hcs-sticky-header.scrolled .category-nav-link.active::after,
+.hcs-sticky-header.scrolled .category-nav-link:hover::after {
+  left: 28%;
+  right: 28%;
 }
 
 /* Mega dropdown menu */
@@ -718,12 +770,16 @@
   }
   .category-nav-bar {
     display: block;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
   }
   .category-nav-container {
     width: 100%;
     height: 58px;
     padding: 0 4px;
+    transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hcs-sticky-header.scrolled .category-nav-container {
+    height: 38px;
   }
   .category-nav-links {
     display: grid;
@@ -748,6 +804,9 @@
     padding: 4px 2px;
     height: 100%;
     white-space: normal;
+  }
+  .hcs-sticky-header.scrolled .category-nav-link {
+    padding: 2px 2px;
   }
   .cat-nav-content {
     display: flex;
@@ -1636,36 +1695,69 @@
     padding: 48px 0 38px;
   }
   
-  /* Remove View All button on responsive as requested */
-  .featured-view-all {
-    display: none !important;
-  }
-
-  /* Single-line centered Featured Products title */
+  /* Flipkart-style Left-Aligned Header + Dark Arrow Capsule on Mobile */
   .featured-header {
     display: flex !important;
-    justify-content: center !important;
+    justify-content: space-between !important;
     align-items: center !important;
-    margin-bottom: 24px !important;
+    position: relative !important;
+    margin-bottom: 18px !important;
     width: 100% !important;
   }
   .featured-title-wrap {
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: 12px !important;
-    white-space: nowrap !important;
-    flex-wrap: nowrap !important;
-  }
-  .featured-title {
-    font-size: clamp(16px, 4.2vw, 20px) !important;
-    letter-spacing: 0.1em !important;
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    text-align: left !important;
   }
   .featured-gold-rule {
-    width: clamp(20px, 4.5vw, 36px) !important;
+    display: none !important;
+  }
+  .featured-title {
+    font-family: var(--sans) !important;
+    font-size: clamp(17px, 4.8vw, 21px) !important;
+    font-weight: 700 !important;
+    color: #174b35 !important;
+    letter-spacing: -0.01em !important;
+    text-transform: capitalize !important;
+    white-space: nowrap !important;
     flex-shrink: 0 !important;
+    margin: 0 !important;
+    text-align: left !important;
+  }
+  .featured-view-all {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: static !important;
+    transform: none !important;
+    width: 44px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    background: #174b35 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 999px !important;
+    box-shadow: 0 2px 8px rgba(23, 75, 53, 0.22) !important;
+    flex-shrink: 0 !important;
+    text-decoration: none !important;
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
+  }
+  .featured-view-all:hover,
+  .featured-view-all:active {
+    background: #225b42 !important;
+    color: #ffffff !important;
+    transform: scale(0.97) !important;
+  }
+  .featured-view-all .view-all-text {
+    display: none !important;
+  }
+  .featured-view-all .view-all-arrow {
+    color: #ffffff !important;
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
   }
 
   /* Hide slide nav buttons on touch devices */
