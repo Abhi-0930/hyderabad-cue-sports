@@ -1,4 +1,4 @@
-export type ProductType = "table" | "accessory";
+export type ProductType = "table" | "accessory" | "apparel";
 
 export type Product = {
   id: string;
@@ -96,6 +96,7 @@ export const products: Product[] = [
     price: 149000,
     image: "/images/snooker-collection.jpg",
     availability: "Low stock",
+    badge: "Low Stock",
     description: "A more compact playing footprint for rooms where proportion matters. The visual and pricing are illustrative sample content for this demonstration.",
     details: ["Demonstration product with editable content", "Room dimensions should be validated before purchase", "Delivery and installation are placeholders"],
     specs: [
@@ -107,6 +108,96 @@ export const products: Product[] = [
     tags: ["8 FT", "tables", "compact"]
   },
   {
+    id: "hcs-heavyweight-hoodie",
+    slug: "hcs-heavyweight-club-hoodie",
+    name: "HCS Signature Heavyweight Hoodie",
+    category: "Hoodies",
+    type: "apparel",
+    size: "L",
+    price: 2899,
+    compareAt: 3499,
+    image: "/images/snooker-room.jpg",
+    gallery: ["/images/snooker-room.jpg", "/images/snooker-detail.jpg"],
+    badge: "Best Seller",
+    availability: "In stock",
+    description: "Ultra-heavyweight 420 GSM French Terry cotton hoodie with minimalist tonal embroidery of the Hyderabad Cue Sports insignia. Designed for unmatched comfort during long frames.",
+    details: ["420 GSM pure heavyweight combed cotton", "Pre-shrunk, fleece-lined interior for structural drape", "Double-layered hood with antique brass eyelets"],
+    specs: [
+      { label: "Fabric", value: "420 GSM 100% French Terry Cotton" },
+      { label: "Fit", value: "Slightly oversized boxy cut" },
+      { label: "Colorway", value: "Heritage Forest Green" },
+      { label: "Sizes available", value: "S, M, L, XL, XXL" }
+    ],
+    tags: ["hoodies", "apparel", "best seller", "clothing"]
+  },
+  {
+    id: "hcs-archive-tee",
+    slug: "archive-boxy-oversized-t-shirt",
+    name: "Archive Cueist Oversized T-Shirt",
+    category: "T-Shirts",
+    type: "apparel",
+    size: "XL",
+    price: 1499,
+    compareAt: 1899,
+    image: "/images/snooker-detail.jpg",
+    gallery: ["/images/snooker-detail.jpg", "/images/snooker-collection.jpg"],
+    badge: "Low Stock",
+    availability: "Low stock",
+    description: "260 GSM luxury dense cotton oversized graphic tee celebrating cue sports heritage. Features drop-shoulder proportions and vintage-wash screen printed graphics.",
+    details: ["260 GSM single jersey compact yarn cotton", "Drop-shoulder relaxed streetwear silhouette", "High-density ribbed collar that retains shape"],
+    specs: [
+      { label: "Fabric", value: "260 GSM 100% Ring-spun Cotton" },
+      { label: "Fit", value: "Drop-shoulder oversized" },
+      { label: "Colorway", value: "Raw Vintage Chalk" },
+      { label: "Sizes available", value: "M, L, XL, XXL" }
+    ],
+    tags: ["t-shirts", "apparel", "oversized", "clothing", "low stock"]
+  },
+  {
+    id: "hcs-club-green-hoodie",
+    slug: "club-green-embroidered-hoodie",
+    name: "Heritage Club Emblem Hoodie",
+    category: "Hoodies",
+    type: "apparel",
+    size: "M",
+    price: 3199,
+    compareAt: 3799,
+    image: "/images/snooker-collection.jpg",
+    badge: "New arrival",
+    availability: "In stock",
+    description: "Premium snooker club edition hoodie crafted from brushed fleece with high-density gold chest embroidery.",
+    details: ["400 GSM heavyweight brushed organic cotton", "Embroidered gold monogram patch", "Ribbed side panels for unrestricted cue movement"],
+    specs: [
+      { label: "Fabric", value: "400 GSM Organic Cotton" },
+      { label: "Fit", value: "Classic relaxed fit" },
+      { label: "Colorway", value: "Deep Emerald & Gold" },
+      { label: "Sizes available", value: "S, M, L, XL" }
+    ],
+    tags: ["hoodies", "apparel", "new", "clothing"]
+  },
+  {
+    id: "hcs-monogram-tee",
+    slug: "hcs-monogram-oversized-tee",
+    name: "HCS Monogram Oversized T-Shirt",
+    category: "T-Shirts",
+    type: "apparel",
+    size: "L",
+    price: 1399,
+    compareAt: 1699,
+    image: "/images/snooker-hero.jpg",
+    badge: "Trending",
+    availability: "In stock",
+    description: "Minimalist streetwear essential with subtle gold micro-print on the chest and high-density branding on the back collar.",
+    details: ["250 GSM heavy bio-washed cotton", "Reinforced neckline and double-stitched cuffs", "Breathable for everyday wear"],
+    specs: [
+      { label: "Fabric", value: "250 GSM Combed Cotton" },
+      { label: "Fit", value: "Relaxed boxy fit" },
+      { label: "Colorway", value: "Anthracite Black" },
+      { label: "Sizes available", value: "S, M, L, XL, XXL" }
+    ],
+    tags: ["t-shirts", "apparel", "trending", "clothing"]
+  },
+  {
     id: "ash-cue",
     slug: "heritage-ash-snooker-cue",
     name: "Heritage Ash Snooker Cue",
@@ -116,6 +207,7 @@ export const products: Product[] = [
     price: 12500,
     image: "/images/snooker-detail.jpg",
     availability: "In stock",
+    badge: "Best Seller",
     description: "A refined accessory placeholder with a tactile, heritage-led feel. Final cue construction details remain editable demo content.",
     details: ["Illustrative accessory listing", "Final wood grade and tip details to be confirmed"],
     specs: [

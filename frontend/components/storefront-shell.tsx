@@ -103,55 +103,281 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
 export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { cart, openCart, wishlist } = useStorefront();
+  const { cart, openCart, wishlist, showNotice } = useStorefront();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [search, setSearch] = useState("");
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const navItems = [
-    { label: "Home", href: "/" },
-    { label: "Snooker Tables", href: "/shop" },
-    { label: "Accessories", href: "/shop?type=accessory" },
-    { label: "About Us", href: "/#about" },
-    { label: "Contact", href: "/#contact" },
+
+  const categories = [
+    { label: "Snooker Boards", href: "/shop?category=Snooker+Tables", desc: "8ft, 10ft & 12ft tournament boards" },
+    { label: "Cues", href: "/shop?category=Cues", desc: "Hand-crafted ash & maple snooker cues" },
+    { label: "Hoodies", href: "/shop?category=Hoodies", desc: "Heavyweight 420 GSM French Terry hoodies" },
+    { label: "T-Shirts", href: "/shop?category=T-Shirts", desc: "Drop-shoulder oversized 260 GSM graphic tees" },
+    { label: "Cue Cases", href: "/shop?category=Cue+Cases", desc: "Canvas & genuine leather carrying cases" },
+    { label: "Table Accessories", href: "/shop?category=Table+Accessories", desc: "Ball sets, triangles & brushes" },
+  ];
+
+  const bottomNavLinks = [
+    { label: "Snooker Boards", href: "/shop?category=Snooker+Tables" },
+    { label: "Cues", href: "/shop?category=Cues" },
+    { label: "Hoodies", href: "/shop?category=Hoodies" },
+    { label: "T-Shirts", href: "/shop?category=T-Shirts" },
+    { label: "Our story", href: "/#about" },
+    { label: "Support", href: "/#contact" },
   ];
 
   const submitSearch = (event: React.FormEvent) => {
     event.preventDefault();
-    router.push(search.trim() ? `/shop?query=${encodeURIComponent(search.trim())}` : "/shop");
-    setSearchOpen(false);
+    if (search.trim()) {
+      router.push(`/shop?query=${encodeURIComponent(search.trim())}`);
+    } else {
+      router.push("/shop");
+    }
   };
 
   return (
     <>
+      {/* 1. Top Announcement Bar */}
       <div className="announcement-bar">
         <div className="announcement-inner">
-          <span>Premium Snooker Tables</span><span className="announcement-dot">•</span><span>Crafted for Precision</span><span className="announcement-dot">•</span><span>Serving Customers Across India</span>
+          <span>HYDERABAD CUE SPORTS</span>
+          <span className="announcement-dot">•</span>
+          <span>PREMIUM EQUIPMENT &amp; CLUB APPAREL</span>
+          <span className="announcement-dot">•</span>
+          <span>SERVING CUSTOMERS ACROSS INDIA</span>
         </div>
       </div>
-      <header className="site-header">
-        <div className="site-header-inner">
-          <button className="icon-button mobile-menu-button" aria-label="Open menu" onClick={() => setMobileOpen(true)}><Menu size={21} /></button>
-          <Link href="/" className="wordmark" aria-label="Hyderabad Cue Sports home">
-            <span className="wordmark-mark">HCS</span>
-            <span><strong>HYDERABAD</strong><em>CUE SPORTS</em></span>
+
+      {/* 2. Middle Row: Main Header */}
+      <header className="site-header-main">
+        <div className="site-header-container">
+          <button
+            className="mobile-menu-toggle"
+            aria-label="Open navigation menu"
+            onClick={() => setMobileOpen(true)}
+          >
+            <Menu size={22} />
+          </button>
+
+          {/* Logo */}
+          <Link href="/" className="hcs-brand-logo" aria-label="Hyderabad Cue Sports Home">
+            <span className="hcs-badge">HCS</span>
+            <div className="hcs-brand-text">
+              <span className="hcs-title">HYDERABAD</span>
+              <span className="hcs-subtitle">CUE SPORTS</span>
+            </div>
           </Link>
-          <nav className="desktop-nav" aria-label="Primary navigation">
-            {navItems.map((item) => <Link key={item.label} href={item.href} className={pathname === item.href ? "active" : ""}>{item.label}</Link>)}
-          </nav>
-          <div className="header-actions">
-            <button className="icon-button" aria-label="Search" onClick={() => setSearchOpen((open) => !open)}><Search size={20} /></button>
-            <button className="icon-button account-button" aria-label="Account"><UserRound size={20} /></button>
-            <button className="icon-button bag-button" aria-label={`Shopping bag with ${cartCount} items`} onClick={openCart}>
-              <ShoppingBag size={20} />
-              {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+
+          {/* Central Search Bar */}
+          <form className="hcs-search-form" onSubmit={submitSearch}>
+            <div className="hcs-search-input-wrap">
+              <Search size={18} className="hcs-search-icon" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search snooker boards, cues, apparel..."
+                aria-label="Search catalog"
+              />
+            </div>
+            <button type="submit" className="hcs-search-btn">
+              Search
+            </button>
+          </form>
+
+          {/* Right Action Icons with Text */}
+          <div className="hcs-header-actions">
+            <button
+              type="button"
+              className="hcs-action-item"
+              aria-label={`Wishlist (${wishlist.length} saved)`}
+              onClick={() => {
+                if (wishlist.length === 0) {
+                  showNotice("You have not saved any items yet.");
+                } else {
+                  router.push("/shop");
+                }
+              }}
+            >
+              <div className="hcs-action-icon-box">
+                <Heart size={21} />
+                {wishlist.length > 0 && <span className="hcs-action-badge">{wishlist.length}</span>}
+              </div>
+              <span className="hcs-action-label">Wishlist</span>
+            </button>
+
+            <button
+              type="button"
+              className="hcs-action-item"
+              aria-label="Account"
+              onClick={() => showNotice("Customer portal sign-in available soon.")}
+            >
+              <div className="hcs-action-icon-box">
+                <UserRound size={21} />
+              </div>
+              <span className="hcs-action-label">Account</span>
+            </button>
+
+            <button
+              type="button"
+              className="hcs-action-item"
+              aria-label={`Shopping Bag with ${cartCount} items`}
+              onClick={openCart}
+            >
+              <div className="hcs-action-icon-box">
+                <ShoppingBag size={21} />
+                {cartCount > 0 && <span className="hcs-action-badge">{cartCount}</span>}
+              </div>
+              <span className="hcs-action-label">Bag</span>
             </button>
           </div>
         </div>
-        {searchOpen && <div className="search-panel"><form onSubmit={submitSearch}><Search size={19} /><input autoFocus value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tables, cues, accessories..." /><button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search"><X size={19} /></button></form></div>}
       </header>
-      {mobileOpen && <div className="mobile-nav-overlay" onClick={() => setMobileOpen(false)}><aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}><div className="mobile-drawer-top"><span className="eyebrow">Navigate</span><button className="icon-button" aria-label="Close menu" onClick={() => setMobileOpen(false)}><X size={20} /></button></div><div className="mobile-nav-links">{navItems.map((item) => <Link key={item.label} href={item.href} onClick={() => setMobileOpen(false)}>{item.label}<ArrowRight size={17} /></Link>)}</div><div className="mobile-nav-note"><Sparkles size={16} /><span>Demo catalogue · edit before launch</span></div><div className="mobile-nav-footer"><span>Wishlist</span><span>{wishlist.length} saved</span></div></aside></div>}
+
+      {/* 3. Bottom Category Navigation Bar */}
+      <nav className="category-nav-bar" aria-label="Category navigation">
+        <div className="category-nav-container">
+          {/* Shop by Category Dropdown Button */}
+          <div
+            className="category-dropdown-wrapper"
+            onMouseEnter={() => setCategoryDropdownOpen(true)}
+            onMouseLeave={() => setCategoryDropdownOpen(false)}
+          >
+            <button
+              type="button"
+              className={`shop-category-btn ${categoryDropdownOpen ? "active" : ""}`}
+              onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+              aria-expanded={categoryDropdownOpen}
+            >
+              <Menu size={16} />
+              <span>Shop by category</span>
+              <ChevronDown size={14} className={categoryDropdownOpen ? "rotated" : ""} />
+            </button>
+
+            {categoryDropdownOpen && (
+              <div className="category-dropdown-menu">
+                <div className="category-dropdown-header">
+                  <span>Browse by Category</span>
+                </div>
+                <div className="category-dropdown-grid">
+                  {categories.map((cat) => (
+                    <Link
+                      key={cat.label}
+                      href={cat.href}
+                      className="category-dropdown-item"
+                      onClick={() => setCategoryDropdownOpen(false)}
+                    >
+                      <div className="category-item-text">
+                        <strong>{cat.label}</strong>
+                        <span>{cat.desc}</span>
+                      </div>
+                      <ArrowRight size={14} />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Direct Horizontal Links */}
+          <div className="category-nav-links">
+            {bottomNavLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`category-nav-link ${pathname === link.href ? "active" : ""}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Drawer */}
+      {mobileOpen && (
+        <div className="mobile-nav-overlay" onClick={() => setMobileOpen(false)}>
+          <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
+            <div className="mobile-drawer-top">
+              <div className="hcs-brand-logo small">
+                <span className="hcs-badge">HCS</span>
+                <div className="hcs-brand-text">
+                  <span className="hcs-title">HYDERABAD</span>
+                  <span className="hcs-subtitle">CUE SPORTS</span>
+                </div>
+              </div>
+              <button className="icon-button" aria-label="Close menu" onClick={() => setMobileOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Mobile Search */}
+            <form className="mobile-search-form" onSubmit={(e) => { submitSearch(e); setMobileOpen(false); }}>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search snooker boards, cues, apparel..."
+              />
+              <button type="submit" aria-label="Submit search"><Search size={16} /></button>
+            </form>
+
+            <div className="mobile-section-heading">Categories</div>
+            <div className="mobile-category-links">
+              {categories.map((cat) => (
+                <Link
+                  key={cat.label}
+                  href={cat.href}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <span>{cat.label}</span>
+                  <ArrowRight size={15} />
+                </Link>
+              ))}
+            </div>
+
+            <div className="mobile-section-heading">Quick Links</div>
+            <div className="mobile-quick-links">
+              <Link href="/" onClick={() => setMobileOpen(false)}>Home</Link>
+              <Link href="/shop" onClick={() => setMobileOpen(false)}>All Products</Link>
+              <Link href="/#about" onClick={() => setMobileOpen(false)}>Our Story</Link>
+              <Link href="/#contact" onClick={() => setMobileOpen(false)}>Support</Link>
+            </div>
+
+            <div className="mobile-drawer-footer">
+              <a
+                href="https://wa.me/919999999999?text=Hi%2C%20I%20have%20an%20enquiry%20regarding%20Hyderabad%20Cue%20Sports"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mobile-whatsapp-cta"
+              >
+                <span>WhatsApp Support</span>
+              </a>
+            </div>
+          </aside>
+        </div>
+      )}
     </>
+  );
+}
+
+export function FloatingWhatsApp() {
+  return (
+    <a
+      href="https://wa.me/919999999999?text=Hi%2C%20I%20have%20an%20enquiry%20regarding%20Hyderabad%20Cue%20Sports"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="floating-whatsapp-btn"
+      aria-label="Chat with Hyderabad Cue Sports on WhatsApp"
+    >
+      <div className="whatsapp-icon-circle">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.986.58 3.84 1.584 5.405L2.054 22l4.733-1.498A10.016 10.016 0 0 0 12.03 22c5.536 0 10.031-4.495 10.031-10.031C22.062 6.495 17.567 2 12.031 2zm0 18.297c-1.636 0-3.17-.46-4.48-1.258l-.321-.193-2.8 0.887.896-2.735-.21-.334A8.257 8.257 0 0 1 3.766 12.03c0-4.557 3.708-8.266 8.265-8.266 4.558 0 8.266 3.709 8.266 8.266 0 4.558-3.708 8.266-8.266 8.266zm4.53-6.177c-.248-.124-1.468-.724-1.696-.807-.228-.083-.393-.124-.559.124-.165.248-.642.807-.787.973-.145.165-.29.186-.538.062-.248-.124-1.047-.386-1.995-1.231-.738-.658-1.236-1.472-1.381-1.72-.145-.248-.015-.382.109-.505.112-.111.248-.29.372-.435.124-.145.166-.248.248-.414.083-.166.042-.311-.02-.435-.063-.124-.559-1.347-.766-1.845-.202-.484-.407-.418-.559-.426l-.477-.008c-.165 0-.435.062-.663.311-.228.248-.87 0.85-.87 2.073 0 1.223.89 2.405 1.014 2.571.125.166 1.752 2.675 4.245 3.751.593.256 1.056.409 1.417.524.595.19 1.137.163 1.565.099.477-.072 1.468-.6 1.675-1.18.207-.58.207-1.077.145-1.18-.062-.104-.228-.166-.476-.29z" />
+        </svg>
+      </div>
+      <span className="whatsapp-floating-label">WhatsApp Us</span>
+    </a>
   );
 }
 
@@ -178,7 +404,7 @@ export function BackToTop() {
 
 export function SiteFooter() {
   const { showNotice } = useStorefront();
-  return <footer className="site-footer" id="contact"><div className="footer-main container"><div className="footer-brand"><Link href="/" className="wordmark wordmark-light"><span className="wordmark-mark">HCS</span><span><strong>HYDERABAD</strong><em>CUE SPORTS</em></span></Link><p>A considered home for premium snooker tables and the objects that make the game feel like yours.</p><div className="footer-socials"><button aria-label="Instagram"><Instagram size={17} /></button><button aria-label="Email" onClick={() => showNotice("Sample email support: support@example.com")}><Mail size={17} /></button></div></div><div className="footer-column"><h4>Shop</h4><Link href="/shop">All Snooker Tables</Link><Link href="/shop?size=8+FT">8 FT Tables</Link><Link href="/shop?size=10+FT">10 FT Tables</Link><Link href="/shop?size=12+FT">12 FT Tables</Link><Link href="/shop?type=accessory">Accessories</Link></div><div className="footer-column"><h4>Information</h4><Link href="/#about">About Us</Link><button onClick={() => showNotice("Shipping information is placeholder content for this demo.")}>Shipping Information</button><button onClick={() => showNotice("Return policy is placeholder content for this demo.")}>Return Policy</button><button onClick={() => showNotice("Privacy policy is placeholder content for this demo.")}>Privacy Policy</button><button onClick={() => showNotice("Terms are placeholder content for this demo.")}>Terms &amp; Conditions</button></div><div className="footer-column"><h4>Customer Support</h4><button onClick={() => showNotice("Sample WhatsApp support: +91 00000 00000")}>WhatsApp Support</button><button onClick={() => showNotice("Sample email support: support@example.com")}>Email Support</button><button onClick={() => showNotice("FAQ content will be added with the final catalogue.")}>Frequently Asked Questions</button><div className="footer-contact-card"><Truck size={17} /><span>Serving customers across India<br /><small>Demo service promise · edit before launch</small></span></div></div></div><div className="footer-bottom container"><span>© 2026 HYDERABAD CUE SPORTS. Demo brand experience.</span><span className="payment-icons"><span>UPI</span><span>VISA</span><span>•••</span></span><button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Back to top <ChevronRight size={14} /></button></div></footer>;
+  return <footer className="site-footer" id="contact"><div className="footer-main container"><div className="footer-brand"><Link href="/" className="wordmark wordmark-light"><span className="wordmark-mark">HCS</span><span><strong>HYDERABAD</strong><em>CUE SPORTS</em></span></Link><p>A considered home for premium snooker tables and the objects that make the game feel like yours.</p><div className="footer-socials"><button aria-label="Instagram"><Instagram size={17} /></button><button aria-label="Email" onClick={() => showNotice("Sample email support: support@example.com")}><Mail size={17} /></button></div></div><div className="footer-column"><h4>Shop</h4><Link href="/shop">All Snooker Tables</Link><Link href="/shop?size=8+FT">8 FT Tables</Link><Link href="/shop?size=10+FT">10 FT Tables</Link><Link href="/shop?size=12+FT">12 FT Tables</Link><Link href="/shop?type=accessory">Accessories</Link></div><div className="footer-column"><h4>Information</h4><Link href="/#about">About Us</Link><button onClick={() => showNotice("Shipping information is placeholder content for this demo.")}>Shipping Information</button><button onClick={() => showNotice("Return policy is placeholder content for this demo.")}>Return Policy</button><button onClick={() => showNotice("Privacy policy is placeholder content for this demo.")}>Privacy Policy</button><button onClick={() => showNotice("Terms are placeholder content for this demo.")}>Terms &amp; Conditions</button></div><div className="footer-column"><h4>Customer Support</h4><button onClick={() => showNotice("Sample WhatsApp support: +91 00000 00000")}>WhatsApp Support</button><button onClick={() => showNotice("Sample email support: support@example.com")}>Email Support</button><button onClick={() => showNotice("FAQ content will be added with the final catalogue.")}>Frequently Asked Questions</button><div className="footer-contact-card"><Truck size={17} /><span>Serving customers across India<br /><small>Direct shipping &amp; professional installation available</small></span></div></div></div><div className="footer-bottom container"><span>© 2026 HYDERABAD CUE SPORTS. Demo brand experience.</span><span className="payment-icons"><span>UPI</span><span>VISA</span><span>•••</span></span><button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Back to top <ChevronRight size={14} /></button></div></footer>;
 }
 
 export function ProductCard({ product, onQuickView }: { product: Product; onQuickView: (product: Product) => void }) {
