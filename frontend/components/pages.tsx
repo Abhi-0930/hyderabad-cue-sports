@@ -13,6 +13,29 @@ export function HomePage() {
   const [subscribed, setSubscribed] = useState(false);
   const { showNotice, addToCart, wishlist, toggleWishlist } = useStorefront();
   const sliderRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const updateScrollButtons = () => {
+    if (!sliderRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
+    setCanScrollLeft(scrollLeft > 15);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 15);
+  };
+
+  useEffect(() => {
+    updateScrollButtons();
+    const el = sliderRef.current;
+    if (!el) return;
+
+    el.addEventListener("scroll", updateScrollButtons, { passive: true });
+    window.addEventListener("resize", updateScrollButtons);
+
+    return () => {
+      el.removeEventListener("scroll", updateScrollButtons);
+      window.removeEventListener("resize", updateScrollButtons);
+    };
+  }, []);
 
   const slide = (direction: "left" | "right") => {
     if (!sliderRef.current) return;
@@ -126,9 +149,10 @@ export function HomePage() {
         {/* 1-Row Continuous Gesture Sliding Container with Desktop Arrow Controls */}
         <div className="featured-slider-wrapper">
           <button
-            className="featured-slide-nav prev"
+            className={`featured-slide-nav prev ${canScrollLeft ? "visible" : "hidden"}`}
             onClick={() => slide("left")}
             aria-label="Slide previous products"
+            tabIndex={canScrollLeft ? 0 : -1}
           >
             <ChevronLeft size={20} />
           </button>
@@ -177,9 +201,10 @@ export function HomePage() {
           </div>
 
           <button
-            className="featured-slide-nav next"
+            className={`featured-slide-nav next ${canScrollRight ? "visible" : "hidden"}`}
             onClick={() => slide("right")}
             aria-label="Slide next products"
+            tabIndex={canScrollRight ? 0 : -1}
           >
             <ChevronRight size={20} />
           </button>
