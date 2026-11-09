@@ -35,7 +35,7 @@ type StorefrontContextValue = {
   wishlist: string[];
   cartOpen: boolean;
   notice: string;
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: Product, quantity?: number, openSidebar?: boolean) => void;
   updateQuantity: (id: string, delta: number) => void;
   removeFromCart: (id: string) => void;
   toggleWishlist: (id: string) => void;
@@ -84,13 +84,15 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     wishlist,
     cartOpen,
     notice,
-    addToCart: (product, quantity = 1) => {
+    addToCart: (product, quantity = 1, openSidebar = true) => {
       setCart((current) => {
         const existing = current.find((item) => item.id === product.id);
         if (existing) return current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item);
         return [...current, { ...product, quantity }];
       });
-      setCartOpen(true);
+      if (openSidebar) {
+        setCartOpen(true);
+      }
       setNotice(`${product.name} added to your bag`);
     },
     updateQuantity: (id, delta) => setCart((current) => current.map((item) => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item)),
@@ -118,10 +120,10 @@ export function SiteHeader() {
     {
       id: "snooker-tables",
       label: "Snooker Tables",
+      iconUrl: "/icons/navbar-icons/billiards.png",
       href: "/shop?category=Snooker+Tables",
       image: "/images/categories/snooker-tables.jpg",
       imageTitle: "12ft Tables | Riley England | Dubai",
-      icon: RectangleHorizontal,
       items: [
         { label: "All Snooker Tables", href: "/shop?category=Snooker+Tables" },
         { label: "8 FT Snooker Tables", href: "/shop?category=Snooker+Tables&size=8+FT" },
@@ -133,10 +135,10 @@ export function SiteHeader() {
     {
       id: "cue-equipment",
       label: "Cue Equipment",
+      iconUrl: "/icons/navbar-icons/pool-cue.png",
       href: "/shop?category=Cues",
       image: "/images/categories/cue-equipment.jpg",
       imageTitle: "Maple Emperor Professional Snooker Cue Set - Baize Master – Cue + Case",
-      icon: Target,
       items: [
         { label: "All Cue Equipment", href: "/shop?category=Cues" },
         { label: "Snooker Cue Sticks", href: "/shop?category=Cues&query=sticks" },
@@ -148,10 +150,10 @@ export function SiteHeader() {
     {
       id: "table-accessories",
       label: "Table Accessories",
+      iconUrl: "/icons/navbar-icons/snooker.png",
       href: "/shop?category=Table+Accessories",
       image: "/images/categories/table-accessories.jpg",
       imageTitle: "Star Champion Tournament Snooker Table - 12 Feet",
-      icon: CircleDot,
       items: [
         { label: "All Table Accessories", href: "/shop?category=Table+Accessories" },
         { label: "Snooker Table Cloth", href: "/shop?category=Table+Accessories&query=cloth" },
@@ -164,10 +166,10 @@ export function SiteHeader() {
     {
       id: "scoreboards",
       label: "Scoreboards",
+      iconUrl: "/icons/navbar-icons/scoreboard.png",
       href: "/shop?category=Scoreboards",
       image: "/images/categories/scoreboards.jpg",
       imageTitle: "Edwardian Mahogany Riley Snooker/Billiards Scoreboard",
-      icon: Trophy,
       items: [
         { label: "All Scoreboards", href: "/shop?category=Scoreboards" },
         { label: "Manual Points Boards", href: "/shop?category=Scoreboards&query=manual" },
@@ -300,10 +302,20 @@ export function SiteHeader() {
                   className={`category-nav-link ${pathname.includes(cat.href) || activeDropdown === cat.id ? "active" : ""}`}
                 >
                   <div className="cat-nav-content">
-                    <cat.icon size={20} className="cat-nav-mobile-icon" />
-                    <span className="cat-nav-text">{cat.label}</span>
+                    <div className="cat-nav-icon-wrapper">
+                      <img
+                        src={cat.iconUrl}
+                        alt={cat.label}
+                        className="cat-nav-flipkart-icon"
+                        width={30}
+                        height={30}
+                      />
+                    </div>
+                    <div className="cat-nav-label-row">
+                      <span className="cat-nav-text">{cat.label}</span>
+                      <ChevronDown size={11} className={`cat-chevron ${activeDropdown === cat.id ? "rotated" : ""}`} />
+                    </div>
                   </div>
-                  <ChevronDown size={13} className={`cat-chevron ${activeDropdown === cat.id ? "rotated" : ""}`} />
                 </Link>
 
                 {activeDropdown === cat.id && (
@@ -391,7 +403,10 @@ export function SiteHeader() {
                       className="mobile-acc-trigger"
                       onClick={() => setMobileExpandedCat(isExpanded ? null : cat.id)}
                     >
-                      <span>{cat.label}</span>
+                      <span className="mobile-acc-label-wrap">
+                        <img src={cat.iconUrl} alt="" className="mobile-acc-icon" width={18} height={18} />
+                        <span>{cat.label}</span>
+                      </span>
                       <ChevronDown size={15} className={`acc-arrow ${isExpanded ? "rotated" : ""}`} />
                     </button>
                     {isExpanded && (
