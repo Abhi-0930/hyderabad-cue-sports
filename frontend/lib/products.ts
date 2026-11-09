@@ -254,6 +254,114 @@ export const products: Product[] = [
       { label: "Availability", value: "In stock" }
     ],
     tags: ["accessories", "cases", "in stock"]
+  },
+  {
+    id: "baize-master-cue-set",
+    slug: "maple-emperor-professional-snooker-cue-set",
+    name: "Maple Emperor Professional Cue Set",
+    category: "Cues",
+    type: "accessory",
+    size: "Standard 58 inch",
+    price: 16800,
+    compareAt: 19500,
+    image: "/images/categories/cue-equipment.jpg",
+    badge: "Best Seller",
+    availability: "In stock",
+    description: "Hand-spliced premium ebony and maple professional cue set featuring Baize Master precision balance, mini-butt extender, and luxury hard case.",
+    details: ["Grade-A North American ash shaft", "Solid brass quick-release vacuum joint", "Includes 6-inch mini-butt extender and leatherette case"],
+    specs: [
+      { label: "Length", value: "58 inches" },
+      { label: "Tip size", value: "9.5mm pressed leather" },
+      { label: "Joint", value: "Quick-release brass" },
+      { label: "Weight", value: "18 - 18.5 oz" }
+    ],
+    tags: ["cues", "sticks", "cue equipment", "baize master", "best seller"]
+  },
+  {
+    id: "riley-edwardian-scoreboard",
+    slug: "edwardian-mahogany-riley-snooker-scoreboard",
+    name: "Edwardian Mahogany Riley Scoreboard",
+    category: "Scoreboards",
+    type: "accessory",
+    size: "Standard wall mount",
+    price: 21500,
+    compareAt: 24500,
+    image: "/images/categories/scoreboards.jpg",
+    badge: "Heritage",
+    availability: "In stock",
+    description: "Handcrafted solid mahogany Riley-style snooker and billiards scoreboard with antique brass markers and smooth pointer sliders.",
+    details: ["Solid polished mahogany timber cabinet", "Engraved metallic numeric track up to 100 points", "Traditional brass slide pointers and frame counters"],
+    specs: [
+      { label: "Material", value: "Solid Plantation Mahogany" },
+      { label: "Format", value: "Manual pointer and slide board" },
+      { label: "Mounting", value: "Concealed heavy-duty wall brackets" },
+      { label: "Origin", value: "Heritage craftsmanship" }
+    ],
+    tags: ["scoreboards", "manual", "riley", "heritage", "points board"]
+  },
+  {
+    id: "pro-electronic-scoreboard",
+    slug: "electronic-digital-snooker-scoreboard",
+    name: "Pro-Match Electronic LED Scoreboard",
+    category: "Scoreboards",
+    type: "accessory",
+    size: "Compact digital",
+    price: 28900,
+    compareAt: 32000,
+    image: "/images/categories/scoreboards.jpg",
+    badge: "Tournament",
+    availability: "In stock",
+    description: "High-contrast dual-player electronic snooker scoreboard with ultra-bright LED digits, wireless remote control, and frame tally counters.",
+    details: ["High-visibility 4-inch red and green LED display", "Dual wireless infrared remote controls included", "Built-in break score calculator and match timer"],
+    specs: [
+      { label: "Display", value: "Ultra-bright anti-glare LED" },
+      { label: "Controls", value: "Dual wireless handheld remotes" },
+      { label: "Power", value: "220V AC with surge protection" },
+      { label: "Features", value: "Current break, frame score, match clock" }
+    ],
+    tags: ["scoreboards", "electronic", "led", "digital", "tournament"]
+  },
+  {
+    id: "strachan-6811-cloth",
+    slug: "strachan-6811-tournament-snooker-cloth",
+    name: "Strachan 6811 Tournament Table Cloth",
+    category: "Table Accessories",
+    type: "accessory",
+    size: "12 FT Bed & Cushions",
+    price: 26500,
+    image: "/images/categories/table-accessories.jpg",
+    badge: "Official",
+    availability: "In stock",
+    description: "The world's leading tournament snooker cloth. 100% pure English wool baize treated with SpillGuard for uniform speed and flawless cue ball control.",
+    details: ["Official cloth specification for global cue sports events", "Precision short nap for predictable, true roll", "Pre-cut bed cloth and 6 matching cushion strips"],
+    specs: [
+      { label: "Composition", value: "100% Pure New Wool" },
+      { label: "Weight", value: "32 oz / yd²" },
+      { label: "Finish", value: "SpillGuard stain-resistant finish" },
+      { label: "Compatibility", value: "Fits full-size 12 FT tournament tables" }
+    ],
+    tags: ["table accessories", "cloth", "strachan", "official", "12 FT"]
+  },
+  {
+    id: "tournament-table-lights",
+    slug: "shadowless-tournament-snooker-lights",
+    name: "Tournament Shadowless Table Luminaire",
+    category: "Table Accessories",
+    type: "accessory",
+    size: "Full-table canopy",
+    price: 18500,
+    image: "/images/categories/table-accessories.jpg",
+    badge: "Precision",
+    availability: "In stock",
+    description: "Engineered canopy lighting system providing uniform, shadowless 5000K daylight illumination across the entire playing surface without glare.",
+    details: ["Eliminates player cue and ball shadows completely", "High CRI 95+ flicker-free LED arrays", "Matte black architectural frame with adjustable suspension cables"],
+    specs: [
+      { label: "Light temperature", value: "5000K Neutral Crisp Daylight" },
+      { label: "CRI rating", value: "95+ true ball color accuracy" },
+      { label: "Suspension", value: "Dual adjustable steel cables" },
+      { label: "Power", value: "Energy-efficient 120W LED" }
+    ],
+    tags: ["table accessories", "lights", "table lights", "shadowless"]
   }
 ];
 
