@@ -337,17 +337,157 @@
   display: flex;
   align-items: center;
   gap: 28px;
+  height: 100%;
+}
+.category-nav-dropdown-item {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 .category-nav-link {
-  color: rgba(255, 255, 255, 0.9);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.92);
   font-size: 13.5px;
   font-weight: 500;
   text-decoration: none;
   transition: color 0.2s;
-  padding: 4px 0;
+  padding: 6px 0;
+  cursor: pointer;
 }
 .category-nav-link:hover, .category-nav-link.active {
   color: #dfc181;
+}
+.cat-chevron {
+  transition: transform 0.2s ease;
+  opacity: 0.8;
+}
+.cat-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* Mega dropdown menu */
+.cat-mega-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  box-shadow: 0 25px 60px rgba(16, 46, 33, 0.2);
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+  z-index: 100;
+  animation: fadeIn 0.18s ease;
+  min-width: 500px;
+}
+.cat-mega-dropdown-inner {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  background: #ffffff;
+}
+.cat-mega-links-column {
+  padding: 20px 22px;
+  border-right: 1px solid #eef2ed;
+}
+.cat-mega-header {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--forest);
+  margin-bottom: 14px;
+}
+.cat-mega-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cat-sublink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 5px;
+  color: #2c3830;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.cat-sublink:hover {
+  background: var(--soft-green);
+  color: var(--forest);
+}
+.cat-sublink-arrow {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.15s, transform 0.15s;
+  color: var(--gold);
+}
+.cat-sublink:hover .cat-sublink-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.cat-mega-preview-card {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  background: #fafbf9;
+}
+.cat-preview-image {
+  position: relative;
+  aspect-ratio: 16/10;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #e5ede7;
+}
+.cat-preview-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.cat-mega-preview-card:hover .cat-preview-image img {
+  transform: scale(1.04);
+}
+.cat-preview-info {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cat-preview-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+.cat-preview-info strong {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--forest);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cat-preview-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--forest);
+  text-decoration: none;
+}
+.cat-preview-link:hover {
+  color: var(--gold);
 }
 
 /* Floating WhatsApp Button */
@@ -430,6 +570,55 @@
   font-size: 14.5px;
   font-weight: 500;
   text-decoration: none;
+}
+.mobile-category-accordion {
+  display: flex;
+  flex-direction: column;
+}
+.mobile-acc-item {
+  border-bottom: 1px solid var(--line);
+}
+.mobile-acc-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  background: transparent;
+  border: 0;
+  color: var(--forest);
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+.acc-arrow {
+  transition: transform 0.2s ease;
+  color: var(--gold);
+}
+.acc-arrow.rotated {
+  transform: rotate(180deg);
+}
+.mobile-acc-body {
+  padding: 4px 0 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--soft);
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.mobile-acc-sublink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: #3b463f;
+  text-decoration: none;
+}
+.mobile-acc-sublink:hover {
+  color: var(--forest);
 }
 .mobile-whatsapp-cta {
   display: flex;
