@@ -21,7 +21,29 @@ export function HomePage() {
   };
 
   return <>
-    <section className="hero-section"><div className="hero-media"><img src="/images/snooker-hero.jpg" alt="Professional snooker table in an elegant room" /><div className="hero-media-fade" /></div><div className="hero-content container"><div className="hero-copy"><h1>Where every shot begins with <em>excellence.</em></h1><div className="hero-actions"><Link href="/shop" className="button button-dark">Explore snooker tables <ArrowRight size={17} /></Link><Link href="#collections" className="button button-light">Discover the collection <ArrowDown size={16} /></Link></div></div></div><div className="hero-scroll-note"><span>Scroll to explore</span><ArrowDown size={16} /></div></section>
+    <section className="hero-section">
+      <div className="hero-media">
+        <img src="/images/snooker-hero.jpg" alt="Professional snooker table in an elegant room" />
+        <div className="hero-media-fade" />
+      </div>
+      <div className="hero-content container">
+        <div className="hero-copy">
+          <h1>
+            Where every<br />
+            shot begins with<br />
+            <em>excellence.</em>
+          </h1>
+          <div className="hero-actions">
+            <Link href="/shop?category=Snooker+Tables" className="button button-dark">
+              Shop Tables <ArrowRight size={15} />
+            </Link>
+            <Link href="/shop" className="button button-light">
+              Shop Equipment
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section className="section collection-section" id="collections"><div className="container"><SectionHeading eyebrow="Find your scale" title="Explore our snooker tables" description="Find the right table for your space, your rhythm and your playing requirements." action={<ArrowLink href="/shop">View all tables</ArrowLink>} /><div className="collection-grid">{collectionCards.map((collection, index) => <Link key={collection.title} href={`/shop?size=${encodeURIComponent(collection.filter)}`} className={`collection-card collection-card-${index + 1}`}><img src={collection.image} alt={collection.title} /><div className="collection-card-overlay" /><div className="collection-card-copy"><span>{collection.eyebrow}</span><h3>{collection.title}</h3><p>{collection.description}</p><span className="collection-explore">Explore collection <ArrowRight size={15} /></span></div></Link>)}</div></div></section>
 
