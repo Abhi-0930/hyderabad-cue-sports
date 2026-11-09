@@ -105,25 +105,67 @@ export function SiteHeader() {
   const router = useRouter();
   const { cart, openCart, wishlist, showNotice } = useStorefront();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  const categories = [
-    { label: "Snooker Boards", href: "/shop?category=Snooker+Tables", desc: "8ft, 10ft & 12ft tournament boards" },
-    { label: "Cues", href: "/shop?category=Cues", desc: "Hand-crafted ash & maple snooker cues" },
-    { label: "Hoodies", href: "/shop?category=Hoodies", desc: "Heavyweight 420 GSM French Terry hoodies" },
-    { label: "T-Shirts", href: "/shop?category=T-Shirts", desc: "Drop-shoulder oversized 260 GSM graphic tees" },
-    { label: "Cue Cases", href: "/shop?category=Cue+Cases", desc: "Canvas & genuine leather carrying cases" },
-    { label: "Table Accessories", href: "/shop?category=Table+Accessories", desc: "Ball sets, triangles & brushes" },
-  ];
-
-  const bottomNavLinks = [
-    { label: "Snooker Boards", href: "/shop?category=Snooker+Tables" },
-    { label: "Cues", href: "/shop?category=Cues" },
-    { label: "Hoodies", href: "/shop?category=Hoodies" },
-    { label: "T-Shirts", href: "/shop?category=T-Shirts" },
-    { label: "Our story", href: "/#about" },
-    { label: "Support", href: "/#contact" },
+  const navigationCategories = [
+    {
+      id: "snooker-tables",
+      label: "Snooker Tables",
+      href: "/shop?category=Snooker+Tables",
+      image: "/images/categories/snooker-tables.jpg",
+      imageTitle: "12ft Tables | Riley England | Dubai",
+      items: [
+        { label: "All Snooker Tables", href: "/shop?category=Snooker+Tables" },
+        { label: "8 FT Snooker Tables", href: "/shop?category=Snooker+Tables&size=8+FT" },
+        { label: "10 FT Snooker Tables", href: "/shop?category=Snooker+Tables&size=10+FT" },
+        { label: "12 FT Snooker Tables", href: "/shop?category=Snooker+Tables&size=12+FT" },
+        { label: "Tournament Tables", href: "/shop?category=Snooker+Tables&query=tournament" },
+      ],
+    },
+    {
+      id: "cue-equipment",
+      label: "Cue Equipment",
+      href: "/shop?category=Cues",
+      image: "/images/categories/cue-equipment.jpg",
+      imageTitle: "Maple Emperor Professional Snooker Cue Set - Baize Master – Cue + Case",
+      items: [
+        { label: "All Cue Equipment", href: "/shop?category=Cues" },
+        { label: "Snooker Cue Sticks", href: "/shop?category=Cues&query=sticks" },
+        { label: "Cue Tips", href: "/shop?category=Cues&query=tips" },
+        { label: "Cue Chalk", href: "/shop?category=Cues&query=chalk" },
+        { label: "Cue Extenders", href: "/shop?category=Cues&query=extender" },
+      ],
+    },
+    {
+      id: "table-accessories",
+      label: "Table Accessories",
+      href: "/shop?category=Table+Accessories",
+      image: "/images/categories/table-accessories.jpg",
+      imageTitle: "Star Champion Tournament Snooker Table - 12 Feet",
+      items: [
+        { label: "All Table Accessories", href: "/shop?category=Table+Accessories" },
+        { label: "Snooker Table Cloth", href: "/shop?category=Table+Accessories&query=cloth" },
+        { label: "Snooker Balls", href: "/shop?category=Table+Accessories&query=balls" },
+        { label: "Table Lights", href: "/shop?category=Table+Accessories&query=lights" },
+        { label: "Table Slates", href: "/shop?category=Table+Accessories&query=slates" },
+        { label: "Table Pockets", href: "/shop?category=Table+Accessories&query=pockets" },
+      ],
+    },
+    {
+      id: "scoreboards",
+      label: "Scoreboards",
+      href: "/shop?category=Scoreboards",
+      image: "/images/categories/scoreboards.jpg",
+      imageTitle: "Edwardian Mahogany Riley Snooker/Billiards Scoreboard",
+      items: [
+        { label: "All Scoreboards", href: "/shop?category=Scoreboards" },
+        { label: "Manual Points Boards", href: "/shop?category=Scoreboards&query=manual" },
+        { label: "Electronic Scoreboards", href: "/shop?category=Scoreboards&query=electronic" },
+      ],
+    },
   ];
 
   const submitSearch = (event: React.FormEvent) => {
@@ -176,7 +218,7 @@ export function SiteHeader() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search snooker boards, cues, apparel..."
+                placeholder="Search snooker tables, cues, accessories, scoreboards..."
                 aria-label="Search catalog"
               />
             </div>
@@ -234,20 +276,74 @@ export function SiteHeader() {
         </div>
       </header>
 
-      {/* 3. Bottom Category Navigation Bar */}
+      {/* 3. Bottom Category Navigation Bar with Dropdowns */}
       <nav className="category-nav-bar" aria-label="Category navigation">
         <div className="category-nav-container">
-          {/* Direct Horizontal Links */}
           <div className="category-nav-links">
-            {bottomNavLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={`category-nav-link ${pathname === link.href ? "active" : ""}`}
+            {navigationCategories.map((cat) => (
+              <div
+                key={cat.id}
+                className="category-nav-dropdown-item"
+                onMouseEnter={() => setActiveDropdown(cat.id)}
+                onMouseLeave={() => setActiveDropdown(null)}
               >
-                {link.label}
-              </Link>
+                <Link
+                  href={cat.href}
+                  className={`category-nav-link ${pathname.includes(cat.href) || activeDropdown === cat.id ? "active" : ""}`}
+                >
+                  <span>{cat.label}</span>
+                  <ChevronDown size={13} className={`cat-chevron ${activeDropdown === cat.id ? "rotated" : ""}`} />
+                </Link>
+
+                {activeDropdown === cat.id && (
+                  <div className="cat-mega-dropdown">
+                    <div className="cat-mega-dropdown-inner">
+                      <div className="cat-mega-links-column">
+                        <span className="cat-mega-header">{cat.label}</span>
+                        <div className="cat-mega-items">
+                          {cat.items.map((item) => (
+                            <Link
+                              key={item.label}
+                              href={item.href}
+                              className="cat-sublink"
+                              onClick={() => setActiveDropdown(null)}
+                            >
+                              <span>{item.label}</span>
+                              <ArrowRight size={13} className="cat-sublink-arrow" />
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="cat-mega-preview-card">
+                        <div className="cat-preview-image">
+                          <img src={cat.image} alt={cat.imageTitle} />
+                          <div className="cat-preview-overlay" />
+                        </div>
+                        <div className="cat-preview-info">
+                          <span className="cat-preview-badge">Featured Range</span>
+                          <strong>{cat.imageTitle}</strong>
+                          <Link
+                            href={cat.href}
+                            className="cat-preview-link"
+                            onClick={() => setActiveDropdown(null)}
+                          >
+                            Explore Collection <ArrowRight size={12} />
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
+
+            <Link href="/#about" className="category-nav-link static-nav-link">
+              Our story
+            </Link>
+            <Link href="/#contact" className="category-nav-link static-nav-link">
+              Support
+            </Link>
           </div>
         </div>
       </nav>
@@ -275,23 +371,43 @@ export function SiteHeader() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search snooker boards, cues, apparel..."
+                placeholder="Search tables, cues, scoreboards..."
               />
               <button type="submit" aria-label="Submit search"><Search size={16} /></button>
             </form>
 
             <div className="mobile-section-heading">Categories</div>
-            <div className="mobile-category-links">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.label}
-                  href={cat.href}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <span>{cat.label}</span>
-                  <ArrowRight size={15} />
-                </Link>
-              ))}
+            <div className="mobile-category-accordion">
+              {navigationCategories.map((cat) => {
+                const isExpanded = mobileExpandedCat === cat.id;
+                return (
+                  <div key={cat.id} className="mobile-acc-item">
+                    <button
+                      type="button"
+                      className="mobile-acc-trigger"
+                      onClick={() => setMobileExpandedCat(isExpanded ? null : cat.id)}
+                    >
+                      <span>{cat.label}</span>
+                      <ChevronDown size={15} className={`acc-arrow ${isExpanded ? "rotated" : ""}`} />
+                    </button>
+                    {isExpanded && (
+                      <div className="mobile-acc-body">
+                        {cat.items.map((sub) => (
+                          <Link
+                            key={sub.label}
+                            href={sub.href}
+                            onClick={() => setMobileOpen(false)}
+                            className="mobile-acc-sublink"
+                          >
+                            <span>{sub.label}</span>
+                            <ArrowRight size={13} />
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mobile-section-heading">Quick Links</div>
