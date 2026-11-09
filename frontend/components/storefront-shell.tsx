@@ -307,8 +307,8 @@ export function SiteHeader() {
                         src={cat.iconUrl}
                         alt={cat.label}
                         className="cat-nav-flipkart-icon"
-                        width={30}
-                        height={30}
+                        width={22}
+                        height={22}
                       />
                     </div>
                     <div className="cat-nav-label-row">
