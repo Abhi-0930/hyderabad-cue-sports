@@ -410,10 +410,21 @@
   justify-content: center;
   height: 24px;
   width: 24px;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 24px;
+  opacity: 1;
+  transform: scale(1);
+  overflow: hidden;
+  transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hcs-sticky-header.scrolled .cat-nav-icon-wrapper {
-  transform: scale(1.05);
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-4px) scale(0.85);
+  pointer-events: none;
+  margin: 0;
+  display: none !important;
 }
 .cat-nav-flipkart-icon {
   width: 22px;
@@ -426,21 +437,15 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  max-height: 24px;
   opacity: 1;
   transform: translateY(0);
-  overflow: hidden;
   transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              margin 0.25s ease;
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hcs-sticky-header.scrolled .cat-nav-label-row {
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-6px) scale(0.92);
-  pointer-events: none;
-  margin: 0;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 .cat-nav-text {
   font-size: 13px;
@@ -894,9 +899,6 @@
     padding: 0 4px;
     transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .hcs-sticky-header.scrolled .category-nav-container {
-    height: 38px;
-  }
   .category-nav-links {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -921,8 +923,34 @@
     height: 100%;
     white-space: normal;
   }
+  .hcs-sticky-header.scrolled .category-nav-container {
+    height: 38px;
+  }
   .hcs-sticky-header.scrolled .category-nav-link {
-    padding: 2px 2px;
+    padding: 0 2px;
+    height: 100%;
+  }
+  .hcs-sticky-header.scrolled .cat-nav-content {
+    gap: 0;
+    height: 100%;
+    justify-content: center;
+  }
+  .hcs-sticky-header.scrolled .cat-nav-icon-wrapper {
+    display: none !important;
+  }
+  .hcs-sticky-header.scrolled .cat-nav-label-row {
+    display: flex !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .hcs-sticky-header.scrolled .cat-nav-text {
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.15;
+    color: #1d2520;
+    max-width: 85px;
+    text-align: center;
+    display: block;
   }
   .cat-nav-content {
     display: flex;
