@@ -2,19 +2,21 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export interface PromoSlide {
   id: string;
-  kicker: string;
+  kicker?: string;
   title: string;
+  subtitle?: string;
   buttonText: string;
   href: string;
   image: string;
   alt: string;
-  theme?: "dark" | "light" | "accessories";
+  theme?: "dark" | "light" | "accessories" | "scoreboards";
   hasUnderline?: boolean;
   isRibbonBadge?: boolean;
+  hasGoldBar?: boolean;
 }
 
 export const defaultPromoSlides: PromoSlide[] = [
@@ -50,155 +52,212 @@ export const defaultPromoSlides: PromoSlide[] = [
     theme: "accessories",
     isRibbonBadge: true,
   },
+  {
+    id: "craft-scoreboards",
+    title: "Scoreboards",
+    subtitle: "Keep Track of Every Frame",
+    buttonText: "Shop Now",
+    href: "/shop?category=Scoreboards",
+    image: "/images/banners/banner-scoreboards-clean.jpg",
+    alt: "Handcrafted mahogany snooker scoreboard with brass rails and pointers on wall",
+    theme: "scoreboards",
+    hasGoldBar: true,
+  },
 ];
 
 interface PromoBannerCarouselProps {
   slides?: PromoSlide[];
+  sectionTitle?: string;
 }
 
-export function PromoBannerCarousel({ slides = defaultPromoSlides }: PromoBannerCarouselProps) {
+const SLIDE_DURATION = 5000; // 5 seconds per slide
+
+export function PromoBannerCarousel({
+  slides = defaultPromoSlides,
+  sectionTitle = "In The Spotlight",
+}: PromoBannerCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [cycleKey, setCycleKey] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [touchDelta, setTouchDelta] = useState(0);
+  const [isSwiping, setIsSwiping] = useState(false);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
   const totalSlides = slides.length;
 
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+    setCycleKey((prev) => prev + 1);
+  };
+
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % totalSlides);
+    setCycleKey((prev) => prev + 1);
   };
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
+    setCycleKey((prev) => prev + 1);
   };
 
-  // Autoplay if more than 1 slide
+  // Progress bar auto-rotation: advances to next slide when progress ends
   useEffect(() => {
-    if (totalSlides <= 1) return;
-    autoPlayRef.current = setInterval(nextSlide, 5500);
-    return () => {
-      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
-    };
-  }, [totalSlides]);
+    if (totalSlides <= 1 || isSwiping) return;
 
-  // Touch handlers for mobile gesture swiping
+    autoPlayRef.current = setTimeout(() => {
+      setCurrentIndex((prev) => (prev + 1) % totalSlides);
+      setCycleKey((prev) => prev + 1);
+    }, SLIDE_DURATION);
+
+    return () => {
+      if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
+    };
+  }, [currentIndex, cycleKey, totalSlides, isSwiping]);
+
+  // Touch gesture swipe handlers
   const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
+    setTouchDelta(0);
+    setIsSwiping(true);
+    if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (touchStart === null) return;
+    const currentX = e.targetTouches[0].clientX;
+    setTouchDelta(currentX - touchStart);
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-    if (isLeftSwipe && totalSlides > 1) nextSlide();
-    if (isRightSwipe && totalSlides > 1) prevSlide();
+    if (touchStart === null) return;
+    setIsSwiping(false);
+    if (touchDelta < -40 && totalSlides > 1) {
+      nextSlide();
+    } else if (touchDelta > 40 && totalSlides > 1) {
+      prevSlide();
+    } else {
+      setCycleKey((prev) => prev + 1);
+    }
+    setTouchStart(null);
+    setTouchDelta(0);
   };
 
   return (
-    <section className="promo-carousel-section" aria-label="Promotional Showcase">
+    <section className="promo-carousel-section" aria-label={sectionTitle}>
       <div className="container promo-carousel-container">
+        {/* Top Text Heading (Flipkart / Amazon Style) */}
+        <div className="promo-section-header">
+          <h2 className="promo-section-title">{sectionTitle}</h2>
+        </div>
+
+        {/* Carousel Viewport (Arrows removed as requested) */}
         <div
-          className="promo-carousel-stage"
+          className="promo-carousel-viewport"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {slides.map((slide, index) => {
-            const isActive = index === currentIndex;
-            const themeClass = slide.theme ? `theme-${slide.theme}` : "theme-dark";
-            return (
-              <div
-                key={slide.id}
-                className={`promo-banner-card ${themeClass} ${isActive ? "active" : ""}`}
-                aria-hidden={!isActive}
-              >
-                {/* Clean Background Image */}
-                <div className="promo-card-bg">
-                  <img
-                    src={slide.image}
-                    alt={slide.alt}
-                    className="promo-bg-img"
-                    loading="lazy"
-                  />
-                  {/* Rich Emerald Gradient Overlay (for dark theme) */}
-                  {slide.theme === "dark" && <div className="promo-overlay-gradient" />}
-                </div>
-
-                {/* Standalone HTML/CSS Content (Separate from Image) */}
-                <div className="promo-card-content">
-                  <div className="promo-kicker-wrap">
-                    <span className="promo-kicker-text">{slide.kicker}</span>
+          {/* Continuous Sliding Horizontal Track */}
+          <div
+            className="promo-carousel-slider"
+            style={{
+              transform:
+                isSwiping && touchDelta !== 0
+                  ? `translateX(calc(-${currentIndex * 100}% + ${touchDelta}px))`
+                  : `translateX(-${currentIndex * 100}%)`,
+              transition: isSwiping ? "none" : "transform 0.55s cubic-bezier(0.25, 1, 0.5, 1)",
+            }}
+          >
+            {slides.map((slide, index) => {
+              const themeClass = slide.theme ? `theme-${slide.theme}` : "theme-dark";
+              return (
+                <div
+                  key={slide.id}
+                  className={`promo-banner-card ${themeClass}`}
+                  aria-hidden={index !== currentIndex}
+                >
+                  {/* Clean Background Image */}
+                  <div className="promo-card-bg">
+                    <img
+                      src={slide.image}
+                      alt={slide.alt}
+                      className="promo-bg-img"
+                      loading="lazy"
+                    />
+                    {slide.theme === "dark" && <div className="promo-overlay-gradient" />}
                   </div>
 
-                  {slide.isRibbonBadge ? (
-                    <div className="promo-ribbon-badge">
-                      <span className="promo-ribbon-text">{slide.title}</span>
+                  {/* Standalone HTML/CSS Content (Separate from Image) */}
+                  <div className="promo-card-content">
+                    {slide.kicker && (
+                      <div className="promo-kicker-wrap">
+                        <span className="promo-kicker-text">{slide.kicker}</span>
+                      </div>
+                    )}
+
+                    {slide.isRibbonBadge ? (
+                      <div className="promo-ribbon-badge">
+                        <span className="promo-ribbon-text">{slide.title}</span>
+                      </div>
+                    ) : (
+                      <h2 className="promo-title-text">{slide.title}</h2>
+                    )}
+
+                    {slide.subtitle && (
+                      <p className="promo-subtitle-text">{slide.subtitle}</p>
+                    )}
+
+                    {slide.hasUnderline && (
+                      <svg className="promo-title-curve" viewBox="0 0 160 12" fill="none" aria-hidden="true">
+                        <path d="M2 10 C 50 2, 110 2, 158 10" stroke="#c6a15b" strokeWidth="2.5" strokeLinecap="round" />
+                      </svg>
+                    )}
+
+                    {slide.hasGoldBar && (
+                      <span className="promo-gold-bar" aria-hidden="true" />
+                    )}
+
+                    <div className="promo-action-wrap">
+                      <Link
+                        href={slide.href}
+                        className={`promo-action-btn ${slide.theme === "dark" ? "btn-gold" : "btn-forest"}`}
+                      >
+                        <span>{slide.buttonText}</span>
+                        <ArrowRight size={16} className="promo-btn-arrow" />
+                      </Link>
                     </div>
-                  ) : (
-                    <h2 className="promo-title-text">{slide.title}</h2>
-                  )}
-
-                  {slide.hasUnderline && (
-                    <svg className="promo-title-curve" viewBox="0 0 160 12" fill="none" aria-hidden="true">
-                      <path d="M2 10 C 50 2, 110 2, 158 10" stroke="#c6a15b" strokeWidth="2.5" strokeLinecap="round" />
-                    </svg>
-                  )}
-
-                  <div className="promo-action-wrap">
-                    <Link
-                      href={slide.href}
-                      className={`promo-action-btn ${slide.theme === "dark" ? "btn-gold" : "btn-forest"}`}
-                    >
-                      <span>{slide.buttonText}</span>
-                      <ArrowRight size={16} className="promo-btn-arrow" />
-                    </Link>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-
-          {/* Desktop Arrow Controls (Visible when > 1 slide) */}
-          {totalSlides > 1 && (
-            <>
-              <button
-                type="button"
-                className="promo-arrow-nav prev"
-                onClick={prevSlide}
-                aria-label="Previous promotional banner"
-              >
-                <ChevronLeft size={22} />
-              </button>
-              <button
-                type="button"
-                className="promo-arrow-nav next"
-                onClick={nextSlide}
-                aria-label="Next promotional banner"
-              >
-                <ChevronRight size={22} />
-              </button>
-
-              {/* Dots Pagination Indicator */}
-              <div className="promo-dots-indicator">
-                {slides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    className={`promo-dot-bullet ${idx === currentIndex ? "active" : ""}`}
-                    onClick={() => setCurrentIndex(idx)}
-                    aria-label={`Go to promotional slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+              );
+            })}
+          </div>
         </div>
+
+        {/* Amazon & Flipkart-Style Animated Progress Bar Pill Indicators Underneath the Card */}
+        {totalSlides > 1 && (
+          <div className="promo-pills-indicator" aria-label="Slide progress indicators">
+            {slides.map((_, idx) => {
+              const isActive = idx === currentIndex;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`promo-pill-track ${isActive ? "active" : ""}`}
+                  onClick={() => goToSlide(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                >
+                  {isActive && !isSwiping && (
+                    <span
+                      key={`fill-${currentIndex}-${cycleKey}`}
+                      className="promo-pill-fill"
+                      style={{ animationDuration: `${SLIDE_DURATION}ms` }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );
