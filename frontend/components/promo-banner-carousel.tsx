@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -70,76 +70,157 @@ interface PromoBannerCarouselProps {
   sectionTitle?: string;
 }
 
-const SLIDE_DURATION = 5000; // 5 seconds per slide
+const SLIDE_DURATION = 5000;
 
 export function PromoBannerCarousel({
   slides = defaultPromoSlides,
   sectionTitle = "In The Spotlight",
 }: PromoBannerCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [activePage, setActivePage] = useState(0);
+  const [visibleCount, setVisibleCount] = useState<number>(3);
   const [cycleKey, setCycleKey] = useState(0);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchDelta, setTouchDelta] = useState(0);
-  const [isSwiping, setIsSwiping] = useState(false);
-  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const totalSlides = slides.length;
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isDownRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+  const hasDraggedRef = useRef(false);
+  const isProgrammaticScrollRef = useRef(false);
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-    setCycleKey((prev) => prev + 1);
-  };
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % totalSlides);
-    setCycleKey((prev) => prev + 1);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
-    setCycleKey((prev) => prev + 1);
-  };
-
-  // Progress bar auto-rotation: advances to next slide when progress ends
+  // Responsive device detection:
+  // Mobile (<=640px): 1 card visible
+  // Tablet (641px - 1024px): 2 cards visible
+  // Desktop (>1024px): 3 cards visible
   useEffect(() => {
-    if (totalSlides <= 1 || isSwiping) return;
-
-    autoPlayRef.current = setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % totalSlides);
-      setCycleKey((prev) => prev + 1);
-    }, SLIDE_DURATION);
-
-    return () => {
-      if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width <= 640) {
+        setVisibleCount(1);
+      } else if (width <= 1024) {
+        setVisibleCount(2);
+      } else {
+        setVisibleCount(3);
+      }
     };
-  }, [currentIndex, cycleKey, totalSlides, isSwiping]);
 
-  // Touch gesture swipe handlers
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-    setTouchDelta(0);
-    setIsSwiping(true);
-    if (autoPlayRef.current) clearTimeout(autoPlayRef.current);
-  };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStart === null) return;
-    const currentX = e.targetTouches[0].clientX;
-    setTouchDelta(currentX - touchStart);
-  };
+  // Compute number of pages/dots accordingly:
+  // Mobile (visible 1): 4 slides -> 4 dots
+  // Tablet (visible 2): 4 slides -> 2 dots
+  // Desktop (visible 3): 4 slides -> 2 dots
+  const pageCount =
+    visibleCount === 1
+      ? slides.length
+      : Math.max(1, Math.ceil(slides.length / visibleCount));
 
-  const handleTouchEnd = () => {
-    if (touchStart === null) return;
-    setIsSwiping(false);
-    if (touchDelta < -40 && totalSlides > 1) {
-      nextSlide();
-    } else if (touchDelta > 40 && totalSlides > 1) {
-      prevSlide();
-    } else {
+  // Ensure activePage does not exceed pageCount if window is resized
+  useEffect(() => {
+    if (activePage >= pageCount) {
+      setActivePage(Math.max(0, pageCount - 1));
       setCycleKey((prev) => prev + 1);
     }
-    setTouchStart(null);
-    setTouchDelta(0);
+  }, [pageCount, activePage]);
+
+  // Navigate to a specific page smoothly
+  const goToPage = useCallback(
+    (pageIndex: number) => {
+      if (!scrollRef.current) return;
+      const { scrollWidth, clientWidth } = scrollRef.current;
+      const maxScroll = scrollWidth - clientWidth;
+      if (maxScroll <= 0) return;
+
+      let targetLeft = 0;
+      if (pageIndex === 0) {
+        targetLeft = 0;
+      } else if (pageIndex >= pageCount - 1) {
+        targetLeft = maxScroll;
+      } else {
+        targetLeft = (pageIndex / (pageCount - 1)) * maxScroll;
+      }
+
+      isProgrammaticScrollRef.current = true;
+      scrollRef.current.scrollTo({
+        left: targetLeft,
+        behavior: "smooth",
+      });
+      setActivePage(pageIndex);
+      setCycleKey((prev) => prev + 1);
+
+      setTimeout(() => {
+        isProgrammaticScrollRef.current = false;
+      }, 500);
+    },
+    [pageCount]
+  );
+
+  // Auto-advance progress timer
+  useEffect(() => {
+    if (pageCount <= 1 || isPaused) return;
+
+    const timer = setTimeout(() => {
+      const nextPage = (activePage + 1) % pageCount;
+      goToPage(nextPage);
+    }, SLIDE_DURATION);
+
+    return () => clearTimeout(timer);
+  }, [activePage, pageCount, isPaused, cycleKey, goToPage]);
+
+  // Handle manual scroll (swipe, drag, trackpad)
+  const handleScroll = () => {
+    if (isProgrammaticScrollRef.current || !scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    const maxScroll = scrollWidth - clientWidth;
+    if (maxScroll <= 0) {
+      if (activePage !== 0) setActivePage(0);
+      return;
+    }
+    const progress = Math.min(Math.max(0, scrollLeft / maxScroll), 1);
+    const newPage = Math.min(
+      Math.max(0, Math.round(progress * (pageCount - 1))),
+      pageCount - 1
+    );
+    if (newPage !== activePage) {
+      setActivePage(newPage);
+      setCycleKey((prev) => prev + 1);
+    }
+  };
+
+  // Mouse drag handlers for desktop
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    isDownRef.current = true;
+    hasDraggedRef.current = false;
+    startXRef.current = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeftRef.current = scrollRef.current.scrollLeft;
+    setIsPaused(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDownRef.current || !scrollRef.current) return;
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = x - startXRef.current;
+    if (Math.abs(walk) > 4) {
+      hasDraggedRef.current = true;
+    }
+    scrollRef.current.scrollLeft = scrollLeftRef.current - walk;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    if (isDownRef.current) {
+      isDownRef.current = false;
+      setIsPaused(false);
+    }
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (hasDraggedRef.current) {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -150,31 +231,26 @@ export function PromoBannerCarousel({
           <h2 className="promo-section-title">{sectionTitle}</h2>
         </div>
 
-        {/* Carousel Viewport (Arrows removed as requested) */}
+        {/* Horizontal Gesture Scroll Rail */}
         <div
           className="promo-carousel-viewport"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          ref={scrollRef}
+          onScroll={handleScroll}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUpOrLeave}
+          onMouseLeave={handleMouseUpOrLeave}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
+          onMouseEnter={() => setIsPaused(true)}
         >
-          {/* Continuous Sliding Horizontal Track */}
-          <div
-            className="promo-carousel-slider"
-            style={{
-              transform:
-                isSwiping && touchDelta !== 0
-                  ? `translateX(calc(-${currentIndex * 100}% + ${touchDelta}px))`
-                  : `translateX(-${currentIndex * 100}%)`,
-              transition: isSwiping ? "none" : "transform 0.55s cubic-bezier(0.25, 1, 0.5, 1)",
-            }}
-          >
-            {slides.map((slide, index) => {
+          <div className="promo-carousel-slider">
+            {slides.map((slide) => {
               const themeClass = slide.theme ? `theme-${slide.theme}` : "theme-dark";
               return (
                 <div
                   key={slide.id}
                   className={`promo-banner-card ${themeClass}`}
-                  aria-hidden={index !== currentIndex}
                 >
                   {/* Clean Background Image */}
                   <div className="promo-card-bg">
@@ -183,11 +259,12 @@ export function PromoBannerCarousel({
                       alt={slide.alt}
                       className="promo-bg-img"
                       loading="lazy"
+                      draggable={false}
                     />
                     {slide.theme === "dark" && <div className="promo-overlay-gradient" />}
                   </div>
 
-                  {/* Standalone HTML/CSS Content (Separate from Image) */}
+                  {/* Standalone HTML/CSS Content */}
                   <div className="promo-card-content">
                     {slide.kicker && (
                       <div className="promo-kicker-wrap">
@@ -200,7 +277,7 @@ export function PromoBannerCarousel({
                         <span className="promo-ribbon-text">{slide.title}</span>
                       </div>
                     ) : (
-                      <h2 className="promo-title-text">{slide.title}</h2>
+                      <h3 className="promo-title-text">{slide.title}</h3>
                     )}
 
                     {slide.subtitle && (
@@ -220,10 +297,11 @@ export function PromoBannerCarousel({
                     <div className="promo-action-wrap">
                       <Link
                         href={slide.href}
+                        onClick={handleLinkClick}
                         className={`promo-action-btn ${slide.theme === "dark" ? "btn-gold" : "btn-forest"}`}
                       >
                         <span>{slide.buttonText}</span>
-                        <ArrowRight size={16} className="promo-btn-arrow" />
+                        <ArrowRight size={14} className="promo-btn-arrow" />
                       </Link>
                     </div>
                   </div>
@@ -233,22 +311,25 @@ export function PromoBannerCarousel({
           </div>
         </div>
 
-        {/* Amazon & Flipkart-Style Animated Progress Bar Pill Indicators Underneath the Card */}
-        {totalSlides > 1 && (
-          <div className="promo-pills-indicator" aria-label="Slide progress indicators">
-            {slides.map((_, idx) => {
-              const isActive = idx === currentIndex;
+        {/* Amazon & Flipkart-Style Animated Progress Bar Pill Indicators Underneath the Cards */}
+        {pageCount > 1 && (
+          <div
+            className={`promo-pills-indicator ${isPaused ? "paused" : ""}`}
+            aria-label="Slide progress indicators"
+          >
+            {Array.from({ length: pageCount }).map((_, idx) => {
+              const isActive = idx === activePage;
               return (
                 <button
                   key={idx}
                   type="button"
                   className={`promo-pill-track ${isActive ? "active" : ""}`}
-                  onClick={() => goToSlide(idx)}
-                  aria-label={`Go to slide ${idx + 1}`}
+                  onClick={() => goToPage(idx)}
+                  aria-label={`Go to slide group ${idx + 1}`}
                 >
-                  {isActive && !isSwiping && (
+                  {isActive && !isPaused && (
                     <span
-                      key={`fill-${currentIndex}-${cycleKey}`}
+                      key={`fill-${idx}-${cycleKey}`}
                       className="promo-pill-fill"
                       style={{ animationDuration: `${SLIDE_DURATION}ms` }}
                     />
