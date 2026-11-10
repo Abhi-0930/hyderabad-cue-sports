@@ -12,6 +12,8 @@ export interface PromoSlide {
   href: string;
   image: string;
   alt: string;
+  theme?: "dark" | "light";
+  hasUnderline?: boolean;
 }
 
 export const defaultPromoSlides: PromoSlide[] = [
@@ -23,6 +25,18 @@ export const defaultPromoSlides: PromoSlide[] = [
     href: "/shop?category=Snooker+Tables",
     image: "/images/banners/banner-snooker-tables-clean.jpg",
     alt: "Luxury tournament snooker table with dark wood carved legs in an elegant hall",
+    theme: "dark",
+  },
+  {
+    id: "professional-cue-equipment",
+    kicker: "Professional",
+    title: "Cue Equipment",
+    buttonText: "Explore Range",
+    href: "/shop?category=Cues",
+    image: "/images/banners/banner-cue-equipment-clean.jpg",
+    alt: "Handcrafted professional snooker cue sticks, tips and chalk on green billiard cloth",
+    theme: "light",
+    hasUnderline: true,
   },
 ];
 
@@ -85,10 +99,11 @@ export function PromoBannerCarousel({ slides = defaultPromoSlides }: PromoBanner
         >
           {slides.map((slide, index) => {
             const isActive = index === currentIndex;
+            const themeClass = slide.theme === "light" ? "theme-light" : "theme-dark";
             return (
               <div
                 key={slide.id}
-                className={`promo-banner-card ${isActive ? "active" : ""}`}
+                className={`promo-banner-card ${themeClass} ${isActive ? "active" : ""}`}
                 aria-hidden={!isActive}
               >
                 {/* Clean Background Image */}
@@ -99,18 +114,26 @@ export function PromoBannerCarousel({ slides = defaultPromoSlides }: PromoBanner
                     className="promo-bg-img"
                     loading="lazy"
                   />
-                  {/* Rich Emerald Gradient Overlay */}
-                  <div className="promo-overlay-gradient" />
+                  {/* Rich Emerald Gradient Overlay (for dark theme) */}
+                  {slide.theme !== "light" && <div className="promo-overlay-gradient" />}
                 </div>
 
                 {/* Standalone HTML/CSS Content (Separate from Image) */}
                 <div className="promo-card-content">
                   <div className="promo-kicker-wrap">
-                    <span className="promo-kicker-gold">{slide.kicker}</span>
+                    <span className="promo-kicker-text">{slide.kicker}</span>
                   </div>
-                  <h2 className="promo-title-white">{slide.title}</h2>
+                  <h2 className="promo-title-text">{slide.title}</h2>
+                  {slide.hasUnderline && (
+                    <svg className="promo-title-curve" viewBox="0 0 160 12" fill="none" aria-hidden="true">
+                      <path d="M2 10 C 50 2, 110 2, 158 10" stroke="#c6a15b" strokeWidth="2.5" strokeLinecap="round" />
+                    </svg>
+                  )}
                   <div className="promo-action-wrap">
-                    <Link href={slide.href} className="promo-shop-now-btn">
+                    <Link
+                      href={slide.href}
+                      className={`promo-action-btn ${slide.theme === "light" ? "btn-forest" : "btn-gold"}`}
+                    >
                       <span>{slide.buttonText}</span>
                       <ArrowRight size={16} className="promo-btn-arrow" />
                     </Link>
@@ -120,7 +143,7 @@ export function PromoBannerCarousel({ slides = defaultPromoSlides }: PromoBanner
             );
           })}
 
-          {/* Desktop Arrow Controls (Visible only if > 1 slide) */}
+          {/* Desktop Arrow Controls (Visible when > 1 slide) */}
           {totalSlides > 1 && (
             <>
               <button
@@ -159,4 +182,3 @@ export function PromoBannerCarousel({ slides = defaultPromoSlides }: PromoBanner
     </section>
   );
 }
-
