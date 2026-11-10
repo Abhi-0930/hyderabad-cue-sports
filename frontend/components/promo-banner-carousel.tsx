@@ -12,8 +12,9 @@ export interface PromoSlide {
   href: string;
   image: string;
   alt: string;
-  theme?: "dark" | "light";
+  theme?: "dark" | "light" | "accessories";
   hasUnderline?: boolean;
+  isRibbonBadge?: boolean;
 }
 
 export const defaultPromoSlides: PromoSlide[] = [
@@ -37,6 +38,17 @@ export const defaultPromoSlides: PromoSlide[] = [
     alt: "Handcrafted professional snooker cue sticks, tips and chalk on green billiard cloth",
     theme: "light",
     hasUnderline: true,
+  },
+  {
+    id: "essential-table-accessories",
+    kicker: "Essential",
+    title: "Table Accessories",
+    buttonText: "Shop Now",
+    href: "/shop?category=Table+Accessories",
+    image: "/images/banners/banner-table-accessories-clean.jpg",
+    alt: "Snooker table accessories with green cloth, balls, triangle rack, and brass net pockets",
+    theme: "accessories",
+    isRibbonBadge: true,
   },
 ];
 
@@ -99,7 +111,7 @@ export function PromoBannerCarousel({ slides = defaultPromoSlides }: PromoBanner
         >
           {slides.map((slide, index) => {
             const isActive = index === currentIndex;
-            const themeClass = slide.theme === "light" ? "theme-light" : "theme-dark";
+            const themeClass = slide.theme ? `theme-${slide.theme}` : "theme-dark";
             return (
               <div
                 key={slide.id}
@@ -115,7 +127,7 @@ export function PromoBannerCarousel({ slides = defaultPromoSlides }: PromoBanner
                     loading="lazy"
                   />
                   {/* Rich Emerald Gradient Overlay (for dark theme) */}
-                  {slide.theme !== "light" && <div className="promo-overlay-gradient" />}
+                  {slide.theme === "dark" && <div className="promo-overlay-gradient" />}
                 </div>
 
                 {/* Standalone HTML/CSS Content (Separate from Image) */}
@@ -123,16 +135,25 @@ export function PromoBannerCarousel({ slides = defaultPromoSlides }: PromoBanner
                   <div className="promo-kicker-wrap">
                     <span className="promo-kicker-text">{slide.kicker}</span>
                   </div>
-                  <h2 className="promo-title-text">{slide.title}</h2>
+
+                  {slide.isRibbonBadge ? (
+                    <div className="promo-ribbon-badge">
+                      <span className="promo-ribbon-text">{slide.title}</span>
+                    </div>
+                  ) : (
+                    <h2 className="promo-title-text">{slide.title}</h2>
+                  )}
+
                   {slide.hasUnderline && (
                     <svg className="promo-title-curve" viewBox="0 0 160 12" fill="none" aria-hidden="true">
                       <path d="M2 10 C 50 2, 110 2, 158 10" stroke="#c6a15b" strokeWidth="2.5" strokeLinecap="round" />
                     </svg>
                   )}
+
                   <div className="promo-action-wrap">
                     <Link
                       href={slide.href}
-                      className={`promo-action-btn ${slide.theme === "light" ? "btn-forest" : "btn-gold"}`}
+                      className={`promo-action-btn ${slide.theme === "dark" ? "btn-gold" : "btn-forest"}`}
                     >
                       <span>{slide.buttonText}</span>
                       <ArrowRight size={16} className="promo-btn-arrow" />
