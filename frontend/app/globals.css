@@ -643,6 +643,11 @@
   display: inline-block;
 }
 
+/* Mobile Search Strip (Desktop: Hidden) */
+.mobile-search-strip {
+  display: none;
+}
+
 /* Mobile Drawer Updates */
 .mobile-search-form {
   display: flex;
@@ -759,14 +764,125 @@
   .announcement-bar {
     display: none;
   }
-  .site-header-container {
-    height: 72px;
+  .site-header-main {
+    padding-bottom: 0;
+    border-bottom: 0;
   }
-  .hcs-search-form {
-    display: none;
+  .site-header-container {
+    height: 58px !important;
+    min-height: unset;
+    padding: 0 14px !important;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
   }
   .mobile-menu-toggle {
     display: grid;
+    place-items: center;
+    z-index: 2;
+  }
+  .site-header-container .hcs-brand-logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 !important;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .site-header-container .hcs-badge {
+    width: 35px;
+    height: 32px;
+    font-size: 12px;
+  }
+  .site-header-container .hcs-title {
+    font-size: 14px;
+  }
+  .site-header-container .hcs-subtitle {
+    font-size: 8.5px;
+  }
+  .hcs-header-actions {
+    margin-left: auto;
+    z-index: 2;
+    gap: 14px;
+    display: flex;
+    align-items: center;
+  }
+  .hcs-header-actions .hcs-action-item:nth-child(1),
+  .hcs-header-actions .hcs-action-item:nth-child(2) {
+    display: none;
+  }
+  .hcs-header-actions .hcs-action-label {
+    display: none;
+  }
+  .hcs-search-form {
+    display: none !important;
+  }
+  .mobile-search-strip {
+    display: block;
+    background: #ffffff;
+    padding: 4px 14px 10px 14px;
+    border-bottom: 1px solid #edf1ee;
+  }
+  .mobile-search-pill {
+    display: flex;
+    align-items: center;
+    height: 42px;
+    background: #ffffff;
+    border: 1px solid #c9d5cd;
+    border-radius: 999px;
+    padding: 0 6px 0 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .mobile-search-pill:focus-within {
+    border-color: var(--forest);
+    box-shadow: 0 0 0 3px rgba(23, 75, 53, 0.12);
+  }
+  .mobile-search-pill-icon {
+    color: #4b5e52;
+    flex-shrink: 0;
+    margin-right: 10px;
+  }
+  .mobile-search-pill input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .mobile-search-pill input::placeholder {
+    color: #7d8c82;
+    font-size: 13px;
+  }
+  .mobile-search-pill-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--forest);
+    color: #ffffff;
+    border: 0;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .mobile-search-pill-btn:hover {
+    background: var(--forest-2);
+  }
+  .mobile-search-pill-btn:active {
+    transform: scale(0.95);
   }
   .category-nav-bar {
     display: block;
@@ -859,6 +975,27 @@
   .hcs-header-actions .hcs-action-item:nth-child(1),
   .hcs-header-actions .hcs-action-item:nth-child(2) {
     display: none;
+  }
+  .hcs-badge {
+    width: 35px !important;
+    height: 32px !important;
+    font-size: 12px !important;
+  }
+  .hcs-title {
+    font-size: 14px !important;
+  }
+  .hcs-subtitle {
+    font-size: 8.5px !important;
+  }
+  .hcs-brand-logo {
+    gap: 8px !important;
+  }
+  .site-header-container {
+    height: 54px !important;
+    padding: 0 12px !important;
+  }
+  .mobile-search-strip {
+    padding: 4px 12px 8px 12px;
   }
   .floating-whatsapp-btn .whatsapp-floating-label {
     display: none;

@@ -285,6 +285,23 @@ export function SiteHeader() {
         </div>
       </header>
 
+      {/* Mobile Search Bar Strip (Dedicated section down from main header, directly above category icons) */}
+      <div className="mobile-search-strip">
+        <form className="mobile-search-pill" onSubmit={submitSearch}>
+          <Search size={18} className="mobile-search-pill-icon" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search snooker tables, cues, accessories..."
+            aria-label="Search catalog"
+          />
+          <button type="submit" className="mobile-search-pill-btn" aria-label="Search">
+            <Search size={15} />
+          </button>
+        </form>
+      </div>
+
       {/* 3. Bottom Category Navigation Bar with Dropdowns */}
       <nav className="category-nav-bar" aria-label="Category navigation">
         <div className="category-nav-container">
