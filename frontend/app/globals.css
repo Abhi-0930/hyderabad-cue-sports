@@ -1842,32 +1842,52 @@
 .promo-carousel-section {
   position: relative;
   width: 100%;
-  margin: 54px 0 24px;
+  margin: 48px 0 32px;
 }
 .promo-carousel-container {
   width: min(1280px, calc(100% - 48px));
   margin: 0 auto;
 }
-.promo-carousel-stage {
+.promo-section-header {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.promo-section-title {
+  font-family: var(--sans);
+  font-size: clamp(20px, 2.5vw, 25px);
+  font-weight: 700;
+  color: #174b35;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-align: left;
+}
+.promo-carousel-viewport {
   position: relative;
   width: 100%;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 16px 45px rgba(10, 35, 22, 0.12);
   background: #092618;
+  touch-action: pan-y pinch-zoom;
+}
+.promo-carousel-slider {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
 }
 .promo-banner-card {
-  position: relative;
+  flex: 0 0 100%;
+  min-width: 100%;
   width: 100%;
+  position: relative;
   min-height: 420px;
   aspect-ratio: 16 / 7;
-  display: none;
+  display: flex;
   align-items: center;
   overflow: hidden;
-}
-.promo-banner-card.active {
-  display: flex;
-  animation: fadeIn 0.4s ease forwards;
 }
 .promo-card-bg {
   position: absolute;
@@ -2010,6 +2030,38 @@
   line-height: 1.1;
 }
 
+/* Card 4: Scoreboards Theme */
+.promo-banner-card.theme-scoreboards .promo-card-bg {
+  background: #fbf9f5;
+}
+.promo-banner-card.theme-scoreboards .promo-title-text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(34px, 5.2vw, 62px);
+  color: #174b35;
+  letter-spacing: -0.01em;
+  text-shadow: none;
+  margin: 0;
+  line-height: 1.05;
+}
+.promo-subtitle-text {
+  font-family: var(--sans);
+  font-size: clamp(15px, 2vw, 20px);
+  font-weight: 500;
+  color: #4a544e;
+  margin: 6px 0 0 0;
+  letter-spacing: 0.01em;
+}
+.promo-gold-bar {
+  display: block;
+  width: 76px;
+  height: 3px;
+  background: linear-gradient(90deg, #c6a15b 0%, rgba(198, 161, 91, 0.2) 100%);
+  margin: 14px 0 26px 0;
+  border-radius: 2px;
+}
+
 /* Action Buttons */
 .promo-action-wrap {
   display: flex;
@@ -2059,64 +2111,80 @@
 }
 
 /* Nav controls */
-.promo-arrow-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 5;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(14, 38, 26, 0.65);
-  backdrop-filter: blur(8px);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.promo-arrow-nav:hover {
-  background: rgba(14, 38, 26, 0.9);
-}
-.promo-arrow-nav.prev {
-  left: 20px;
-}
-.promo-arrow-nav.next {
-  right: 20px;
-}
-.promo-dots-indicator {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
+/* Amazon & Flipkart-Style Animated Progress Bar Pill Indicators */
+.promo-pills-indicator {
   display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  background: rgba(14, 38, 26, 0.45);
-  backdrop-filter: blur(6px);
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: 16px;
 }
-.promo-dot-bullet {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.45);
+.promo-pill-track {
+  width: 20px;
+  height: 4px;
+  border-radius: 999px;
+  background: #d8ded9;
   border: 0;
+  padding: 0;
   cursor: pointer;
-  transition: background 0.2s ease, width 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s ease;
 }
-.promo-dot-bullet.active {
-  background: #dfc181;
-  width: 24px;
+.promo-pill-track:hover {
+  background: #bdc7be;
+}
+.promo-pill-track.active {
+  width: 36px;
+  background: #d8ded9;
+}
+.promo-pill-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  background: #174b35;
   border-radius: 999px;
+  animation-name: promoFillProgress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes promoFillProgress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
 }
 
 @media (max-width: 960px) {
   .promo-carousel-section {
-    margin: 36px 0 20px;
+    margin: 32px 0 20px;
+  }
+  .promo-section-header {
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+  .promo-section-title {
+    font-size: clamp(18px, 4.8vw, 22px);
+  }
+  .promo-carousel-viewport {
+    border-radius: 16px;
+  }
+  .promo-pills-indicator {
+    margin-top: 12px;
+    gap: 6px;
+  }
+  .promo-pill-track {
+    width: 16px;
+    height: 3.5px;
+  }
+  .promo-pill-track.active {
+    width: 30px;
+    height: 3.5px;
   }
   .promo-carousel-container {
     width: 100%;
@@ -2153,6 +2221,17 @@
   }
   .promo-ribbon-text {
     font-size: clamp(19px, 5vw, 30px);
+  }
+  .promo-banner-card.theme-scoreboards .promo-title-text {
+    font-size: clamp(26px, 7vw, 42px);
+  }
+  .promo-subtitle-text {
+    font-size: clamp(13px, 3.8vw, 16px);
+    margin-top: 4px;
+  }
+  .promo-gold-bar {
+    width: 60px;
+    margin: 10px 0 20px 0;
   }
   .promo-title-curve {
     width: 110px;
