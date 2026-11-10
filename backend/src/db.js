@@ -4,10 +4,10 @@ const path = require("path");
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
-const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  console.warn("⚠️ Warning: DATABASE_URL is not set in backend/.env");
+  throw new Error("Missing required environment variable: DATABASE_URL in backend/.env");
 }
 
 const pool = new Pool({
@@ -28,4 +28,3 @@ module.exports = {
   query: (text, params) => pool.query(text, params),
   pool,
 };
-

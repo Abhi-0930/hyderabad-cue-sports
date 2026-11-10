@@ -6,14 +6,14 @@ const dotenv = require("dotenv");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 async function runMigration() {
-  const directUrl = process.env.DIRECT_URL || process.env.DATABASE_URL;
+  const directUrl = process.env.DIRECT_URL;
 
   if (!directUrl) {
-    console.error("❌ DIRECT_URL or DATABASE_URL is missing in backend/.env");
+    console.error("❌ Missing required environment variable: DIRECT_URL in backend/.env");
     process.exit(1);
   }
 
-  console.log("🚀 Connecting to Supabase PostgreSQL at aws-1-ap-northeast-1.pooler.supabase.com...");
+  console.log("🚀 Connecting to Supabase PostgreSQL database...");
   
   const client = new Client({
     connectionString: directUrl,
@@ -58,4 +58,3 @@ async function runMigration() {
 }
 
 runMigration();
-

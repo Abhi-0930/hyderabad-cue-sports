@@ -1,7 +1,7 @@
 {
   "name": "hyderabad-cue-sports-backend",
   "version": "1.0.0",
-  "description": "Backend API server for Hyderabad Cue Sports with Supabase PostgreSQL connection",
+  "description": "High-performance Fastify backend for Hyderabad Cue Sports with Supabase PostgreSQL connection",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
@@ -10,10 +10,9 @@
     "migrate": "node src/scripts/migrate.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
+    "@fastify/cors": "^10.0.2",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2",
+    "fastify": "^5.2.1",
     "pg": "^8.13.1"
   }
 }
-
