@@ -93,7 +93,6 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
       if (openSidebar) {
         setCartOpen(true);
       }
-      setNotice(`${product.name} added to your bag`);
     },
     updateQuantity: (id, delta) => setCart((current) => current.map((item) => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item)),
     removeFromCart: (id) => setCart((current) => current.filter((item) => item.id !== id)),
@@ -114,7 +113,17 @@ export function SiteHeader() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 30);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navigationCategories = [
     {
@@ -189,8 +198,9 @@ export function SiteHeader() {
 
   return (
     <>
-      {/* Main Header */}
-      <header className="site-header-main">
+      <div className={`hcs-sticky-header ${isScrolled ? "scrolled" : ""}`}>
+        {/* Main Header */}
+        <header className="site-header-main">
         <div className="site-header-container">
           <button
             className="mobile-menu-toggle"
@@ -289,6 +299,7 @@ export function SiteHeader() {
                 <Link
                   href={cat.href}
                   className={`category-nav-link ${pathname.includes(cat.href) || activeDropdown === cat.id ? "active" : ""}`}
+                  title={cat.label}
                 >
                   <div className="cat-nav-content">
                     <div className="cat-nav-icon-wrapper">
@@ -352,6 +363,7 @@ export function SiteHeader() {
           </div>
         </div>
       </nav>
+      </div>
 
       {/* Mobile Drawer */}
       {mobileOpen && (

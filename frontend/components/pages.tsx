@@ -166,9 +166,7 @@ export function HomePage() {
             <span className="featured-gold-rule" />
           </div>
           <Link href="/shop" className="featured-view-all" aria-label="View all featured products">
-            <span className="view-all-text">View All</span>
-            <ArrowRight size={16} className="view-all-arrow desktop-only-icon" />
-            <ChevronRight size={22} className="view-all-arrow mobile-only-icon" />
+            <ChevronRight size={22} className="view-all-arrow" />
           </Link>
         </div>
 

@@ -468,6 +468,37 @@ export const accessoryCategories = [
   { label: "Table Accessories", note: "Keep the room ready", image: "/images/snooker-room.jpg" }
 ];
 
+export const accessoryDeals = [
+  {
+    id: "cues",
+    name: "Snooker Cues",
+    subtitle: "Handcrafted Ash & Maple",
+    image: "/images/products/featured-cue-stick.jpg",
+    link: "/shop?category=cues"
+  },
+  {
+    id: "balls",
+    name: "Snooker Balls",
+    subtitle: "Tournament Quality Sets",
+    image: "/images/products/featured-balls-15.jpg",
+    link: "/shop?category=table%20accessories"
+  },
+  {
+    id: "cloth",
+    name: "Table Baize & Cloth",
+    subtitle: "Strachan 6811 Championship",
+    image: "/images/products/featured-table-cloth.jpg",
+    link: "/shop?category=table%20accessories"
+  },
+  {
+    id: "scoreboards",
+    name: "Scoreboards",
+    subtitle: "Solid Mahogany & Brass",
+    image: "/images/categories/scoreboards.jpg",
+    link: "/shop?category=scoreboards"
+  }
+];
+
 export const formatInr = (amount: number) => `₹${amount.toLocaleString("en-IN")}`;
 
 export const getProduct = (slug: string) => products.find((product) => product.slug === slug);
