@@ -7,6 +7,7 @@ import { ArrowDown, ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, F
 import { accessoryCategories, collectionCards, formatInr, getProduct, Product, products } from "@/lib/products";
 import { ArrowLink, ProductCard, QuickViewModal, SectionHeading, SliderArrows, useStorefront } from "@/components/storefront-shell";
 import { AnimatedAddToCart } from "@/components/animated-add-to-cart";
+import { PromoBannerCarousel } from "@/components/promo-banner-carousel";
 
 export function HomePage() {
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
@@ -210,6 +211,9 @@ export function HomePage() {
 
       </div>
     </section>
+
+    {/* Promotional Banner Card Carousel */}
+    <PromoBannerCarousel />
 
     <section className="editorial-section" id="about"><div className="editorial-image"><img src="/images/snooker-room.jpg" alt="Elegant modern snooker room" /></div><div className="editorial-copy"><span className="eyebrow">The Hyderabad Cue Sports point of view</span><h2>Built around the game. <em>Designed for excellence.</em></h2><p>We believe the best playing rooms are made of more than measurements. They are shaped by proportion, material, light and the feeling that the next frame could be the one you remember.</p><div className="editorial-points"><div><span className="point-number">01</span><div><strong>Thoughtful product selection</strong><p>Curated sample pieces with a clear sense of place.</p></div></div><div><span className="point-number">02</span><div><strong>Professional playing experience</strong><p>Designed around the ritual and rhythm of the game.</p></div></div><div><span className="point-number">03</span><div><strong>Quality-focused design</strong><p>A calm visual language for serious spaces.</p></div></div><div><span className="point-number">04</span><div><strong>Customer-centric support</strong><p>A considered hand at every stage of the journey.</p></div></div></div><Link href="/#contact" className="text-button">Meet the brand <ArrowRight size={16} /></Link></div></section>
 
