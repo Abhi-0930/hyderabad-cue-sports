@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown, ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, Filter, Heart, Minus, Plus, Ruler, Search, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles, Star, Truck, X } from "lucide-react";
-import { accessoryCategories, collectionCards, formatInr, getProduct, Product, products } from "@/lib/products";
+import { accessoryCategories, accessoryDeals, collectionCards, formatInr, getProduct, Product, products } from "@/lib/products";
 import { ArrowLink, ProductCard, QuickViewModal, SectionHeading, SliderArrows, useStorefront } from "@/components/storefront-shell";
 import { AnimatedAddToCart } from "@/components/animated-add-to-cart";
 import { PromoBannerCarousel } from "@/components/promo-banner-carousel";
@@ -125,14 +125,36 @@ export function HomePage() {
     </section>
 
     <section className="featured-products-section">
-      {/* Corner Decorative Waves with Gold Trim */}
-      <svg className="featured-corner-tl" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M0 0 H180 C130 35 75 75 25 115 C10 132 0 148 0 160 Z" fill="#113a27" />
-        <path d="M180 0 C130 35 75 75 25 115 C10 132 0 148 0 160" stroke="#c6a15b" strokeWidth="2.5" />
+      {/* Bottom Corner Decorative Ribbon Waves with Metallic Gold Accent */}
+      <svg className="featured-corner-bl" viewBox="0 0 320 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="featuredWaveGoldBL" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#d4af37" />
+            <stop offset="50%" stopColor="#f3e5ab" />
+            <stop offset="100%" stopColor="#c6a15b" />
+          </linearGradient>
+          <linearGradient id="featuredWaveGreenBL" x1="0%" y1="0%" x2="40%" y2="100%">
+            <stop offset="0%" stopColor="#14462e" />
+            <stop offset="100%" stopColor="#0b2b1a" />
+          </linearGradient>
+        </defs>
+        <path d="M 0 15 C 90 25 200 88 320 90 L 0 90 Z" fill="url(#featuredWaveGreenBL)" />
+        <path d="M 0 15 C 90 25 200 88 320 90" stroke="url(#featuredWaveGoldBL)" strokeWidth="3" strokeLinecap="round" />
       </svg>
-      <svg className="featured-corner-br" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M200 160 H20 C70 125 125 85 175 45 C190 28 200 12 200 0 Z" fill="#113a27" />
-        <path d="M20 160 C70 125 125 85 175 45 C190 28 200 12 200 0" stroke="#c6a15b" strokeWidth="2.5" />
+      <svg className="featured-corner-br" viewBox="0 0 320 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="featuredWaveGoldBR" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="#d4af37" />
+            <stop offset="50%" stopColor="#f3e5ab" />
+            <stop offset="100%" stopColor="#c6a15b" />
+          </linearGradient>
+          <linearGradient id="featuredWaveGreenBR" x1="100%" y1="0%" x2="60%" y2="100%">
+            <stop offset="0%" stopColor="#14462e" />
+            <stop offset="100%" stopColor="#0b2b1a" />
+          </linearGradient>
+        </defs>
+        <path d="M 0 90 C 120 88 230 25 320 15 L 320 90 Z" fill="url(#featuredWaveGreenBR)" />
+        <path d="M 0 90 C 120 88 230 25 320 15" stroke="url(#featuredWaveGoldBR)" strokeWidth="3" strokeLinecap="round" />
       </svg>
 
       <div className="container featured-products-container">
@@ -145,7 +167,8 @@ export function HomePage() {
           </div>
           <Link href="/shop" className="featured-view-all" aria-label="View all featured products">
             <span className="view-all-text">View All</span>
-            <ArrowRight size={16} className="view-all-arrow" />
+            <ArrowRight size={16} className="view-all-arrow desktop-only-icon" />
+            <ChevronRight size={22} className="view-all-arrow mobile-only-icon" />
           </Link>
         </div>
 
@@ -215,9 +238,33 @@ export function HomePage() {
     {/* Promotional Banner Card Carousel */}
     <PromoBannerCarousel />
 
-    <section className="editorial-section" id="about"><div className="editorial-image"><img src="/images/snooker-room.jpg" alt="Elegant modern snooker room" /></div><div className="editorial-copy"><span className="eyebrow">The Hyderabad Cue Sports point of view</span><h2>Built around the game. <em>Designed for excellence.</em></h2><p>We believe the best playing rooms are made of more than measurements. They are shaped by proportion, material, light and the feeling that the next frame could be the one you remember.</p><div className="editorial-points"><div><span className="point-number">01</span><div><strong>Thoughtful product selection</strong><p>Curated sample pieces with a clear sense of place.</p></div></div><div><span className="point-number">02</span><div><strong>Professional playing experience</strong><p>Designed around the ritual and rhythm of the game.</p></div></div><div><span className="point-number">03</span><div><strong>Quality-focused design</strong><p>A calm visual language for serious spaces.</p></div></div><div><span className="point-number">04</span><div><strong>Customer-centric support</strong><p>A considered hand at every stage of the journey.</p></div></div></div><Link href="/#contact" className="text-button">Meet the brand <ArrowRight size={16} /></Link></div></section>
+    {/* Everything You Need For The Game - Amazon-Style Deals Quadrant */}
+    <section className="accessories-section">
+      <div className="container">
+        <div className="amazon-deals-container">
+          <div className="amazon-deals-header">
+            <h2 className="amazon-deals-title">Everything you need for the game</h2>
+            <Link href="/shop?type=accessory" className="amazon-deals-arrow-link" aria-label="Explore all accessories">
+              <ChevronRight size={22} className="amazon-deals-arrow" />
+            </Link>
+          </div>
 
-    <section className="section accessories-section"><div className="container"><SectionHeading eyebrow="Finish the room" title="Everything you need for the game" description="A preview of the accessories that bring the playing experience together." action={<ArrowLink href="/shop?type=accessory">Explore accessories</ArrowLink>} /><div className="accessory-rail">{accessoryCategories.map((category) => <Link href="/shop?type=accessory" className="accessory-card" key={category.label}><div className="accessory-image"><img src={category.image} alt="" /></div><div className="accessory-card-copy"><strong>{category.label}</strong><span>{category.note}</span><ArrowRight size={15} /></div></Link>)}</div></div></section>
+          <div className="amazon-deals-grid">
+            {accessoryDeals.map((item) => (
+              <Link href={item.link} className="amazon-deal-card" key={item.id}>
+                <div className="amazon-deal-media">
+                  <img src={item.image} alt={item.name} />
+                </div>
+                <div className="amazon-deal-body">
+                  <h3 className="amazon-deal-name">{item.name}</h3>
+                  <span className="amazon-deal-subtext">{item.subtitle}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section className="statement-banner"><div className="statement-banner-image"><img src="/images/snooker-detail.jpg" alt="Close view of a professional snooker table" /></div><div className="statement-banner-content container"><span className="eyebrow">Make space for the game</span><h2>Create your perfect <em>snooker space.</em></h2><p>Explore premium snooker tables for homes, clubs and professional playing environments.</p><Link href="/shop" className="button button-light">Explore collection <ArrowRight size={16} /></Link></div></section>
 
