@@ -1905,7 +1905,7 @@
 .promo-kicker-wrap {
   margin-bottom: 2px;
 }
-.promo-kicker-gold {
+.promo-kicker-text {
   font-family: var(--sans);
   font-style: italic;
   font-weight: 700;
@@ -1917,7 +1917,7 @@
   letter-spacing: -0.01em;
   line-height: 1.1;
 }
-.promo-title-white {
+.promo-title-text {
   font-family: var(--sans);
   font-style: italic;
   font-weight: 800;
@@ -1928,34 +1928,83 @@
   margin: 2px 0 28px 0;
   text-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
 }
+
+/* Light Theme (Cue Equipment Card) */
+.promo-banner-card.theme-light .promo-card-bg {
+  background: #f7f3ec;
+}
+.promo-banner-card.theme-light .promo-kicker-text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(26px, 4vw, 46px);
+  color: #174b35;
+  background: none;
+  -webkit-text-fill-color: #174b35;
+  text-shadow: none;
+}
+.promo-banner-card.theme-light .promo-title-text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(34px, 5.2vw, 62px);
+  color: #0b2e1e;
+  letter-spacing: -0.01em;
+  text-shadow: none;
+  margin: 2px 0 6px 0;
+}
+.promo-title-curve {
+  width: 140px;
+  height: 12px;
+  margin-bottom: 24px;
+  display: block;
+}
+
+/* Action Buttons */
 .promo-action-wrap {
   display: flex;
   align-items: center;
 }
-.promo-shop-now-btn {
+.promo-action-btn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 13px 32px;
-  background: linear-gradient(135deg, #dfc181 0%, #c89e52 100%);
-  color: #0b1c12 !important;
+  border-radius: 999px;
   font-size: 15px;
   font-weight: 800;
-  border-radius: 999px;
   text-decoration: none;
-  box-shadow: 0 8px 24px rgba(198, 161, 91, 0.32);
-  transition: opacity 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
-.promo-shop-now-btn:hover {
+.promo-action-btn.btn-gold {
+  background: linear-gradient(135deg, #dfc181 0%, #c89e52 100%);
+  color: #0b1c12 !important;
+  box-shadow: 0 8px 24px rgba(198, 161, 91, 0.32);
+}
+.promo-action-btn.btn-gold:hover {
   box-shadow: 0 12px 30px rgba(198, 161, 91, 0.5);
   filter: brightness(1.04);
 }
-.promo-btn-arrow {
+.promo-action-btn.btn-gold .promo-btn-arrow {
   color: #0b1c12;
   transition: transform 0.2s ease;
 }
-.promo-shop-now-btn:hover .promo-btn-arrow {
+.promo-action-btn.btn-forest {
+  background: #092618;
+  color: #ffffff !important;
+  border: 1.5px solid #c6a15b;
+  box-shadow: 0 8px 24px rgba(9, 38, 24, 0.28);
+}
+.promo-action-btn.btn-forest:hover {
+  background: #113a27;
+  box-shadow: 0 12px 30px rgba(9, 38, 24, 0.42);
+}
+.promo-action-btn.btn-forest .promo-btn-arrow {
+  color: #c6a15b;
+  transition: transform 0.2s ease;
+}
+.promo-action-btn:hover .promo-btn-arrow {
   transform: translateX(4px);
 }
 
@@ -1968,7 +2017,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(14, 38, 26, 0.65);
   backdrop-filter: blur(8px);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.25);
@@ -1978,7 +2027,7 @@
   transition: background 0.2s ease;
 }
 .promo-arrow-nav:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(14, 38, 26, 0.9);
 }
 .promo-arrow-nav.prev {
   left: 20px;
@@ -1994,19 +2043,24 @@
   z-index: 5;
   display: flex;
   gap: 8px;
+  background: rgba(14, 38, 26, 0.45);
+  backdrop-filter: blur(6px);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 .promo-dot-bullet {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.45);
   border: 0;
   cursor: pointer;
-  transition: background 0.2s ease, width 0.2s ease;
+  transition: background 0.2s ease, width 0.25s ease;
 }
 .promo-dot-bullet.active {
   background: #dfc181;
-  width: 26px;
+  width: 24px;
   border-radius: 999px;
 }
 
@@ -2026,16 +2080,30 @@
     padding: 34px 26px;
     max-width: 440px;
   }
-  .promo-kicker-gold {
+  .promo-kicker-text {
     font-size: clamp(22px, 5.5vw, 32px);
   }
-  .promo-title-white {
+  .promo-banner-card.theme-light .promo-kicker-text {
+    font-size: clamp(20px, 5vw, 30px);
+  }
+  .promo-title-text {
     font-size: clamp(26px, 7vw, 42px);
     margin: 2px 0 20px 0;
   }
-  .promo-shop-now-btn {
+  .promo-banner-card.theme-light .promo-title-text {
+    font-size: clamp(26px, 7vw, 42px);
+    margin: 2px 0 4px 0;
+  }
+  .promo-title-curve {
+    width: 110px;
+    margin-bottom: 18px;
+  }
+  .promo-action-btn {
     padding: 10px 24px;
     font-size: 13.5px;
+  }
+  .promo-arrow-nav {
+    display: none;
   }
   .promo-overlay-gradient {
     background: linear-gradient(
