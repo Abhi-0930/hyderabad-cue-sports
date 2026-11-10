@@ -64,3 +64,4 @@ app.listen(PORT, () => {
   console.log(`🎱 Hyderabad Cue Sports Backend is running on http://localhost:${PORT}`);
   console.log(`📡 Connected to Supabase PostgreSQL: aws-1-ap-northeast-1.pooler.supabase.com`);
 });
+
