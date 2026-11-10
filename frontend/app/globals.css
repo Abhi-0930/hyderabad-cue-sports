@@ -1837,6 +1837,229 @@
 }
 
 /* =========================================================
+   PROMO BANNER CAROUSEL SECTION
+   ========================================================= */
+.promo-carousel-section {
+  position: relative;
+  width: 100%;
+  margin: 54px 0 24px;
+}
+.promo-carousel-container {
+  width: min(1280px, calc(100% - 48px));
+  margin: 0 auto;
+}
+.promo-carousel-stage {
+  position: relative;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 16px 45px rgba(10, 35, 22, 0.12);
+  background: #092618;
+}
+.promo-banner-card {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  aspect-ratio: 16 / 7;
+  display: none;
+  align-items: center;
+  overflow: hidden;
+}
+.promo-banner-card.active {
+  display: flex;
+  animation: fadeIn 0.4s ease forwards;
+}
+.promo-card-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.promo-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  display: block;
+}
+.promo-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(6, 26, 16, 0.96) 0%,
+    rgba(8, 34, 21, 0.9) 34%,
+    rgba(10, 42, 26, 0.42) 58%,
+    transparent 80%
+  );
+}
+.promo-card-content {
+  position: relative;
+  z-index: 2;
+  padding: 50px 64px;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.promo-kicker-wrap {
+  margin-bottom: 2px;
+}
+.promo-kicker-gold {
+  font-family: var(--sans);
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(28px, 4.2vw, 48px);
+  background: linear-gradient(135deg, #f7d88c 0%, #dfb76c 40%, #c69f52 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.promo-title-white {
+  font-family: var(--sans);
+  font-style: italic;
+  font-weight: 800;
+  font-size: clamp(34px, 5.2vw, 62px);
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 2px 0 28px 0;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+.promo-action-wrap {
+  display: flex;
+  align-items: center;
+}
+.promo-shop-now-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 32px;
+  background: linear-gradient(135deg, #dfc181 0%, #c89e52 100%);
+  color: #0b1c12 !important;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 999px;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(198, 161, 91, 0.32);
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.promo-shop-now-btn:hover {
+  box-shadow: 0 12px 30px rgba(198, 161, 91, 0.5);
+  filter: brightness(1.04);
+}
+.promo-btn-arrow {
+  color: #0b1c12;
+  transition: transform 0.2s ease;
+}
+.promo-shop-now-btn:hover .promo-btn-arrow {
+  transform: translateX(4px);
+}
+
+/* Nav controls */
+.promo-arrow-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.promo-arrow-nav:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+.promo-arrow-nav.prev {
+  left: 20px;
+}
+.promo-arrow-nav.next {
+  right: 20px;
+}
+.promo-dots-indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+}
+.promo-dot-bullet {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  border: 0;
+  cursor: pointer;
+  transition: background 0.2s ease, width 0.2s ease;
+}
+.promo-dot-bullet.active {
+  background: #dfc181;
+  width: 26px;
+  border-radius: 999px;
+}
+
+@media (max-width: 960px) {
+  .promo-carousel-section {
+    margin: 36px 0 20px;
+  }
+  .promo-carousel-container {
+    width: 100%;
+    padding: 0 16px;
+  }
+  .promo-banner-card {
+    min-height: 320px;
+    aspect-ratio: auto;
+  }
+  .promo-card-content {
+    padding: 34px 26px;
+    max-width: 440px;
+  }
+  .promo-kicker-gold {
+    font-size: clamp(22px, 5.5vw, 32px);
+  }
+  .promo-title-white {
+    font-size: clamp(26px, 7vw, 42px);
+    margin: 2px 0 20px 0;
+  }
+  .promo-shop-now-btn {
+    padding: 10px 24px;
+    font-size: 13.5px;
+  }
+  .promo-overlay-gradient {
+    background: linear-gradient(
+      90deg,
+      rgba(6, 26, 16, 0.97) 0%,
+      rgba(8, 34, 21, 0.92) 50%,
+      rgba(10, 42, 26, 0.5) 75%,
+      transparent 100%
+    );
+  }
+}
+@media (max-width: 520px) {
+  .promo-carousel-section {
+    margin: 28px 0 16px;
+  }
+  .promo-banner-card {
+    min-height: 280px;
+  }
+  .promo-card-content {
+    padding: 24px 18px;
+  }
+}
+
+/* =========================================================
    GLOBAL HOVER STABILITY RESET (DISABLE BOUNCE / SCALE)
    ========================================================= */
 .button:hover,
