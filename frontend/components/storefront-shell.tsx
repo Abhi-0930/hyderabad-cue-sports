@@ -31,6 +31,7 @@ import {
 import { formatInr, Product, products } from "@/lib/products";
 import { apiFetch, type AuthUser } from "@/lib/api";
 import { buildProductUrl, buildShopUrl, buildLoginUrl } from "@/lib/url";
+import { toast } from "sonner";
 
 type CartItem = Product & { quantity: number };
 type StorefrontContextValue = {
@@ -47,7 +48,7 @@ type StorefrontContextValue = {
   closeCart: () => void;
   setUser: (user: AuthUser | null) => void;
   logout: () => Promise<void>;
-  showNotice: (message: string) => void;
+  showNotice: (message: string, type?: "success" | "error" | "info" | "warning") => void;
 };
 
 const StorefrontContext = createContext<StorefrontContextValue | null>(null);
@@ -111,11 +112,29 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
       });
       if (openSidebar) {
         setCartOpen(true);
+      } else {
+        toast.success(`Added ${product.name} to bag`, {
+          action: {
+            label: "View bag",
+            onClick: () => setCartOpen(true),
+          },
+        });
       }
     },
     updateQuantity: (id, delta) => setCart((current) => current.map((item) => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item)),
     removeFromCart: (id) => setCart((current) => current.filter((item) => item.id !== id)),
-    toggleWishlist: (id) => setWishlist((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]),
+    toggleWishlist: (id) => {
+      setWishlist((current) => {
+        const exists = current.includes(id);
+        if (exists) {
+          toast("Item removed from your wishlist");
+          return current.filter((item) => item !== id);
+        } else {
+          toast.success("Item saved to your wishlist");
+          return [...current, id];
+        }
+      });
+    },
     openCart: () => setCartOpen(true),
     closeCart: () => setCartOpen(false),
     setUser,
@@ -124,10 +143,20 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
         await apiFetch("/api/auth/logout", { method: "POST" });
       } finally {
         setUser(null);
-        setNotice("You have been signed out.");
+        toast.success("You have been signed out.");
       }
     },
-    showNotice: (message) => setNotice(message),
+    showNotice: (message, type = "info") => {
+      if (type === "success") {
+        toast.success(message);
+      } else if (type === "error") {
+        toast.error(message);
+      } else if (type === "warning") {
+        toast.warning(message);
+      } else {
+        toast.info(message);
+      }
+    },
   }), [cart, wishlist, cartOpen, notice, user]);
 
   return (
@@ -607,8 +636,7 @@ export function CartDrawer() {
 }
 
 export function ToastNotice() {
-  const { notice } = useStorefront();
-  return notice ? <div className="toast-notice" role="status"><Zap size={16} />{notice}</div> : null;
+  return null;
 }
 
 export function BackToTop() {
@@ -657,3 +685,5 @@ export function SliderArrows({ onPrev, onNext }: { onPrev?: () => void; onNext?:
 }
 
 export const catalogProducts = products;
+
+export { toast } from "sonner";

@@ -106,7 +106,19 @@ export function PromoBannerCarousel({
 
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    const handleGlobalMouseUp = () => {
+      if (isDownRef.current) {
+        isDownRef.current = false;
+        setIsPaused(false);
+      }
+    };
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mouseup", handleGlobalMouseUp);
+    };
   }, []);
 
   // Compute number of pages/dots accordingly:
@@ -153,7 +165,7 @@ export function PromoBannerCarousel({
 
       setTimeout(() => {
         isProgrammaticScrollRef.current = false;
-      }, 500);
+      }, 750);
     },
     [pageCount]
   );
@@ -210,11 +222,18 @@ export function PromoBannerCarousel({
     scrollRef.current.scrollLeft = scrollLeftRef.current - walk;
   };
 
-  const handleMouseUpOrLeave = () => {
-    if (isDownRef.current) {
-      isDownRef.current = false;
-      setIsPaused(false);
-    }
+  const handleMouseUp = () => {
+    isDownRef.current = false;
+    setIsPaused(false);
+  };
+
+  const handleMouseEnter = () => {
+    setIsPaused(true);
+  };
+
+  const handleMouseLeave = () => {
+    isDownRef.current = false;
+    setIsPaused(false);
   };
 
   const handleLinkClick = (e: React.MouseEvent) => {
@@ -238,11 +257,12 @@ export function PromoBannerCarousel({
           onScroll={handleScroll}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUpOrLeave}
-          onMouseLeave={handleMouseUpOrLeave}
+          onMouseUp={handleMouseUp}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
           onTouchStart={() => setIsPaused(true)}
           onTouchEnd={() => setIsPaused(false)}
-          onMouseEnter={() => setIsPaused(true)}
+          onTouchCancel={() => setIsPaused(false)}
         >
           <div className="promo-carousel-slider">
             {slides.map((slide) => {
@@ -327,7 +347,7 @@ export function PromoBannerCarousel({
                   onClick={() => goToPage(idx)}
                   aria-label={`Go to slide group ${idx + 1}`}
                 >
-                  {isActive && !isPaused && (
+                  {isActive && (
                     <span
                       key={`fill-${idx}-${cycleKey}`}
                       className="promo-pill-fill"

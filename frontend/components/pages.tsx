@@ -55,7 +55,7 @@ export function HomePage() {
     event.preventDefault();
     if (!email.trim()) return;
     setSubscribed(true);
-    showNotice("Thank you — you are on the demo list.");
+    showNotice("Thank you — you are on the VIP updates list.", "success");
   };
 
   return <>
