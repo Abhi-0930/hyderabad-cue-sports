@@ -1,17 +1,18 @@
 const db = require("../db");
+const { encryptPII, normalizePhone, normalizeEmail } = require("../utils/crypto");
 
 /**
- * Fastify plugin for Inquiries routes
+ * Fastify plugin for Inquiries routes (with AES-256 PII protection at rest)
  * @param {import('fastify').FastifyInstance} fastify
  */
-async function inquiriesRoutes(fastify, options) {
+async function inquiriesRoutes(fastify) {
   // POST /api/inquiries - Submit consultation / custom snooker table inquiry
   fastify.post("/", async (request, reply) => {
     try {
       const {
         fullName,
-        phone,
-        email,
+        phone: rawPhone,
+        email: rawEmail,
         city,
         productId,
         productInterest,
@@ -19,11 +20,14 @@ async function inquiriesRoutes(fastify, options) {
         message,
       } = request.body || {};
 
+      const phone = normalizePhone(rawPhone);
+      const email = rawEmail ? normalizeEmail(rawEmail) : null;
+
       if (!fullName || !phone || !city) {
         reply.status(400);
         return {
           success: false,
-          message: "Missing required fields (fullName, phone, city)",
+          message: "Missing or invalid required fields (fullName, valid 10-digit phone, city).",
         };
       }
 
@@ -31,14 +35,14 @@ async function inquiriesRoutes(fastify, options) {
         INSERT INTO public.inquiries (
           full_name, phone, email, city, product_id, product_interest, room_dimensions, message
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING *;
+        RETURNING id, city, product_interest, room_dimensions, status, created_at;
       `;
 
       const { rows } = await db.query(sql, [
-        fullName,
-        phone,
-        email || null,
-        city,
+        fullName.trim(),
+        encryptPII(phone),
+        email ? encryptPII(email) : null,
+        city.trim(),
         productId || null,
         productInterest || null,
         roomDimensions || null,

@@ -74,12 +74,82 @@ CREATE TRIGGER on_auth_user_created
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- ------------------------------------------------------------------------------
+-- 3B. PASSWORDLESS CUSTOMERS, SESSIONS, ADDRESSES & WISHLIST (Hashed + AES-256)
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.customers (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    phone_hash TEXT UNIQUE NOT NULL,
+    phone_encrypted TEXT NOT NULL,
+    email_hash TEXT UNIQUE,
+    email_encrypted TEXT,
+    full_name TEXT,
+    is_phone_verified BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_customers_phone_hash ON public.customers(phone_hash);
+CREATE INDEX IF NOT EXISTS idx_customers_email_hash ON public.customers(email_hash);
+
+CREATE TABLE IF NOT EXISTS public.auth_sessions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    customer_id UUID NOT NULL REFERENCES public.customers(id) ON DELETE CASCADE,
+    token_hash TEXT UNIQUE NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    user_agent TEXT,
+    ip_address TEXT,
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_sessions_token_hash ON public.auth_sessions(token_hash);
+CREATE INDEX IF NOT EXISTS idx_auth_sessions_customer_id ON public.auth_sessions(customer_id);
+
+CREATE TABLE IF NOT EXISTS public.otp_challenges (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    phone_hash TEXT NOT NULL,
+    otp_hash TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_otp_challenges_phone_hash ON public.otp_challenges(phone_hash);
+
+CREATE TABLE IF NOT EXISTS public.customer_addresses (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    customer_id UUID NOT NULL REFERENCES public.customers(id) ON DELETE CASCADE,
+    label TEXT NOT NULL DEFAULT 'Home',
+    recipient_name TEXT NOT NULL,
+    phone_encrypted TEXT NOT NULL,
+    address_line1 TEXT NOT NULL,
+    address_line2 TEXT,
+    city TEXT NOT NULL,
+    state TEXT NOT NULL,
+    pincode TEXT NOT NULL,
+    is_default BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_customer_addresses_customer_id ON public.customer_addresses(customer_id);
+
+CREATE TABLE IF NOT EXISTS public.wishlist_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    customer_id UUID NOT NULL REFERENCES public.customers(id) ON DELETE CASCADE,
+    product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    UNIQUE (customer_id, product_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_wishlist_customer_id ON public.wishlist_items(customer_id);
+
+-- ------------------------------------------------------------------------------
 -- 4. ORDERS TABLE
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     order_number TEXT UNIQUE NOT NULL,         -- e.g. 'HCS-2026-1042'
     user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    customer_id UUID REFERENCES public.customers(id) ON DELETE SET NULL,
     customer_name TEXT NOT NULL,
     customer_email TEXT NOT NULL,
     customer_phone TEXT NOT NULL,
@@ -134,41 +204,56 @@ CREATE TABLE IF NOT EXISTS public.inquiries (
     created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
+-- Ensure existing orders table has customer_id column
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_id UUID REFERENCES public.customers(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON public.orders(customer_id);
+
 -- ------------------------------------------------------------------------------
 -- 7. ROW LEVEL SECURITY (RLS) POLICIES
 -- ------------------------------------------------------------------------------
 -- Enable RLS on all tables
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.auth_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.otp_challenges ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.customer_addresses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.wishlist_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
 
 -- Products: Everyone (authenticated & guests) can view active products
+DROP POLICY IF EXISTS "Public products viewable by everyone" ON public.products;
 CREATE POLICY "Public products viewable by everyone" 
 ON public.products FOR SELECT 
 USING (true);
 
 -- Profiles: Users can view and update their own profile; Admins have full access
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" 
 ON public.profiles FOR SELECT 
 USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" 
 ON public.profiles FOR UPDATE 
 USING (auth.uid() = id);
 
 -- Orders: Users can view their own orders
+DROP POLICY IF EXISTS "Users can view own orders" ON public.orders;
 CREATE POLICY "Users can view own orders" 
 ON public.orders FOR SELECT 
 USING (auth.uid() = user_id);
 
 -- Anyone (guests or logged in) can create an order at checkout
+DROP POLICY IF EXISTS "Users can create orders" ON public.orders;
 CREATE POLICY "Users can create orders" 
 ON public.orders FOR INSERT 
 WITH CHECK (true);
 
 -- Order Items: Viewable if user owns the parent order
+DROP POLICY IF EXISTS "Users can view own order items" ON public.order_items;
 CREATE POLICY "Users can view own order items" 
 ON public.order_items FOR SELECT 
 USING (
@@ -179,11 +264,13 @@ USING (
     )
 );
 
+DROP POLICY IF EXISTS "Anyone can insert order items during checkout" ON public.order_items;
 CREATE POLICY "Anyone can insert order items during checkout" 
 ON public.order_items FOR INSERT 
 WITH CHECK (true);
 
 -- Inquiries: Anyone can submit an inquiry
+DROP POLICY IF EXISTS "Anyone can submit inquiry" ON public.inquiries;
 CREATE POLICY "Anyone can submit inquiry" 
 ON public.inquiries FOR INSERT 
 WITH CHECK (true);
@@ -195,6 +282,7 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('storefront-media', 'storefront-media', true)
 ON CONFLICT (id) DO NOTHING;
 
+DROP POLICY IF EXISTS "Public Access for storefront-media" ON storage.objects;
 CREATE POLICY "Public Access for storefront-media" 
 ON storage.objects FOR SELECT 
 USING (bucket_id = 'storefront-media');

@@ -10,9 +10,11 @@
     "migrate": "node src/scripts/migrate.js"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.1.5",
     "@fastify/cors": "^10.0.2",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.13.1"
   }
 }
