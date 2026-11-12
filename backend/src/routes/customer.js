@@ -248,3 +248,4 @@ async function customerRoutes(fastify) {
 }
 
 module.exports = customerRoutes;
+

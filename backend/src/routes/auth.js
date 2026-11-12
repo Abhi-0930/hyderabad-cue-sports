@@ -262,3 +262,4 @@ async function authRoutes(fastify) {
 }
 
 module.exports = authRoutes;
+
