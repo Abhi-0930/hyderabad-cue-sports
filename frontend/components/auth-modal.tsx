@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { ArrowLeft, Check, ChevronDown, Loader2, X } from "lucide-react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import { ArrowLeft, Check, ChevronDown, Loader2, Search, X } from "lucide-react";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+import { allCountries, type Country } from "country-telephone-data";
 import { apiFetch, type AuthUser } from "@/lib/api";
 
 interface AuthModalProps {
@@ -12,24 +13,13 @@ interface AuthModalProps {
   isStandalonePage?: boolean;
 }
 
-interface CountryOption {
-  code: string;
-  dial: string;
-  name: string;
-}
-
-const COUNTRY_CODES: CountryOption[] = [
-  { code: "IN", dial: "+91", name: "India" },
-  { code: "AE", dial: "+971", name: "United Arab Emirates" },
-  { code: "US", dial: "+1", name: "United States / Canada" },
-  { code: "GB", dial: "+44", name: "United Kingdom" },
-  { code: "SG", dial: "+65", name: "Singapore" },
-  { code: "AU", dial: "+61", name: "Australia" },
-  { code: "SA", dial: "+966", name: "Saudi Arabia" },
-  { code: "QA", dial: "+974", name: "Qatar" },
-  { code: "MY", dial: "+60", name: "Malaysia" },
-  { code: "DE", dial: "+49", name: "Germany" },
+const SORTED_COUNTRIES: Country[] = [
+  ...allCountries.filter((c) => c.iso2 === "in"),
+  ...allCountries.filter((c) => c.iso2 !== "in"),
 ];
+
+const DEFAULT_COUNTRY: Country =
+  SORTED_COUNTRIES.find((c) => c.iso2 === "in") || SORTED_COUNTRIES[0];
 
 type AuthStep = "entry" | "needs_email" | "needs_phone";
 type EntryMode = "phone" | "email";
@@ -51,50 +41,85 @@ interface CompleteSignupResponse {
   message?: string;
 }
 
-function validatePhoneByCountry(digits: string, dialCode: string): string | null {
-  if (dialCode === "+91") {
+function formatCountryDisplayName(name: string): string {
+  return name.replace(/\s*\([^)]*\)\s*$/, "").trim() || name;
+}
+
+function validatePhoneByCountry(digits: string, country: Country): string | null {
+  if (country.iso2 === "in") {
     return /^[6-9]\d{9}$/.test(digits)
       ? null
       : "Please enter a valid 10-digit Indian mobile number.";
   }
-  return digits.length >= 7 && digits.length <= 15
+  return digits.length >= 6 && digits.length <= 15
     ? null
-    : "Please enter a valid mobile number (7 to 15 digits).";
+    : "Please enter a valid mobile number (6 to 15 digits).";
 }
 
 function PhoneNumberField({
-  dialCode,
-  onDialChange,
+  selectedCountry,
+  onCountryChange,
   value,
   onChange,
 }: {
-  dialCode: string;
-  onDialChange: (dial: string) => void;
+  selectedCountry: Country;
+  onCountryChange: (country: Country) => void;
   value: string;
   onChange: (digits: string) => void;
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const wrapRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const phoneInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!dropdownOpen) return;
+
+    const focusTimer = window.setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 10);
+
     const handleClickOutside = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
+        setSearchQuery("");
       }
     };
+
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setDropdownOpen(false);
+      if (e.key === "Escape") {
+        setDropdownOpen(false);
+        setSearchQuery("");
+      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     window.addEventListener("keydown", handleEsc);
     return () => {
+      window.clearTimeout(focusTimer);
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("keydown", handleEsc);
     };
   }, [dropdownOpen]);
 
-  const maxDigits = dialCode === "+91" ? 10 : 15;
+  const filteredCountries = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return SORTED_COUNTRIES;
+    const digitQuery = q.replace(/^\+/, "");
+    return SORTED_COUNTRIES.filter((c) => {
+      const displayName = formatCountryDisplayName(c.name).toLowerCase();
+      return (
+        displayName.includes(q) ||
+        c.name.toLowerCase().includes(q) ||
+        c.iso2.toLowerCase().includes(q) ||
+        c.dialCode.includes(digitQuery) ||
+        `+${c.dialCode}`.includes(q)
+      );
+    });
+  }, [searchQuery]);
+
+  const maxDigits = selectedCountry.iso2 === "in" ? 10 : 15;
 
   return (
     <div className="hcs-auth-phone-wrap" ref={wrapRef}>
@@ -102,12 +127,19 @@ function PhoneNumberField({
         <button
           type="button"
           className="hcs-auth-country-btn"
-          onClick={() => setDropdownOpen((prev) => !prev)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDropdownOpen((prev) => {
+              if (prev) setSearchQuery("");
+              return !prev;
+            });
+          }}
           aria-haspopup="listbox"
           aria-expanded={dropdownOpen}
-          aria-label="Select country code"
+          aria-label={`Select country code (current +${selectedCountry.dialCode})`}
         >
-          <span>{dialCode}</span>
+          <span>+{selectedCountry.dialCode}</span>
           <ChevronDown
             size={15}
             strokeWidth={2.2}
@@ -118,6 +150,7 @@ function PhoneNumberField({
         <div className="hcs-auth-divider" />
 
         <input
+          ref={phoneInputRef}
           type="tel"
           inputMode="numeric"
           maxLength={maxDigits}
@@ -126,37 +159,89 @@ function PhoneNumberField({
           placeholder="Mobile number"
           className="hcs-auth-input"
           aria-label="Mobile number"
-          autoFocus
         />
       </div>
 
       {dropdownOpen && (
-        <ul className="hcs-auth-country-menu" role="listbox" aria-label="Country code list">
-          {COUNTRY_CODES.map((country) => {
-            const isSelected = country.dial === dialCode;
-            return (
-              <li key={country.code} role="option" aria-selected={isSelected}>
-                <button
-                  type="button"
-                  className={`hcs-auth-country-option ${isSelected ? "selected" : ""}`}
-                  onClick={() => {
-                    onDialChange(country.dial);
-                    if (country.dial === "+91" && value.length > 10) {
-                      onChange(value.slice(0, 10));
-                    }
-                    setDropdownOpen(false);
-                  }}
-                >
-                  <span className="hcs-country-iso">{country.code}</span>
-                  <span className="hcs-country-name">{country.name}</span>
-                  <span className="hcs-country-dial">{country.dial}</span>
-                  {isSelected && <Check size={14} className="hcs-country-check" />}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <div
+          className="hcs-auth-country-panel"
+          role="dialog"
+          aria-label="Choose country code"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="hcs-country-search-wrap">
+            <Search size={15} className="hcs-country-search-icon" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search country or code (+91, India...)"
+              className="hcs-country-search-input"
+              aria-label="Search country or dial code"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="hcs-country-search-clear"
+                onClick={() => {
+                  setSearchQuery("");
+                  searchInputRef.current?.focus();
+                }}
+                aria-label="Clear country search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <ul className="hcs-auth-country-menu" role="listbox" aria-label="Country code list">
+            {filteredCountries.length === 0 ? (
+              <li className="hcs-country-empty">No countries match &ldquo;{searchQuery}&rdquo;</li>
+            ) : (
+              filteredCountries.map((country) => {
+                const isSelected = country.iso2 === selectedCountry.iso2;
+                return (
+                  <li key={country.iso2} role="option" aria-selected={isSelected}>
+                    <button
+                      type="button"
+                      className={`hcs-auth-country-option ${isSelected ? "selected" : ""}`}
+                      onClick={() => {
+                        onCountryChange(country);
+                        if (country.iso2 === "in" && value.length > 10) {
+                          onChange(value.slice(0, 10));
+                        }
+                        setDropdownOpen(false);
+                        setSearchQuery("");
+                        window.setTimeout(() => phoneInputRef.current?.focus(), 0);
+                      }}
+                    >
+                      <span className="hcs-country-iso">{country.iso2.toUpperCase()}</span>
+                      <span className="hcs-country-name">
+                        {formatCountryDisplayName(country.name)}
+                      </span>
+                      <span className="hcs-country-dial">+{country.dialCode}</span>
+                      {isSelected && <Check size={14} className="hcs-country-check" />}
+                    </button>
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        </div>
       )}
+    </div>
+  );
+}
+
+export function AuthBrandLogo({ className = "" }: { className?: string }) {
+  return (
+    <div className={`hcs-auth-brand ${className}`.trim()}>
+      <span className="hcs-auth-badge">HCS</span>
+      <div className="hcs-auth-brand-text">
+        <span className="hcs-auth-title">HYDERABAD</span>
+        <span className="hcs-auth-subtitle">CUE SPORTS</span>
+      </div>
     </div>
   );
 }
@@ -170,7 +255,7 @@ export function AuthCard({
 
   const [step, setStep] = useState<AuthStep>("entry");
   const [entryMode, setEntryMode] = useState<EntryMode>("phone");
-  const [countryDial, setCountryDial] = useState("+91");
+  const [selectedCountry, setSelectedCountry] = useState<Country>(DEFAULT_COUNTRY);
   const [phoneInput, setPhoneInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [onboardingToken, setOnboardingToken] = useState("");
@@ -200,7 +285,7 @@ export function AuthCard({
 
     const cleanDigits = phoneInput.replace(/\D/g, "");
     if (entryMode === "phone") {
-      const phoneError = validatePhoneByCountry(cleanDigits, countryDial);
+      const phoneError = validatePhoneByCountry(cleanDigits, selectedCountry);
       if (phoneError) {
         setError(phoneError);
         return;
@@ -226,7 +311,11 @@ export function AuthCard({
     try {
       const payload =
         entryMode === "phone"
-          ? { mode: "phone", phone: `${countryDial}${cleanDigits}`, turnstileToken }
+          ? {
+              mode: "phone",
+              phone: `+${selectedCountry.dialCode}${cleanDigits}`,
+              turnstileToken,
+            }
           : { mode: "email", email: emailInput.trim(), turnstileToken };
 
       const { ok, data } = await apiFetch<ContinueResponse>("/api/auth/continue", {
@@ -281,7 +370,7 @@ export function AuthCard({
         return;
       }
     } else if (step === "needs_phone") {
-      const phoneError = validatePhoneByCountry(cleanDigits, countryDial);
+      const phoneError = validatePhoneByCountry(cleanDigits, selectedCountry);
       if (phoneError) {
         setError(phoneError);
         return;
@@ -293,7 +382,7 @@ export function AuthCard({
       const payload =
         step === "needs_email"
           ? { email: emailInput.trim(), onboardingToken }
-          : { phone: `${countryDial}${cleanDigits}`, onboardingToken };
+          : { phone: `+${selectedCountry.dialCode}${cleanDigits}`, onboardingToken };
 
       const { ok, data } = await apiFetch<CompleteSignupResponse>(
         "/api/auth/complete-signup",
@@ -333,13 +422,7 @@ export function AuthCard({
       )}
 
       {/* Brand Logo (Centered HCS Angled Gold Badge + Bold Green Typography) */}
-      <div className="hcs-auth-brand">
-        <span className="hcs-auth-badge">HCS</span>
-        <div className="hcs-auth-brand-text">
-          <span className="hcs-auth-title">HYDERABAD</span>
-          <span className="hcs-auth-subtitle">CUE SPORTS</span>
-        </div>
-      </div>
+      <AuthBrandLogo />
 
       {step === "entry" ? (
         <form onSubmit={handleContinueSubmit} className="hcs-auth-form" noValidate>
@@ -352,9 +435,9 @@ export function AuthCard({
 
           {entryMode === "phone" ? (
             <PhoneNumberField
-              dialCode={countryDial}
-              onDialChange={(dial) => {
-                setCountryDial(dial);
+              selectedCountry={selectedCountry}
+              onCountryChange={(country) => {
+                setSelectedCountry(country);
                 if (error) setError("");
               }}
               value={phoneInput}
@@ -464,9 +547,9 @@ export function AuthCard({
             </div>
           ) : (
             <PhoneNumberField
-              dialCode={countryDial}
-              onDialChange={(dial) => {
-                setCountryDial(dial);
+              selectedCountry={selectedCountry}
+              onCountryChange={(country) => {
+                setSelectedCountry(country);
                 if (error) setError("");
               }}
               value={phoneInput}
