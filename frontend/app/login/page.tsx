@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { AuthCard } from "@/components/auth-modal";
 import { useStorefront } from "@/components/storefront-shell";
 
@@ -33,8 +33,7 @@ export default function LoginPage() {
           onClick={handleBack}
           aria-label="Go back"
         >
-          <ArrowLeft size={18} strokeWidth={2.2} />
-          <span>Back</span>
+          <ChevronLeft size={26} strokeWidth={2.4} />
         </button>
       </div>
 

@@ -27,7 +27,11 @@ const SESSION_MAX_AGE_SECONDS = SESSION_DAYS * 24 * 60 * 60;
  * Normalize Indian mobile numbers to consistent +91XXXXXXXXXX format.
  */
 function normalizePhone(rawPhone) {
-  const digits = String(rawPhone || "").replace(/\D/g, "");
+  const trimmed = String(rawPhone || "").trim();
+  const digits = trimmed.replace(/\D/g, "");
+  if (trimmed.startsWith("+") && digits.length >= 8 && digits.length <= 15) {
+    return `+${digits}`;
+  }
   if (digits.length === 10 && /^[6-9]\d{9}$/.test(digits)) {
     return `+91${digits}`;
   }

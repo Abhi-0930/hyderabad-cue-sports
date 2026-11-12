@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { ArrowLeft, ChevronDown, Loader2, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Loader2, X } from "lucide-react";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { apiFetch, type AuthUser } from "@/lib/api";
 
@@ -11,6 +11,25 @@ interface AuthModalProps {
   onSuccess: (user: AuthUser) => void;
   isStandalonePage?: boolean;
 }
+
+interface CountryOption {
+  code: string;
+  dial: string;
+  name: string;
+}
+
+const COUNTRY_CODES: CountryOption[] = [
+  { code: "IN", dial: "+91", name: "India" },
+  { code: "AE", dial: "+971", name: "United Arab Emirates" },
+  { code: "US", dial: "+1", name: "United States / Canada" },
+  { code: "GB", dial: "+44", name: "United Kingdom" },
+  { code: "SG", dial: "+65", name: "Singapore" },
+  { code: "AU", dial: "+61", name: "Australia" },
+  { code: "SA", dial: "+966", name: "Saudi Arabia" },
+  { code: "QA", dial: "+974", name: "Qatar" },
+  { code: "MY", dial: "+60", name: "Malaysia" },
+  { code: "DE", dial: "+49", name: "Germany" },
+];
 
 type AuthStep = "entry" | "needs_email" | "needs_phone";
 type EntryMode = "phone" | "email";
@@ -32,6 +51,116 @@ interface CompleteSignupResponse {
   message?: string;
 }
 
+function validatePhoneByCountry(digits: string, dialCode: string): string | null {
+  if (dialCode === "+91") {
+    return /^[6-9]\d{9}$/.test(digits)
+      ? null
+      : "Please enter a valid 10-digit Indian mobile number.";
+  }
+  return digits.length >= 7 && digits.length <= 15
+    ? null
+    : "Please enter a valid mobile number (7 to 15 digits).";
+}
+
+function PhoneNumberField({
+  dialCode,
+  onDialChange,
+  value,
+  onChange,
+}: {
+  dialCode: string;
+  onDialChange: (dial: string) => void;
+  value: string;
+  onChange: (digits: string) => void;
+}) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, [dropdownOpen]);
+
+  const maxDigits = dialCode === "+91" ? 10 : 15;
+
+  return (
+    <div className="hcs-auth-phone-wrap" ref={wrapRef}>
+      <div className="hcs-auth-phone-box">
+        <button
+          type="button"
+          className="hcs-auth-country-btn"
+          onClick={() => setDropdownOpen((prev) => !prev)}
+          aria-haspopup="listbox"
+          aria-expanded={dropdownOpen}
+          aria-label="Select country code"
+        >
+          <span>{dialCode}</span>
+          <ChevronDown
+            size={15}
+            strokeWidth={2.2}
+            className={dropdownOpen ? "hcs-chevron-open" : ""}
+          />
+        </button>
+
+        <div className="hcs-auth-divider" />
+
+        <input
+          type="tel"
+          inputMode="numeric"
+          maxLength={maxDigits}
+          value={value}
+          onChange={(e) => onChange(e.target.value.replace(/\D/g, "").slice(0, maxDigits))}
+          placeholder="Mobile number"
+          className="hcs-auth-input"
+          aria-label="Mobile number"
+          autoFocus
+        />
+      </div>
+
+      {dropdownOpen && (
+        <ul className="hcs-auth-country-menu" role="listbox" aria-label="Country code list">
+          {COUNTRY_CODES.map((country) => {
+            const isSelected = country.dial === dialCode;
+            return (
+              <li key={country.code} role="option" aria-selected={isSelected}>
+                <button
+                  type="button"
+                  className={`hcs-auth-country-option ${isSelected ? "selected" : ""}`}
+                  onClick={() => {
+                    onDialChange(country.dial);
+                    if (country.dial === "+91" && value.length > 10) {
+                      onChange(value.slice(0, 10));
+                    }
+                    setDropdownOpen(false);
+                  }}
+                >
+                  <span className="hcs-country-iso">{country.code}</span>
+                  <span className="hcs-country-name">{country.name}</span>
+                  <span className="hcs-country-dial">{country.dial}</span>
+                  {isSelected && <Check size={14} className="hcs-country-check" />}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export function AuthCard({
   onClose,
   onSuccess,
@@ -41,6 +170,7 @@ export function AuthCard({
 
   const [step, setStep] = useState<AuthStep>("entry");
   const [entryMode, setEntryMode] = useState<EntryMode>("phone");
+  const [countryDial, setCountryDial] = useState("+91");
   const [phoneInput, setPhoneInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [onboardingToken, setOnboardingToken] = useState("");
@@ -68,10 +198,11 @@ export function AuthCard({
     e.preventDefault();
     setError("");
 
+    const cleanDigits = phoneInput.replace(/\D/g, "");
     if (entryMode === "phone") {
-      const cleanDigits = phoneInput.replace(/\D/g, "");
-      if (!/^[6-9]\d{9}$/.test(cleanDigits)) {
-        setError("Please enter a valid 10-digit Indian mobile number.");
+      const phoneError = validatePhoneByCountry(cleanDigits, countryDial);
+      if (phoneError) {
+        setError(phoneError);
         return;
       }
     } else {
@@ -95,7 +226,7 @@ export function AuthCard({
     try {
       const payload =
         entryMode === "phone"
-          ? { mode: "phone", phone: phoneInput.replace(/\D/g, ""), turnstileToken }
+          ? { mode: "phone", phone: `${countryDial}${cleanDigits}`, turnstileToken }
           : { mode: "email", email: emailInput.trim(), turnstileToken };
 
       const { ok, data } = await apiFetch<ContinueResponse>("/api/auth/continue", {
@@ -143,15 +274,16 @@ export function AuthCard({
     e.preventDefault();
     setError("");
 
+    const cleanDigits = phoneInput.replace(/\D/g, "");
     if (step === "needs_email") {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.trim())) {
         setError("Please enter a valid email address.");
         return;
       }
     } else if (step === "needs_phone") {
-      const cleanDigits = phoneInput.replace(/\D/g, "");
-      if (!/^[6-9]\d{9}$/.test(cleanDigits)) {
-        setError("Please enter a valid 10-digit Indian mobile number.");
+      const phoneError = validatePhoneByCountry(cleanDigits, countryDial);
+      if (phoneError) {
+        setError(phoneError);
         return;
       }
     }
@@ -161,7 +293,7 @@ export function AuthCard({
       const payload =
         step === "needs_email"
           ? { email: emailInput.trim(), onboardingToken }
-          : { phone: phoneInput.replace(/\D/g, ""), onboardingToken };
+          : { phone: `${countryDial}${cleanDigits}`, onboardingToken };
 
       const { ok, data } = await apiFetch<CompleteSignupResponse>(
         "/api/auth/complete-signup",
@@ -200,7 +332,7 @@ export function AuthCard({
         </button>
       )}
 
-      {/* Brand Logo (Exact HCS Angled Gold Badge + Bold Green Typography) */}
+      {/* Brand Logo (Centered HCS Angled Gold Badge + Bold Green Typography) */}
       <div className="hcs-auth-brand">
         <span className="hcs-auth-badge">HCS</span>
         <div className="hcs-auth-brand-text">
@@ -219,27 +351,18 @@ export function AuthCard({
           </p>
 
           {entryMode === "phone" ? (
-            <div className="hcs-auth-phone-box">
-              <div className="hcs-auth-country-code">
-                <span>+91</span>
-                <ChevronDown size={14} strokeWidth={2.2} />
-              </div>
-              <div className="hcs-auth-divider" />
-              <input
-                type="tel"
-                inputMode="numeric"
-                maxLength={10}
-                value={phoneInput}
-                onChange={(e) => {
-                  setPhoneInput(e.target.value.replace(/\D/g, "").slice(0, 10));
-                  if (error) setError("");
-                }}
-                placeholder="Mobile number"
-                className="hcs-auth-input"
-                aria-label="Mobile number"
-                autoFocus
-              />
-            </div>
+            <PhoneNumberField
+              dialCode={countryDial}
+              onDialChange={(dial) => {
+                setCountryDial(dial);
+                if (error) setError("");
+              }}
+              value={phoneInput}
+              onChange={(digits) => {
+                setPhoneInput(digits);
+                if (error) setError("");
+              }}
+            />
           ) : (
             <div className="hcs-auth-email-box">
               <input
@@ -340,27 +463,18 @@ export function AuthCard({
               />
             </div>
           ) : (
-            <div className="hcs-auth-phone-box">
-              <div className="hcs-auth-country-code">
-                <span>+91</span>
-                <ChevronDown size={14} strokeWidth={2.2} />
-              </div>
-              <div className="hcs-auth-divider" />
-              <input
-                type="tel"
-                inputMode="numeric"
-                maxLength={10}
-                value={phoneInput}
-                onChange={(e) => {
-                  setPhoneInput(e.target.value.replace(/\D/g, "").slice(0, 10));
-                  if (error) setError("");
-                }}
-                placeholder="Mobile number"
-                className="hcs-auth-input"
-                aria-label="Mobile number"
-                autoFocus
-              />
-            </div>
+            <PhoneNumberField
+              dialCode={countryDial}
+              onDialChange={(dial) => {
+                setCountryDial(dial);
+                if (error) setError("");
+              }}
+              value={phoneInput}
+              onChange={(digits) => {
+                setPhoneInput(digits);
+                if (error) setError("");
+              }}
+            />
           )}
 
           {error && <div className="hcs-auth-error" role="alert">{error}</div>}
@@ -392,4 +506,3 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     </div>
   );
 }
-

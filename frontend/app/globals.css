@@ -3101,22 +3101,17 @@ body {
 .hcs-auth-page-back {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e2e8e3;
-  background: #ffffff;
-  color: #113a27;
-  font-family: var(--sans);
-  font-size: 14px;
-  font-weight: 600;
+  justify-content: center;
+  padding: 4px;
+  border: none;
+  background: transparent;
+  color: #092c1b;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: opacity 0.15s ease;
 }
 
 .hcs-auth-page-back:hover {
-  background: #f4f7f5;
-  border-color: #cbd5ce;
+  opacity: 0.7;
   transform: none !important;
 }
 
@@ -3171,10 +3166,12 @@ body {
 
 /* Brand Header matching HCS angled badge + HYDERABAD CUE SPORTS */
 .hcs-auth-brand {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  margin-bottom: 26px;
+  width: 100%;
+  margin: 0 auto 28px;
 }
 
 .hcs-auth-badge {
@@ -3256,15 +3253,106 @@ body {
   border-color: #113a27;
 }
 
-.hcs-auth-country-code {
+.hcs-auth-phone-wrap {
+  position: relative;
+}
+
+.hcs-auth-country-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  border: none;
+  background: transparent;
+  padding: 4px 2px;
   font-family: var(--sans);
   font-size: 15px;
   font-weight: 600;
   color: #132219;
+  cursor: pointer;
   user-select: none;
+  flex-shrink: 0;
+}
+
+.hcs-auth-country-btn:hover {
+  transform: none !important;
+}
+
+.hcs-auth-country-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.hcs-auth-country-btn svg.hcs-chevron-open {
+  transform: rotate(180deg);
+}
+
+.hcs-auth-country-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 270px;
+  max-height: 240px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #d8e0da;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(10, 32, 20, 0.14);
+  z-index: 60;
+}
+
+.hcs-auth-country-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: #132219;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.hcs-auth-country-option:hover {
+  background: #f4f7f5;
+  transform: none !important;
+}
+
+.hcs-auth-country-option.selected {
+  background: #eef4f0;
+  font-weight: 600;
+  color: #113a27;
+}
+
+.hcs-country-iso {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7870;
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.hcs-country-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hcs-country-dial {
+  font-weight: 600;
+  color: #113a27;
+  flex-shrink: 0;
+}
+
+.hcs-country-check {
+  color: #113a27;
   flex-shrink: 0;
 }
 
