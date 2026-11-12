@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   ChevronDown,
@@ -48,6 +48,7 @@ type StorefrontContextValue = {
   closeCart: () => void;
   setUser: (user: AuthUser | null) => void;
   logout: () => Promise<void>;
+  logoutAll: () => Promise<void>;
   showNotice: (message: string, type?: "success" | "error" | "info" | "warning") => void;
 };
 
@@ -98,6 +99,58 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     return () => window.clearTimeout(timeout);
   }, [notice]);
 
+  const broadcastAuth = useCallback((type: "LOGIN" | "LOGOUT", authUser: AuthUser | null) => {
+    try {
+      if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+        const bc = new BroadcastChannel("hcs_auth_channel");
+        bc.postMessage({ type, user: authUser });
+        bc.close();
+      }
+      window.localStorage.setItem(
+        "hcs_auth_sync",
+        JSON.stringify({ type, user: authUser, ts: Date.now() })
+      );
+    } catch {}
+  }, []);
+
+  const handleSetUser = useCallback((nextUser: AuthUser | null) => {
+    setUser(nextUser);
+    broadcastAuth(nextUser ? "LOGIN" : "LOGOUT", nextUser);
+  }, [broadcastAuth]);
+
+  // Synchronize login/logout state in real-time across all open browser tabs
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    let channel: BroadcastChannel | null = null;
+    if ("BroadcastChannel" in window) {
+      channel = new BroadcastChannel("hcs_auth_channel");
+      channel.onmessage = (event) => {
+        if (event.data?.type === "LOGIN") {
+          setUser(event.data.user);
+        } else if (event.data?.type === "LOGOUT") {
+          setUser(null);
+        }
+      };
+    }
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "hcs_auth_sync" && event.newValue) {
+        try {
+          const parsed = JSON.parse(event.newValue);
+          if (parsed.type === "LOGIN") setUser(parsed.user);
+          if (parsed.type === "LOGOUT") setUser(null);
+        } catch {}
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      channel?.close();
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
+
   const value = useMemo<StorefrontContextValue>(() => ({
     cart,
     wishlist,
@@ -137,13 +190,21 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     },
     openCart: () => setCartOpen(true),
     closeCart: () => setCartOpen(false),
-    setUser,
+    setUser: handleSetUser,
     logout: async () => {
       try {
         await apiFetch("/api/auth/logout", { method: "POST" });
       } finally {
-        setUser(null);
+        handleSetUser(null);
         toast.success("You have been signed out.");
+      }
+    },
+    logoutAll: async () => {
+      try {
+        await apiFetch("/api/auth/logout-all", { method: "POST" });
+      } finally {
+        handleSetUser(null);
+        toast.success("Signed out from all devices.");
       }
     },
     showNotice: (message, type = "info") => {
@@ -157,7 +218,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
         toast.info(message);
       }
     },
-  }), [cart, wishlist, cartOpen, notice, user]);
+  }), [cart, wishlist, cartOpen, notice, user, handleSetUser]);
 
   return (
     <StorefrontContext.Provider value={value}>

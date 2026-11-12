@@ -3495,6 +3495,27 @@ body {
   margin: 6px 0 14px;
 }
 
+.hcs-turnstile-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 14px;
+  background: #f4f6f4;
+  border: 1px solid rgba(23, 75, 53, 0.2);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--forest);
+  margin-top: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.hcs-turnstile-retry-btn:hover {
+  background: #e8eee8;
+}
+
 .hcs-auth-error {
   background: #fef2f2;
   border: 1px solid #fecaca;

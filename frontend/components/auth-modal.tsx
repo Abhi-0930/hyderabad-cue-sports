@@ -263,6 +263,7 @@ export function AuthCard({
   const [onboardingToken, setOnboardingToken] = useState("");
   const [maskedIdentifier, setMaskedIdentifier] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const turnstileRef = useRef<TurnstileInstance>(null);
@@ -273,6 +274,7 @@ export function AuthCard({
     setMaskedIdentifier("");
     setError("");
     setTurnstileToken(null);
+    setTurnstileError(false);
     turnstileRef.current?.reset();
   };
 
@@ -498,15 +500,33 @@ export function AuthCard({
                 siteKey={turnstileSiteKey}
                 onSuccess={(token) => {
                   setTurnstileToken(token);
+                  setTurnstileError(false);
                   if (error) setError("");
                 }}
-                onExpire={() => setTurnstileToken(null)}
+                onExpire={() => {
+                  setTurnstileToken(null);
+                  turnstileRef.current?.reset();
+                }}
                 onError={() => {
                   setTurnstileToken(null);
-                  setError("Human verification could not load. Please refresh and try again.");
+                  setTurnstileError(true);
+                  setError("Human verification could not load. Tap below to retry.");
                 }}
                 options={{ theme: "light", size: "flexible" }}
               />
+              {turnstileError && (
+                <button
+                  type="button"
+                  className="hcs-turnstile-retry-btn"
+                  onClick={() => {
+                    setTurnstileError(false);
+                    setError("");
+                    turnstileRef.current?.reset();
+                  }}
+                >
+                  Retry Verification Check
+                </button>
+              )}
             </div>
           )}
 

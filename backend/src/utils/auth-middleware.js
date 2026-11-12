@@ -1,6 +1,7 @@
 const db = require("../db");
 const {
   hashToken,
+  computeUserAgentHash,
   verifySessionJwt,
   decryptPII,
   maskPhone,
@@ -11,7 +12,8 @@ const SESSION_COOKIE_NAME = "hcs_session";
 
 /**
  * Resolves the authenticated customer from the hcs_session httpOnly cookie.
- * Returns null if unauthenticated or expired.
+ * Validates token signature, database session existence, and device fingerprint.
+ * Returns null if unauthenticated, expired, or device mismatched.
  */
 async function resolveCustomerSession(request) {
   const token = request.cookies?.[SESSION_COOKIE_NAME];
@@ -20,6 +22,18 @@ async function resolveCustomerSession(request) {
   try {
     const decoded = verifySessionJwt(token);
     const tokenHash = hashToken(token);
+
+    // Device Fingerprint Verification: Prevent session hijacking across different browsers/devices
+    const currentUaHash = computeUserAgentHash(request.headers?.["user-agent"]);
+    if (decoded.uaHash && decoded.uaHash !== currentUaHash) {
+      request.log?.warn(
+        { customerId: decoded.customerId },
+        "Security Alert: Session cookie device fingerprint mismatch. Revoking session."
+      );
+      // Immediately invalidate compromised session
+      await db.query("DELETE FROM public.auth_sessions WHERE token_hash = $1", [tokenHash]);
+      return null;
+    }
 
     const { rows } = await db.query(
       `

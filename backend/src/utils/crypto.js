@@ -24,12 +24,24 @@ const SESSION_DAYS = 30;
 const SESSION_MAX_AGE_SECONDS = SESSION_DAYS * 24 * 60 * 60;
 
 /**
+ * Strip zero-width, bidirectional/RTL overrides, and control characters to prevent homoglyph & bypass attacks.
+ */
+function sanitizeInputString(str) {
+  if (!str || typeof str !== "string") return "";
+  return str
+    .replace(/[\u200B-\u200D\uFEFF]/g, "") // Zero-width spaces & BOM
+    .replace(/[\u202A-\u202E\u2066-\u2069]/g, "") // Bidirectional / RTL overrides
+    .replace(/[\x00-\x1F\x7F]/g, "") // ASCII control characters
+    .trim();
+}
+
+/**
  * Normalize Indian mobile numbers to consistent +91XXXXXXXXXX format.
  */
 function normalizePhone(rawPhone) {
-  const trimmed = String(rawPhone || "").trim();
-  const digits = trimmed.replace(/\D/g, "");
-  if (trimmed.startsWith("+") && digits.length >= 8 && digits.length <= 15) {
+  const sanitized = sanitizeInputString(rawPhone);
+  const digits = sanitized.replace(/\D/g, "");
+  if (sanitized.startsWith("+") && digits.length >= 8 && digits.length <= 15) {
     return `+${digits}`;
   }
   if (digits.length === 10 && /^[6-9]\d{9}$/.test(digits)) {
@@ -45,12 +57,20 @@ function normalizePhone(rawPhone) {
 }
 
 /**
- * Normalize and validate email addresses.
+ * Normalize and validate email addresses with strict RFC standards and max-length bounds.
  */
 function normalizeEmail(rawEmail) {
-  const trimmed = String(rawEmail || "").trim().toLowerCase();
-  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
-  return isValid ? trimmed : null;
+  const sanitized = sanitizeInputString(rawEmail).toLowerCase();
+  if (!sanitized || sanitized.length > 254) return null;
+  const isValid = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(sanitized);
+  return isValid ? sanitized : null;
+}
+
+/**
+ * Compute SHA-256 device fingerprint from User-Agent.
+ */
+function computeUserAgentHash(userAgent) {
+  return hashToken(sanitizeInputString(userAgent) || "unknown_device");
 }
 
 /**
@@ -124,10 +144,12 @@ function verifySessionJwt(token) {
 module.exports = {
   SESSION_DAYS,
   SESSION_MAX_AGE_SECONDS,
+  sanitizeInputString,
   normalizePhone,
   normalizeEmail,
   hashBlindIndex,
   hashToken,
+  computeUserAgentHash,
   encryptPII,
   decryptPII,
   maskPhone,

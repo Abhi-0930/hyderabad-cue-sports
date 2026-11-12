@@ -223,6 +223,38 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
 
+-- ------------------------------------------------------------------------------
+-- CUSTOMERS & SESSIONS RLS: Strict Deny-All for public roles
+-- (Only accessible by backend service_role / direct pooler connection)
+-- ------------------------------------------------------------------------------
+DROP POLICY IF EXISTS "Deny public direct access to customers" ON public.customers;
+CREATE POLICY "Deny public direct access to customers"
+ON public.customers FOR ALL
+TO anon, authenticated
+USING (false)
+WITH CHECK (false);
+
+DROP POLICY IF EXISTS "Deny public direct access to auth_sessions" ON public.auth_sessions;
+CREATE POLICY "Deny public direct access to auth_sessions"
+ON public.auth_sessions FOR ALL
+TO anon, authenticated
+USING (false)
+WITH CHECK (false);
+
+DROP POLICY IF EXISTS "Deny public direct access to customer_addresses" ON public.customer_addresses;
+CREATE POLICY "Deny public direct access to customer_addresses"
+ON public.customer_addresses FOR ALL
+TO anon, authenticated
+USING (false)
+WITH CHECK (false);
+
+DROP POLICY IF EXISTS "Deny public direct access to otp_challenges" ON public.otp_challenges;
+CREATE POLICY "Deny public direct access to otp_challenges"
+ON public.otp_challenges FOR ALL
+TO anon, authenticated
+USING (false)
+WITH CHECK (false);
+
 -- Products: Everyone (authenticated & guests) can view active products
 DROP POLICY IF EXISTS "Public products viewable by everyone" ON public.products;
 CREATE POLICY "Public products viewable by everyone" 
