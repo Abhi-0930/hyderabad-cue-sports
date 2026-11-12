@@ -270,11 +270,12 @@ export function SiteHeader() {
             </button>
           </form>
 
-          {/* Right Action Icons with Text */}
+          {/* Right Action Icons with Text (Order: Wishlist, Bag, Login) */}
           <div className="hcs-header-actions">
+            {/* 1. Wishlist */}
             <button
               type="button"
-              className="hcs-action-item"
+              className="hcs-action-item hcs-wishlist-btn"
               aria-label={`Wishlist (${wishlist.length} saved)`}
               onClick={() => {
                 if (wishlist.length === 0) {
@@ -291,12 +292,27 @@ export function SiteHeader() {
               <span className="hcs-action-label">Wishlist</span>
             </button>
 
+            {/* 2. Bag */}
+            <button
+              type="button"
+              className="hcs-action-item hcs-bag-btn"
+              aria-label={`Shopping Bag with ${cartCount} items`}
+              onClick={openCart}
+            >
+              <div className="hcs-action-icon-box">
+                <ShoppingBag size={21} />
+                {cartCount > 0 && <span className="hcs-action-badge">{cartCount}</span>}
+              </div>
+              <span className="hcs-action-label">Bag</span>
+            </button>
+
+            {/* 3. Login / Account (Profile icon + text, not a button, for desktop and mobile) */}
             <div className="hcs-account-wrapper">
               {!user ? (
                 <Link
                   href="/login"
-                  className="hcs-action-item"
-                  aria-label="Login / Sign up"
+                  className="hcs-action-item hcs-account-trigger"
+                  aria-label="Login"
                 >
                   <div className="hcs-action-icon-box">
                     <UserRound size={21} />
@@ -307,7 +323,7 @@ export function SiteHeader() {
                 <>
                   <button
                     type="button"
-                    className="hcs-action-item"
+                    className="hcs-action-item hcs-account-trigger"
                     aria-label="Account menu"
                     onClick={() => setAccountMenuOpen((prev) => !prev)}
                   >
@@ -343,19 +359,6 @@ export function SiteHeader() {
                 </>
               )}
             </div>
-
-            <button
-              type="button"
-              className="hcs-action-item"
-              aria-label={`Shopping Bag with ${cartCount} items`}
-              onClick={openCart}
-            >
-              <div className="hcs-action-icon-box">
-                <ShoppingBag size={21} />
-                {cartCount > 0 && <span className="hcs-action-badge">{cartCount}</span>}
-              </div>
-              <span className="hcs-action-label">Bag</span>
-            </button>
           </div>
         </div>
       </header>
@@ -520,6 +523,41 @@ export function SiteHeader() {
                   </div>
                 );
               })}
+            </div>
+
+            <div className="mobile-section-heading">Account</div>
+            <div className="mobile-drawer-auth">
+              {!user ? (
+                <Link
+                  href="/login"
+                  className="mobile-drawer-login-btn"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <UserRound size={17} />
+                  <span>Login</span>
+                </Link>
+              ) : (
+                <div className="mobile-drawer-user">
+                  <div className="mobile-drawer-user-info">
+                    <UserRound size={17} />
+                    <div>
+                      <strong>{user.fullName || "HCS Member"}</strong>
+                      <span>{user.maskedPhone}</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="mobile-drawer-logout-btn"
+                    onClick={async () => {
+                      setMobileOpen(false);
+                      await logout();
+                    }}
+                  >
+                    <LogOut size={15} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="mobile-section-heading">Quick Links</div>

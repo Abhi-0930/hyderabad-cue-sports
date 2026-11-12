@@ -816,16 +816,29 @@
   .hcs-header-actions {
     margin-left: auto;
     z-index: 2;
-    gap: 14px;
+    gap: 12px;
     display: flex;
     align-items: center;
   }
-  .hcs-header-actions .hcs-action-item:nth-child(1),
-  .hcs-header-actions .hcs-action-item:nth-child(2) {
-    display: none;
+  .hcs-header-actions .hcs-wishlist-btn {
+    display: none !important;
   }
   .hcs-header-actions .hcs-action-label {
-    display: none;
+    display: block;
+    font-size: 10px;
+    line-height: 1.1;
+  }
+  .hcs-action-item {
+    padding: 2px 6px;
+    gap: 3px;
+  }
+  .hcs-action-icon-box {
+    width: 24px;
+    height: 24px;
+  }
+  .hcs-action-icon-box svg {
+    width: 20px;
+    height: 20px;
   }
   .hcs-search-form {
     display: none !important;
@@ -1000,9 +1013,27 @@
   .announcement-bar {
     display: none;
   }
-  .hcs-header-actions .hcs-action-item:nth-child(1),
-  .hcs-header-actions .hcs-action-item:nth-child(2) {
-    display: none;
+  .hcs-header-actions {
+    gap: 8px;
+  }
+  .hcs-header-actions .hcs-wishlist-btn {
+    display: none !important;
+  }
+  .hcs-action-item {
+    padding: 2px 4px;
+    gap: 2px;
+  }
+  .hcs-header-actions .hcs-action-label {
+    display: block;
+    font-size: 10px;
+  }
+  .hcs-action-icon-box {
+    width: 22px;
+    height: 22px;
+  }
+  .hcs-action-icon-box svg {
+    width: 19px;
+    height: 19px;
   }
   .hcs-badge {
     width: 35px !important;
@@ -3516,6 +3547,18 @@ body {
   cursor: not-allowed;
 }
 
+.hcs-auth-form--email .hcs-auth-mode-row {
+  margin-bottom: 20px;
+}
+
+.hcs-auth-form--email .hcs-auth-submit {
+  margin-top: 20px;
+}
+
+.hcs-auth-form--needs-email .hcs-auth-submit {
+  margin-top: 32px;
+}
+
 .hcs-auth-back {
   display: inline-flex;
   align-items: center;
@@ -3550,6 +3593,85 @@ body {
 /* Header Account Status & Dropdown */
 .hcs-account-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.hcs-account-wrapper .hcs-action-item {
+  color: #2b332d;
+}
+
+.hcs-account-wrapper .hcs-action-item:hover {
+  color: var(--forest);
+  transform: none !important;
+}
+
+/* Mobile Drawer Auth Controls */
+.mobile-drawer-auth {
+  padding: 6px 0 12px;
+}
+
+.mobile-drawer-login-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  background: #113a27;
+  color: #ffffff !important;
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mobile-drawer-user {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f5f7f5;
+  border: 1px solid #e2e8e3;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.mobile-drawer-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #113a27;
+}
+
+.mobile-drawer-user-info div {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-drawer-user-info strong {
+  font-size: 14px;
+  color: #113a27;
+}
+
+.mobile-drawer-user-info span {
+  font-size: 12px;
+  color: #4f5e54;
+}
+
+.mobile-drawer-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 7px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .hcs-account-dot {
@@ -3626,14 +3748,17 @@ body {
   .hcs-auth-page {
     padding: 14px 14px 32px;
   }
+  .hcs-auth-page-topbar {
+    margin: 0 auto 8px;
+  }
   .hcs-auth-page-body {
-    padding: 16px 0 40px;
+    padding: 20px 0 40px;
   }
   .hcs-auth-brand {
-    margin: 0 auto 36px;
+    margin: -24px auto 38px;
   }
   .hcs-auth-card {
-    padding: 28px 20px 24px;
+    padding: 24px 16px 20px;
   }
   .hcs-auth-card.standalone {
     max-width: 100%;
@@ -3646,6 +3771,12 @@ body {
   }
   .hcs-auth-heading {
     font-size: 21px;
+  }
+  .hcs-auth-form--email .hcs-auth-submit {
+    margin-top: 24px;
+  }
+  .hcs-auth-form--needs-email .hcs-auth-submit {
+    margin-top: 36px;
   }
 }
 

@@ -425,7 +425,11 @@ export function AuthCard({
       <AuthBrandLogo />
 
       {step === "entry" ? (
-        <form onSubmit={handleContinueSubmit} className="hcs-auth-form" noValidate>
+        <form
+          onSubmit={handleContinueSubmit}
+          className={`hcs-auth-form ${entryMode === "email" ? "hcs-auth-form--email" : ""}`}
+          noValidate
+        >
           <h2 className="hcs-auth-heading">Log in for the best experience</h2>
           <p className="hcs-auth-subtext">
             {entryMode === "phone"
@@ -513,7 +517,11 @@ export function AuthCard({
           </button>
         </form>
       ) : (
-        <form onSubmit={handleCompleteSignup} className="hcs-auth-form" noValidate>
+        <form
+          onSubmit={handleCompleteSignup}
+          className={`hcs-auth-form ${step === "needs_email" ? "hcs-auth-form--needs-email" : ""}`}
+          noValidate
+        >
           <button type="button" className="hcs-auth-back" onClick={resetToEntry}>
             <ArrowLeft size={15} />
             <span>Change {step === "needs_email" ? "mobile number" : "email"}</span>
