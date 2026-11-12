@@ -11,6 +11,7 @@ import {
   CircleDot,
   Heart,
   Instagram,
+  LogOut,
   Mail,
   Menu,
   Minus,
@@ -28,6 +29,7 @@ import {
   Zap,
 } from "lucide-react";
 import { formatInr, Product, products } from "@/lib/products";
+import { apiFetch, type AuthUser } from "@/lib/api";
 
 type CartItem = Product & { quantity: number };
 type StorefrontContextValue = {
@@ -35,12 +37,15 @@ type StorefrontContextValue = {
   wishlist: string[];
   cartOpen: boolean;
   notice: string;
+  user: AuthUser | null;
   addToCart: (product: Product, quantity?: number, openSidebar?: boolean) => void;
   updateQuantity: (id: string, delta: number) => void;
   removeFromCart: (id: string) => void;
   toggleWishlist: (id: string) => void;
   openCart: () => void;
   closeCart: () => void;
+  setUser: (user: AuthUser | null) => void;
+  logout: () => Promise<void>;
   showNotice: (message: string) => void;
 };
 
@@ -57,12 +62,24 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [notice, setNotice] = useState("");
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
     const savedCart = window.localStorage.getItem("snookerboards-cart");
     const savedWishlist = window.localStorage.getItem("snookerboards-wishlist");
     if (savedCart) setCart(JSON.parse(savedCart));
     if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+
+    // Check active 30-day session cookie on load
+    apiFetch<{ authenticated: boolean; user: AuthUser | null }>("/api/auth/me")
+      .then(({ ok, data }) => {
+        if (ok && data.authenticated && data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(() => {
+        // Backend offline; keep guest browsing active
+      });
   }, []);
 
   useEffect(() => {
@@ -84,6 +101,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     wishlist,
     cartOpen,
     notice,
+    user,
     addToCart: (product, quantity = 1, openSidebar = true) => {
       setCart((current) => {
         const existing = current.find((item) => item.id === product.id);
@@ -99,18 +117,32 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     toggleWishlist: (id) => setWishlist((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]),
     openCart: () => setCartOpen(true),
     closeCart: () => setCartOpen(false),
+    setUser,
+    logout: async () => {
+      try {
+        await apiFetch("/api/auth/logout", { method: "POST" });
+      } finally {
+        setUser(null);
+        setNotice("You have been signed out.");
+      }
+    },
     showNotice: (message) => setNotice(message),
-  }), [cart, wishlist, cartOpen, notice]);
+  }), [cart, wishlist, cartOpen, notice, user]);
 
-  return <StorefrontContext.Provider value={value}>{children}</StorefrontContext.Provider>;
+  return (
+    <StorefrontContext.Provider value={value}>
+      {children}
+    </StorefrontContext.Provider>
+  );
 }
 
 export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { cart, openCart, wishlist, showNotice } = useStorefront();
+  const { cart, openCart, wishlist, showNotice, user, logout } = useStorefront();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
@@ -124,6 +156,8 @@ export function SiteHeader() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  if (pathname === "/login") return null;
 
   const navigationCategories = [
     {
@@ -257,17 +291,58 @@ export function SiteHeader() {
               <span className="hcs-action-label">Wishlist</span>
             </button>
 
-            <button
-              type="button"
-              className="hcs-action-item"
-              aria-label="Account"
-              onClick={() => showNotice("Customer portal sign-in available soon.")}
-            >
-              <div className="hcs-action-icon-box">
-                <UserRound size={21} />
-              </div>
-              <span className="hcs-action-label">Account</span>
-            </button>
+            <div className="hcs-account-wrapper">
+              {!user ? (
+                <Link
+                  href="/login"
+                  className="hcs-action-item"
+                  aria-label="Login / Sign up"
+                >
+                  <div className="hcs-action-icon-box">
+                    <UserRound size={21} />
+                  </div>
+                  <span className="hcs-action-label">Login</span>
+                </Link>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="hcs-action-item"
+                    aria-label="Account menu"
+                    onClick={() => setAccountMenuOpen((prev) => !prev)}
+                  >
+                    <div className="hcs-action-icon-box">
+                      <UserRound size={21} />
+                      <span className="hcs-account-dot" />
+                    </div>
+                    <span className="hcs-action-label">
+                      {user.fullName ? user.fullName.split(" ")[0] : "Account"}
+                    </span>
+                  </button>
+
+                  {accountMenuOpen && (
+                    <div className="hcs-account-dropdown" onMouseLeave={() => setAccountMenuOpen(false)}>
+                      <div className="hcs-account-meta">
+                        <strong>{user.fullName || "HCS Member"}</strong>
+                        <span>{user.maskedPhone}</span>
+                        {user.maskedEmail && <small>{user.maskedEmail}</small>}
+                      </div>
+                      <button
+                        type="button"
+                        className="hcs-account-logout-btn"
+                        onClick={async () => {
+                          setAccountMenuOpen(false);
+                          await logout();
+                        }}
+                      >
+                        <LogOut size={15} />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
 
             <button
               type="button"
@@ -471,6 +546,8 @@ export function SiteHeader() {
 }
 
 export function FloatingWhatsApp() {
+  const pathname = usePathname();
+  if (pathname === "/login") return null;
   return (
     <a
       href="https://wa.me/919999999999?text=Hi%2C%20I%20have%20an%20enquiry%20regarding%20Hyderabad%20Cue%20Sports"
@@ -501,17 +578,21 @@ export function ToastNotice() {
 }
 
 export function BackToTop() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 520);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  if (pathname === "/login") return null;
   return visible ? <button className="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top"><ChevronRight size={17} /></button> : null;
 }
 
 export function SiteFooter() {
+  const pathname = usePathname();
   const { showNotice } = useStorefront();
+  if (pathname === "/login") return null;
   return <footer className="site-footer" id="contact"><div className="footer-main container"><div className="footer-brand"><Link href="/" className="wordmark wordmark-light"><span className="wordmark-mark">HCS</span><span><strong>HYDERABAD</strong><em>CUE SPORTS</em></span></Link><p>A considered home for premium snooker tables and the objects that make the game feel like yours.</p><div className="footer-socials"><button aria-label="Instagram"><Instagram size={17} /></button><button aria-label="Email" onClick={() => showNotice("Sample email support: support@example.com")}><Mail size={17} /></button></div></div><div className="footer-column"><h4>Shop</h4><Link href="/shop">All Snooker Tables</Link><Link href="/shop?size=8+FT">8 FT Tables</Link><Link href="/shop?size=10+FT">10 FT Tables</Link><Link href="/shop?size=12+FT">12 FT Tables</Link><Link href="/shop?type=accessory">Accessories</Link></div><div className="footer-column"><h4>Information</h4><Link href="/#about">About Us</Link><button onClick={() => showNotice("Shipping information is placeholder content for this demo.")}>Shipping Information</button><button onClick={() => showNotice("Return policy is placeholder content for this demo.")}>Return Policy</button><button onClick={() => showNotice("Privacy policy is placeholder content for this demo.")}>Privacy Policy</button><button onClick={() => showNotice("Terms are placeholder content for this demo.")}>Terms &amp; Conditions</button></div><div className="footer-column"><h4>Customer Support</h4><button onClick={() => showNotice("Sample WhatsApp support: +91 00000 00000")}>WhatsApp Support</button><button onClick={() => showNotice("Sample email support: support@example.com")}>Email Support</button><button onClick={() => showNotice("FAQ content will be added with the final catalogue.")}>Frequently Asked Questions</button><div className="footer-contact-card"><Truck size={17} /><span>Serving customers across India<br /><small>Direct shipping &amp; professional installation available</small></span></div></div></div><div className="footer-bottom container"><span>© 2026 HYDERABAD CUE SPORTS. Demo brand experience.</span><span className="payment-icons"><span>UPI</span><span>VISA</span><span>•••</span></span><button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Back to top <ChevronRight size={14} /></button></div></footer>;
 }
 

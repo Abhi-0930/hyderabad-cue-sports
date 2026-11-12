@@ -25,8 +25,18 @@ function getCookieOptions() {
   };
 }
 
+function buildPublicUser(customer, plainPhone, plainEmail) {
+  return {
+    id: customer.id,
+    maskedPhone: maskPhone(plainPhone),
+    maskedEmail: plainEmail ? maskEmail(plainEmail) : null,
+    fullName: customer.full_name || null,
+    isPhoneVerified: Boolean(customer.is_phone_verified),
+  };
+}
+
 /**
- * Create a 30-day persistent session in PostgreSQL (hashed token) and attach cookie.
+ * Create a 30-day persistent session in PostgreSQL (hashed token) and attach httpOnly cookie.
  */
 async function createAndAttachSession(customer, request, reply) {
   const jwtToken = signSessionJwt({ customerId: customer.id });
@@ -52,13 +62,15 @@ async function createAndAttachSession(customer, request, reply) {
 
 /**
  * Fastify plugin for Passwordless Customer Authentication routes.
+ * Supports entry via Mobile Number (default) or Email-ID ("Use Email-ID").
  * @param {import('fastify').FastifyInstance} fastify
  */
 async function authRoutes(fastify) {
-  // POST /api/auth/continue - Verify Turnstile + lookup hashed phone
+  // POST /api/auth/continue - Verify Turnstile + lookup hashed phone or email
   fastify.post("/continue", async (request, reply) => {
     try {
-      const { phone: rawPhone, turnstileToken } = request.body || {};
+      const { mode = "phone", phone: rawPhone, email: rawEmail, turnstileToken } =
+        request.body || {};
 
       const turnstileResult = await verifyTurnstileToken(turnstileToken, request.ip);
       if (!turnstileResult.success) {
@@ -70,6 +82,44 @@ async function authRoutes(fastify) {
         };
       }
 
+      if (mode === "email") {
+        const email = normalizeEmail(rawEmail);
+        if (!email) {
+          reply.status(400);
+          return { success: false, message: "Please enter a valid email address." };
+        }
+
+        const emailHash = hashBlindIndex(email);
+        const { rows } = await db.query(
+          "SELECT id, phone_encrypted, email_encrypted, full_name, is_phone_verified FROM public.customers WHERE email_hash = $1 LIMIT 1",
+          [emailHash]
+        );
+
+        if (rows.length > 0) {
+          const customer = rows[0];
+          await createAndAttachSession(customer, request, reply);
+          const decryptedPhone = decryptPII(customer.phone_encrypted);
+          return {
+            success: true,
+            status: "logged_in",
+            user: buildPublicUser(customer, decryptedPhone, email),
+          };
+        }
+
+        const onboardingToken = signSessionJwt(
+          { purpose: "complete_signup_phone", email },
+          "15m"
+        );
+
+        return {
+          success: true,
+          status: "needs_phone",
+          onboardingToken,
+          maskedEmail: maskEmail(email),
+        };
+      }
+
+      // Default mode: phone
       const phone = normalizePhone(rawPhone);
       if (!phone) {
         reply.status(400);
@@ -88,8 +138,6 @@ async function authRoutes(fastify) {
       if (rows.length > 0) {
         const customer = rows[0];
         await createAndAttachSession(customer, request, reply);
-
-        const decryptedPhone = decryptPII(customer.phone_encrypted);
         const decryptedEmail = customer.email_encrypted
           ? decryptPII(customer.email_encrypted)
           : null;
@@ -97,19 +145,12 @@ async function authRoutes(fastify) {
         return {
           success: true,
           status: "logged_in",
-          user: {
-            id: customer.id,
-            maskedPhone: maskPhone(decryptedPhone),
-            maskedEmail: decryptedEmail ? maskEmail(decryptedEmail) : null,
-            fullName: customer.full_name,
-            isPhoneVerified: customer.is_phone_verified,
-          },
+          user: buildPublicUser(customer, phone, decryptedEmail),
         };
       }
 
-      // New user: issue short-lived onboarding token to collect unique email next
       const onboardingToken = signSessionJwt(
-        { purpose: "complete_signup", phone },
+        { purpose: "complete_signup_email", phone },
         "15m"
       );
 
@@ -130,10 +171,10 @@ async function authRoutes(fastify) {
     }
   });
 
-  // POST /api/auth/complete-signup - Capture unique email (hashed + encrypted) & issue 30-day session
+  // POST /api/auth/complete-signup - Capture remaining field (email or phone) & issue 30-day session
   fastify.post("/complete-signup", async (request, reply) => {
     try {
-      const { email: rawEmail, onboardingToken } = request.body || {};
+      const { email: rawEmail, phone: rawPhone, onboardingToken } = request.body || {};
 
       if (!onboardingToken) {
         reply.status(400);
@@ -147,26 +188,38 @@ async function authRoutes(fastify) {
         reply.status(401);
         return {
           success: false,
-          message: "Signup session expired. Please re-enter your mobile number.",
+          message: "Signup session expired. Please start again.",
         };
       }
 
-      if (decoded.purpose !== "complete_signup" || !decoded.phone) {
+      let phone;
+      let email;
+
+      if (decoded.purpose === "complete_signup_email" && decoded.phone) {
+        phone = decoded.phone;
+        email = normalizeEmail(rawEmail);
+        if (!email) {
+          reply.status(400);
+          return { success: false, message: "Please enter a valid email address." };
+        }
+      } else if (decoded.purpose === "complete_signup_phone" && decoded.email) {
+        email = decoded.email;
+        phone = normalizePhone(rawPhone);
+        if (!phone) {
+          reply.status(400);
+          return {
+            success: false,
+            message: "Please enter a valid 10-digit Indian mobile number.",
+          };
+        }
+      } else {
         reply.status(400);
         return { success: false, message: "Invalid signup session token." };
       }
 
-      const email = normalizeEmail(rawEmail);
-      if (!email) {
-        reply.status(400);
-        return { success: false, message: "Please enter a valid email address." };
-      }
-
-      const phone = decoded.phone;
       const phoneHash = hashBlindIndex(phone);
       const emailHash = hashBlindIndex(email);
 
-      // Enforce unique email per account
       const emailCheck = await db.query(
         "SELECT id FROM public.customers WHERE email_hash = $1 LIMIT 1",
         [emailHash]
@@ -179,7 +232,6 @@ async function authRoutes(fastify) {
         };
       }
 
-      // Guard against duplicate race condition on phone_hash
       const phoneCheck = await db.query(
         "SELECT id FROM public.customers WHERE phone_hash = $1 LIMIT 1",
         [phoneHash]
@@ -192,16 +244,13 @@ async function authRoutes(fastify) {
         };
       }
 
-      const phoneEncrypted = encryptPII(phone);
-      const emailEncrypted = encryptPII(email);
-
       const { rows } = await db.query(
         `
         INSERT INTO public.customers (phone_hash, phone_encrypted, email_hash, email_encrypted, is_phone_verified)
         VALUES ($1, $2, $3, $4, false)
         RETURNING id, full_name, is_phone_verified
         `,
-        [phoneHash, phoneEncrypted, emailHash, emailEncrypted]
+        [phoneHash, encryptPII(phone), emailHash, encryptPII(email)]
       );
 
       const newCustomer = rows[0];
@@ -211,13 +260,7 @@ async function authRoutes(fastify) {
       return {
         success: true,
         status: "logged_in",
-        user: {
-          id: newCustomer.id,
-          maskedPhone: maskPhone(phone),
-          maskedEmail: maskEmail(email),
-          fullName: newCustomer.full_name,
-          isPhoneVerified: newCustomer.is_phone_verified,
-        },
+        user: buildPublicUser(newCustomer, phone, email),
       };
     } catch (err) {
       request.log.error(err);
@@ -262,4 +305,3 @@ async function authRoutes(fastify) {
 }
 
 module.exports = authRoutes;
-

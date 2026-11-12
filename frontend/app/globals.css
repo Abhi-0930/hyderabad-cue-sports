@@ -3079,3 +3079,416 @@ body {
   }
 }
 
+/* =========================================================
+   CUSTOMER AUTH PAGE (/login)
+   ========================================================= */
+.hcs-auth-page {
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px 48px;
+}
+
+.hcs-auth-page-topbar {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+}
+
+.hcs-auth-page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8e3;
+  background: #ffffff;
+  color: #113a27;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.hcs-auth-page-back:hover {
+  background: #f4f7f5;
+  border-color: #cbd5ce;
+  transform: none !important;
+}
+
+.hcs-auth-page-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 0 40px;
+}
+
+.hcs-auth-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 36px 32px 32px;
+  box-shadow: 0 20px 50px rgba(10, 32, 20, 0.18);
+  border: 1px solid #e6ece8;
+}
+
+.hcs-auth-card.standalone {
+  border: none;
+  box-shadow: none;
+  background: #ffffff;
+  padding: 8px 4px 24px;
+  max-width: 420px;
+}
+
+.hcs-auth-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #f3f6f4;
+  color: #174b35;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.hcs-auth-close:hover {
+  background: #e4ebe6;
+  transform: none !important;
+}
+
+/* Brand Header matching HCS angled badge + HYDERABAD CUE SPORTS */
+.hcs-auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.hcs-auth-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 9px;
+  border: 1.8px solid #c5a049;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #b48d36;
+  transform: rotate(-10deg);
+  background: #ffffff;
+}
+
+.hcs-auth-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.08;
+}
+
+.hcs-auth-title {
+  font-family: var(--sans);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #092c1b;
+}
+
+.hcs-auth-subtitle {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: #b48d36;
+  margin-top: 2px;
+}
+
+.hcs-auth-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.hcs-auth-heading {
+  font-family: var(--sans);
+  font-size: 23px;
+  font-weight: 700;
+  color: #0e1e15;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.hcs-auth-subtext {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: #5d6861;
+  margin: 0 0 22px;
+  line-height: 1.4;
+}
+
+.hcs-auth-phone-box,
+.hcs-auth-email-box {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  border: 1.5px solid #cbd5ce;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0 14px;
+  transition: border-color 0.2s ease;
+}
+
+.hcs-auth-phone-box:focus-within,
+.hcs-auth-email-box:focus-within {
+  border-color: #113a27;
+}
+
+.hcs-auth-country-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: #132219;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.hcs-auth-divider {
+  width: 1px;
+  height: 24px;
+  background: #d8e0da;
+  margin: 0 12px;
+  flex-shrink: 0;
+}
+
+.hcs-auth-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 15.5px;
+  font-weight: 500;
+  color: #0e1e15;
+}
+
+.hcs-auth-input::placeholder {
+  color: #828e86;
+  font-weight: 400;
+}
+
+.hcs-auth-mode-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  margin-bottom: 14px;
+}
+
+.hcs-auth-toggle-link {
+  background: transparent;
+  border: none;
+  padding: 2px 0;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: #174b35;
+  cursor: pointer;
+}
+
+.hcs-auth-toggle-link:hover {
+  text-decoration: underline;
+  transform: none !important;
+}
+
+.hcs-auth-turnstile {
+  margin: 6px 0 14px;
+}
+
+.hcs-auth-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.hcs-auth-legal {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: #616d65;
+  line-height: 1.5;
+  margin: 4px 0 20px;
+}
+
+.hcs-auth-legal a {
+  color: #113a27;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.hcs-auth-submit {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  background: #113a27;
+  color: #ffffff;
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.hcs-auth-submit:hover:not(:disabled) {
+  background: #0b291b;
+  transform: none !important;
+}
+
+.hcs-auth-submit:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.hcs-auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 14px;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #174b35;
+  cursor: pointer;
+  width: max-content;
+}
+
+.hcs-auth-back:hover {
+  text-decoration: underline;
+  transform: none !important;
+}
+
+.hcs-spin {
+  animation: hcsSpin 0.8s linear infinite;
+}
+
+@keyframes hcsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Header Account Status & Dropdown */
+.hcs-account-wrapper {
+  position: relative;
+}
+
+.hcs-account-dot {
+  position: absolute;
+  top: 0;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
+  border: 1.5px solid #ffffff;
+}
+
+.hcs-account-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 230px;
+  background: #ffffff;
+  border: 1px solid #e2e8e3;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(10, 32, 20, 0.14);
+  padding: 12px;
+  z-index: 1200;
+}
+
+.hcs-account-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #edf1ee;
+  margin-bottom: 8px;
+}
+
+.hcs-account-meta strong {
+  font-size: 14px;
+  color: #113a27;
+}
+
+.hcs-account-meta span {
+  font-size: 12.5px;
+  color: #3f4e44;
+  font-weight: 500;
+}
+
+.hcs-account-meta small {
+  font-size: 11.5px;
+  color: #6b7870;
+}
+
+.hcs-account-logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #b91c1c;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.hcs-account-logout-btn:hover {
+  background: #fef2f2;
+  transform: none !important;
+}
+
+@media (max-width: 520px) {
+  .hcs-auth-page {
+    padding: 16px 20px 36px;
+  }
+  .hcs-auth-card {
+    padding: 28px 20px 24px;
+  }
+  .hcs-auth-card.standalone {
+    padding: 4px 0 24px;
+  }
+  .hcs-auth-heading {
+    font-size: 21px;
+  }
+}
+
