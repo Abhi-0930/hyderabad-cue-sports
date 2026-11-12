@@ -9,6 +9,7 @@ import { ArrowLink, ProductCard, QuickViewModal, SectionHeading, SliderArrows, u
 import { AnimatedAddToCart } from "@/components/animated-add-to-cart";
 import { PromoBannerCarousel } from "@/components/promo-banner-carousel";
 import { ShopByEquipment } from "@/components/shop-by-equipment";
+import { buildProductUrl } from "@/lib/url";
 
 export function HomePage() {
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
@@ -188,7 +189,7 @@ export function HomePage() {
               return (
                 <div key={product.id} className="featured-product-card">
                   <div className="featured-card-media">
-                    <Link href={`/products/${product.slug}`} className="featured-media-link">
+                    <Link href={buildProductUrl(product, { ref: "hcs_hp_featured" })} className="featured-media-link">
                       <img src={product.image} alt={product.name} />
                     </Link>
                     <button
@@ -202,7 +203,7 @@ export function HomePage() {
 
                   <div className="featured-card-body">
                     <h3 className="featured-product-name">
-                      <Link href={`/products/${product.slug}`}>{product.name}</Link>
+                      <Link href={buildProductUrl(product, { ref: "hcs_hp_featured" })}>{product.name}</Link>
                     </h3>
                     <div className="featured-product-price">
                       {formatInr(product.price)}
@@ -340,12 +341,44 @@ export function ShopPage() {
   </>;
 }
 
-export function ProductPage({ slug }: { slug: string }) {
-  const product = getProduct(slug);
+export function ProductPage({
+  slug,
+  pid,
+  isTampered,
+}: {
+  slug?: string;
+  pid?: string;
+  isTampered?: boolean;
+}) {
+  const product = pid
+    ? products.find((p) => p.id === pid) || (slug ? getProduct(slug) : undefined)
+    : slug
+    ? getProduct(slug)
+    : undefined;
+
   const { addToCart } = useStorefront();
   const [selectedImage, setSelectedImage] = useState(product?.image ?? "");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("details");
+
+  if (isTampered) {
+    return (
+      <section className="not-found section">
+        <div className="container">
+          <span className="eyebrow">Security Warning · Link Modified</span>
+          <h1>Invalid or modified product link</h1>
+          <p>
+            The query parameters on this link do not match our verified catalogue signature.
+            To protect your checkout security, please access the product from our authentic range.
+          </p>
+          <Link href="/shop" className="button button-dark">
+            Browse Authentic Products <ArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
   if (!product) return <section className="not-found section"><div className="container"><span className="eyebrow">404 · Product not found</span><h1>This frame is still being set.</h1><p>The product you are looking for is not part of the demo catalogue.</p><Link href="/shop" className="button button-dark">Back to collection <ArrowRight size={16} /></Link></div></section>;
   const gallery = product.gallery?.length ? product.gallery : [product.image, "/images/snooker-room.jpg", "/images/snooker-detail.jpg"];
   const related = products.filter((item) => item.id !== product.id && item.type === product.type).slice(0, 3);

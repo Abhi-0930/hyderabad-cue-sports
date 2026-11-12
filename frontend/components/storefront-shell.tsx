@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { formatInr, Product, products } from "@/lib/products";
 import { apiFetch, type AuthUser } from "@/lib/api";
+import { buildProductUrl, buildShopUrl, buildLoginUrl } from "@/lib/url";
 
 type CartItem = Product & { quantity: number };
 type StorefrontContextValue = {
@@ -223,11 +224,7 @@ export function SiteHeader() {
 
   const submitSearch = (event: React.FormEvent) => {
     event.preventDefault();
-    if (search.trim()) {
-      router.push(`/shop?query=${encodeURIComponent(search.trim())}`);
-    } else {
-      router.push("/shop");
-    }
+    router.push(buildShopUrl({ query: search.trim(), ref: "hcs_nav_search" }));
   };
 
   return (
@@ -310,7 +307,7 @@ export function SiteHeader() {
             <div className="hcs-account-wrapper">
               {!user ? (
                 <Link
-                  href="/login"
+                  href={buildLoginUrl({ ref: "hcs_header_nav" })}
                   className="hcs-action-item hcs-account-trigger"
                   aria-label="Login"
                 >
@@ -329,7 +326,6 @@ export function SiteHeader() {
                   >
                     <div className="hcs-action-icon-box">
                       <UserRound size={21} />
-                      <span className="hcs-account-dot" />
                     </div>
                     <span className="hcs-action-label">
                       {user.fullName ? user.fullName.split(" ")[0] : "Account"}
@@ -529,7 +525,7 @@ export function SiteHeader() {
             <div className="mobile-drawer-auth">
               {!user ? (
                 <Link
-                  href="/login"
+                  href={buildLoginUrl({ ref: "hcs_drawer_nav" })}
                   className="mobile-drawer-login-btn"
                   onClick={() => setMobileOpen(false)}
                 >
@@ -637,13 +633,15 @@ export function SiteFooter() {
 export function ProductCard({ product, onQuickView }: { product: Product; onQuickView: (product: Product) => void }) {
   const { wishlist, toggleWishlist, addToCart } = useStorefront();
   const isSaved = wishlist.includes(product.id);
-  return <article className="product-card"><div className="product-image-wrap"><Link href={`/products/${product.slug}`} className="product-image-link"><img src={product.image} alt={product.name} /><span className="image-wash" /></Link>{product.badge && <span className="product-badge">{product.badge}</span>}<button className={`wishlist-button ${isSaved ? "saved" : ""}`} onClick={() => toggleWishlist(product.id)} aria-label={isSaved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}><Heart size={18} fill={isSaved ? "currentColor" : "none"} /></button><button className="quick-view-button" onClick={() => onQuickView(product)}>Quick view <ArrowRight size={14} /></button></div><div className="product-card-body"><Link href={`/products/${product.slug}`}><span className="product-kicker">{product.size} · {product.category}</span><h3>{product.name}</h3></Link><div className="product-card-meta"><div><strong>{formatInr(product.price)}</strong>{product.compareAt && <del>{formatInr(product.compareAt)}</del>}</div><span className={`availability ${product.availability.toLowerCase().replaceAll(" ", "-")}`}>{product.availability}</span></div><button className="text-button" onClick={() => addToCart(product)}>Add to bag <ArrowRight size={15} /></button></div></article>;
+  const productHref = buildProductUrl(product, { ref: "hcs_cat_item" });
+  return <article className="product-card"><div className="product-image-wrap"><Link href={productHref} className="product-image-link"><img src={product.image} alt={product.name} /><span className="image-wash" /></Link>{product.badge && <span className="product-badge">{product.badge}</span>}<button className={`wishlist-button ${isSaved ? "saved" : ""}`} onClick={() => toggleWishlist(product.id)} aria-label={isSaved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}><Heart size={18} fill={isSaved ? "currentColor" : "none"} /></button><button className="quick-view-button" onClick={() => onQuickView(product)}>Quick view <ArrowRight size={14} /></button></div><div className="product-card-body"><Link href={productHref}><span className="product-kicker">{product.size} · {product.category}</span><h3>{product.name}</h3></Link><div className="product-card-meta"><div><strong>{formatInr(product.price)}</strong>{product.compareAt && <del>{formatInr(product.compareAt)}</del>}</div><span className={`availability ${product.availability.toLowerCase().replaceAll(" ", "-")}`}>{product.availability}</span></div><button className="text-button" onClick={() => addToCart(product)}>Add to bag <ArrowRight size={15} /></button></div></article>;
 }
 
 export function QuickViewModal({ product, onClose }: { product: Product | null; onClose: () => void }) {
   const { addToCart } = useStorefront();
   if (!product) return null;
-  return <div className="modal-overlay" onClick={onClose}><div className="quick-view-modal" onClick={(event) => event.stopPropagation()}><button className="modal-close icon-button" onClick={onClose} aria-label="Close quick view"><X size={20} /></button><div className="quick-view-image"><img src={product.image} alt={product.name} /></div><div className="quick-view-content"><span className="eyebrow">Quick view · Demo product</span><h2>{product.name}</h2><p className="quick-view-price">{formatInr(product.price)}</p><p>{product.description}</p><div className="quick-view-facts"><span><ShieldCheck size={16} />{product.availability}</span><span><Sparkles size={16} />{product.size} playing size</span></div><div className="quick-view-actions"><button className="button button-dark" onClick={() => { addToCart(product); onClose(); }}>Add to bag <ShoppingBag size={16} /></button><Link className="button button-ghost" href={`/products/${product.slug}`} onClick={onClose}>View details <ArrowRight size={16} /></Link></div></div></div></div>;
+  const productHref = buildProductUrl(product, { ref: "hcs_quickview" });
+  return <div className="modal-overlay" onClick={onClose}><div className="quick-view-modal" onClick={(event) => event.stopPropagation()}><button className="modal-close icon-button" onClick={onClose} aria-label="Close quick view"><X size={20} /></button><div className="quick-view-image"><img src={product.image} alt={product.name} /></div><div className="quick-view-content"><span className="eyebrow">Quick view · Demo product</span><h2>{product.name}</h2><p className="quick-view-price">{formatInr(product.price)}</p><p>{product.description}</p><div className="quick-view-facts"><span><ShieldCheck size={16} />{product.availability}</span><span><Sparkles size={16} />{product.size} playing size</span></div><div className="quick-view-actions"><button className="button button-dark" onClick={() => { addToCart(product); onClose(); }}>Add to bag <ShoppingBag size={16} /></button><Link className="button button-ghost" href={productHref} onClick={onClose}>View details <ArrowRight size={16} /></Link></div></div></div></div>;
 }
 
 export function SectionHeading({ eyebrow, title, description, action }: { eyebrow: string; title: string; description?: string; action?: React.ReactNode }) {

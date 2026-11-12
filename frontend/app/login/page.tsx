@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { AuthCard } from "@/components/auth-modal";
@@ -8,7 +8,8 @@ import { useStorefront } from "@/components/storefront-shell";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, setUser, showNotice } = useStorefront();
+  const { user, setUser } = useStorefront();
+  const backActionRef = useRef<(() => boolean) | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -17,6 +18,12 @@ export default function LoginPage() {
   }, [user, router]);
 
   const handleBack = () => {
+    // If on Step 2, backActionRef returns true after transitioning to Step 1
+    if (backActionRef.current && backActionRef.current()) {
+      return;
+    }
+
+    // On Step 1: navigate to the previous page or home
     if (typeof window !== "undefined" && window.history.length > 1) {
       router.back();
     } else {
@@ -40,9 +47,11 @@ export default function LoginPage() {
       <div className="hcs-auth-page-body">
         <AuthCard
           isStandalonePage
+          onRegisterBackAction={(handler) => {
+            backActionRef.current = handler;
+          }}
           onSuccess={(loggedInUser) => {
             setUser(loggedInUser);
-            showNotice("Welcome to Hyderabad Cue Sports.");
             router.push("/");
           }}
         />

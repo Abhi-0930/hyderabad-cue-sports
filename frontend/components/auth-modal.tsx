@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { ArrowLeft, Check, ChevronDown, Loader2, Search, X } from "lucide-react";
+import { Check, ChevronDown, Loader2, Search, X } from "lucide-react";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { allCountries, type Country } from "country-telephone-data";
 import { apiFetch, type AuthUser } from "@/lib/api";
@@ -11,6 +11,7 @@ interface AuthModalProps {
   onClose?: () => void;
   onSuccess: (user: AuthUser) => void;
   isStandalonePage?: boolean;
+  onRegisterBackAction?: (handler: () => boolean) => void;
 }
 
 const SORTED_COUNTRIES: Country[] = [
@@ -250,6 +251,7 @@ export function AuthCard({
   onClose,
   onSuccess,
   isStandalonePage = false,
+  onRegisterBackAction,
 }: Omit<AuthModalProps, "isOpen">) {
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -273,6 +275,17 @@ export function AuthCard({
     setTurnstileToken(null);
     turnstileRef.current?.reset();
   };
+
+  useEffect(() => {
+    if (!onRegisterBackAction) return;
+    onRegisterBackAction(() => {
+      if (step !== "entry") {
+        resetToEntry();
+        return true;
+      }
+      return false;
+    });
+  }, [step, onRegisterBackAction]);
 
   const toggleEntryMode = () => {
     setEntryMode((prev) => (prev === "phone" ? "email" : "phone"));
@@ -522,11 +535,6 @@ export function AuthCard({
           className={`hcs-auth-form ${step === "needs_email" ? "hcs-auth-form--needs-email" : ""}`}
           noValidate
         >
-          <button type="button" className="hcs-auth-back" onClick={resetToEntry}>
-            <ArrowLeft size={15} />
-            <span>Change {step === "needs_email" ? "mobile number" : "email"}</span>
-          </button>
-
           <h2 className="hcs-auth-heading">
             {step === "needs_email"
               ? "Add your email to finish"
