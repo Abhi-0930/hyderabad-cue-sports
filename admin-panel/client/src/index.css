@@ -502,3 +502,182 @@ h1 { color: var(--deep-green); font-family: Georgia, serif; letter-spacing: -.03
 @media (max-width: 1120px) { .cms-overview-grid { grid-template-columns: repeat(2, 1fr); } .cms-overview-columns { grid-template-columns: 1fr; } .builder-row { grid-template-columns: 23px 28px 62px minmax(190px, 1fr) 80px 71px 90px; } }
 @media (max-width: 760px) { .cms-header, .cms-builder-toolbar, .preview-toolbar { align-items: flex-start; flex-direction: column; } .cms-quick-links { grid-template-columns: 1fr; } .banner-row { grid-template-columns: 80px minmax(180px, 1fr) 55px 60px; } .banner-mobile-preview { display: none; } .cms-page-row { grid-template-columns: 34px minmax(160px, 1fr) 70px 25px; } .cms-page-row time { display: none; } }
 @media (max-width: 560px) { .cms-overview-grid { grid-template-columns: 1fr 1fr; gap: 9px; } .cms-overview-grid .metric-card { padding: 13px; } .builder-row { grid-template-columns: 20px 26px 55px minmax(170px, 1fr) 80px; } .builder-products, .builder-row > .visibility-toggle, .builder-row > .row-actions { grid-column: 4 / -1; } .builder-products { margin-top: -7px; } .builder-row > .row-actions { justify-content: flex-start; } .banner-row { grid-template-columns: 75px minmax(160px, 1fr) 60px; } .banner-row > .publication-dot, .banner-row > .row-actions { grid-column: 2; } .storefront-top { gap: 9px; padding: 0 13px; } .storefront-top > span:not(.brand-mark):not(.storefront-cart), .storefront-top > strong { display: none; } .storefront-section { padding: 22px 17px; } .storefront-section h2 { font-size: 19px; } }
+
+/* =========================================================
+   ADMIN AUTHENTICATION GATE (Reference UI)
+   ========================================================= */
+
+.admin-login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fafbfa;
+  padding: 32px 16px;
+  box-sizing: border-box;
+}
+
+.admin-login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.admin-brand-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(22px, 3.2vw, 28px);
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  line-height: 1.25;
+  color: #0d3822;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.admin-brand-arc {
+  width: 140px;
+  height: 12px;
+  margin-top: 6px;
+  display: block;
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border: 1px solid #e3e8e4;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px -4px rgba(13, 56, 34, 0.06), 0 2px 8px -2px rgba(0, 0, 0, 0.03);
+  padding: 38px 34px 34px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .admin-login-card {
+    padding: 30px 22px 26px;
+    border-radius: 16px;
+  }
+}
+
+.admin-card-title {
+  font-family: var(--sans, inherit);
+  font-size: 22px;
+  font-weight: 700;
+  color: #0d3822;
+  text-align: center;
+  margin: 0 0 24px;
+  letter-spacing: -0.01em;
+}
+
+.admin-login-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.admin-input-icon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px 0 44px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #1e293b;
+  background: #ffffff;
+  box-sizing: border-box;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.admin-input::placeholder {
+  color: #9ca3af;
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: #0d3822;
+  box-shadow: 0 0 0 3px rgba(13, 56, 34, 0.08);
+}
+
+.admin-input-has-toggle {
+  padding-right: 44px;
+}
+
+.admin-password-toggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+}
+
+.admin-password-toggle:hover {
+  color: #475569;
+}
+
+.admin-login-btn {
+  width: 100%;
+  height: 48px;
+  background: #0d3822;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.18s ease, transform 0.1s ease, box-shadow 0.18s ease;
+  box-shadow: 0 2px 4px rgba(13, 56, 34, 0.12);
+}
+
+.admin-login-btn:hover:not(:disabled) {
+  background: #092818;
+  box-shadow: 0 4px 10px rgba(13, 56, 34, 0.2);
+}
+
+.admin-login-btn:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.admin-login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

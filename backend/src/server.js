@@ -59,6 +59,8 @@ async function buildServer() {
     FRONTEND_URL,
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
   ]);
 
   // 3. CORS & Signed Cookies
@@ -112,6 +114,7 @@ async function buildServer() {
   await fastify.register(require("./routes/products"), { prefix: "/api/products" });
   await fastify.register(require("./routes/orders"), { prefix: "/api/orders" });
   await fastify.register(require("./routes/inquiries"), { prefix: "/api/inquiries" });
+  await fastify.register(require("./routes/admin"), { prefix: "/api/admin" });
 
   // 3. Health check route with Supabase ping
   fastify.get("/api/health", async (request, reply) => {

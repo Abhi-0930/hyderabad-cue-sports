@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { Toaster } from "@/components/ui/sonner";
+import { useEffect, useState } from "react";
+import { toast, Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import AdminLogin, { type AdminUser } from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProductModule from "./pages/ProductModule";
 import CategoryModule from "./pages/CategoryModule";
@@ -18,12 +19,97 @@ import { AdminShell } from "./components/admin/AdminShell";
 import type { NavKey, OrderRecord, ProductRecord } from "./types/admin";
 
 function AdminApp() {
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(() => {
+    try {
+      const saved = localStorage.getItem("hcs_admin_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [active, setActive] = useState<NavKey>("dashboard");
   const [products, setProducts] = useState<ProductRecord[]>(phase2Products);
   const [orders, setOrders] = useState<OrderRecord[]>(phase3Orders);
+
+  // Background verification of active PostgreSQL admin session
+  useEffect(() => {
+    if (!adminUser) return;
+    const verifySession = async () => {
+      try {
+        const headers: Record<string, string> = {};
+        if (adminUser.token) {
+          headers["Authorization"] = `Bearer ${adminUser.token}`;
+        }
+        const res = await fetch("http://localhost:5000/api/admin/me", {
+          credentials: "include",
+          headers,
+        });
+        if (!res.ok) {
+          localStorage.removeItem("hcs_admin_user");
+          setAdminUser(null);
+        }
+      } catch {
+        // network temporarily offline, keep local state
+      }
+    };
+    verifySession();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:5000/api/admin/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {}
+    localStorage.removeItem("hcs_admin_user");
+    setAdminUser(null);
+    toast.success("Signed out successfully.");
+  };
+
+  // Strict Authentication Gate: Show Login Screen when unauthenticated
+  if (!adminUser) {
+    return (
+      <AdminLogin
+        onLogin={(user) => {
+          setAdminUser(user);
+          toast.success(`Welcome back, ${user.fullName || "Admin"}!`);
+        }}
+      />
+    );
+  }
+
   const navigate = (key: NavKey) => setActive(key);
-  const content = active === "dashboard" ? <AdminDashboard onViewOrders={() => navigate("orders")} onViewProducts={() => navigate("products")} /> : active === "products" ? <ProductModule products={products} setProducts={setProducts} /> : active === "categories" ? <CategoryModule /> : active === "inventory" ? <InventoryModule products={products} setProducts={setProducts} /> : active === "orders" ? <OrdersModule orders={orders} setOrders={setOrders} /> : active === "customers" ? <CustomerModule /> : active === "cms" ? <CmsModule products={products} /> : <AdminDashboard onViewOrders={() => navigate("orders")} onViewProducts={() => navigate("products")} />;
-  return <AdminShell active={active} onNavigate={navigate}>{content}</AdminShell>;
+  const content =
+    active === "dashboard" ? (
+      <AdminDashboard onViewOrders={() => navigate("orders")} onViewProducts={() => navigate("products")} />
+    ) : active === "products" ? (
+      <ProductModule products={products} setProducts={setProducts} />
+    ) : active === "categories" ? (
+      <CategoryModule />
+    ) : active === "inventory" ? (
+      <InventoryModule products={products} setProducts={setProducts} />
+    ) : active === "orders" ? (
+      <OrdersModule orders={orders} setOrders={setOrders} />
+    ) : active === "customers" ? (
+      <CustomerModule />
+    ) : active === "cms" ? (
+      <CmsModule products={products} />
+    ) : (
+      <AdminDashboard onViewOrders={() => navigate("orders")} onViewProducts={() => navigate("products")} />
+    );
+
+  return (
+    <AdminShell
+      active={active}
+      onNavigate={navigate}
+      adminUser={adminUser}
+      onLogout={handleLogout}
+    >
+      {content}
+    </AdminShell>
+  );
 }
 
 function Router() {

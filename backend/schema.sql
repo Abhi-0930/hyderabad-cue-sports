@@ -255,6 +255,31 @@ TO anon, authenticated
 USING (false)
 WITH CHECK (false);
 
+-- ------------------------------------------------------------------------------
+-- 11. ADMIN USERS TABLE (Internal Backoffice & Store Management)
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.admin_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    full_name TEXT NOT NULL DEFAULT 'Administrator',
+    role TEXT NOT NULL DEFAULT 'superadmin' CHECK (role IN ('superadmin', 'admin', 'manager')),
+    is_active BOOLEAN DEFAULT true,
+    last_login_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_users_email ON public.admin_users(email);
+ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Deny public direct access to admin_users" ON public.admin_users;
+CREATE POLICY "Deny public direct access to admin_users"
+ON public.admin_users FOR ALL
+TO anon, authenticated
+USING (false)
+WITH CHECK (false);
+
 -- Products: Everyone (authenticated & guests) can view active products
 DROP POLICY IF EXISTS "Public products viewable by everyone" ON public.products;
 CREATE POLICY "Public products viewable by everyone" 
