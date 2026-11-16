@@ -11,5 +11,5 @@ const pageCopy: Record<ResourceKey, { eyebrow: string; title: string; descriptio
 
 export default function ResourcePage({ resource }: { resource: ResourceKey }) {
   const copy = pageCopy[resource];
-  return <div className="resource-page"><div className="page-heading"><div><p className="eyebrow">{copy.eyebrow}</p><h1>{copy.title}</h1><p className="page-subtitle">{copy.description}</p></div><div className="heading-actions"><Button variant="outline" size="sm"><Download size={15} /> Export</Button><Button size="sm"><Plus size={15} /> {copy.action}</Button></div></div><SectionCard title={`All ${resource}`} action={<span className="table-summary">Updated a few seconds ago</span>}><DataTable resource={resource} /></SectionCard></div>;
+  return <div className="resource-page"><div className="page-heading"><div><h1>{copy.title}</h1></div><div className="heading-actions"><Button variant="outline" size="sm"><Download size={15} /> Export</Button><Button size="sm"><Plus size={15} /> {copy.action}</Button></div></div><SectionCard title={`All ${resource}`} action={<span className="table-summary">Updated a few seconds ago</span>}><DataTable resource={resource} /></SectionCard></div>;
 }

@@ -27,8 +27,8 @@ export function SectionCard({ title, eyebrow, action, children, className = "" }
   return <section className={`section-card ${className}`}><div className="section-card-header"><div>{eyebrow && <p className="eyebrow">{eyebrow}</p>}<h2>{title}</h2></div>{action}</div>{children}</section>;
 }
 
-export function MetricCard({ label, value, change, detail, icon, accent = "forest" }: { label: string; value: string; change: string; detail: string; icon: ReactNode; accent?: "forest" | "gold" | "ivory" | "red" }) {
-  return <article className={`metric-card metric-${accent}`}><div className="metric-card-top"><div className="metric-icon">{icon}</div><span className={change.startsWith("−") ? "metric-change down" : "metric-change"}>{change}</span></div><p className="metric-label">{label}</p><p className="metric-value">{value}</p><p className="metric-detail">{detail}</p></article>;
+export function MetricCard({ label, value, change, detail, icon, accent = "forest" }: { label: string; value: string; change: string; detail?: string; icon: ReactNode; accent?: "forest" | "gold" | "ivory" | "red" }) {
+  return <article className={`metric-card metric-${accent}`}><div className="metric-card-top"><div className="metric-icon">{icon}</div><span className={change.startsWith("−") ? "metric-change down" : "metric-change"}>{change}</span></div><p className="metric-label">{label}</p><p className="metric-value">{value}</p>{detail && <p className="metric-detail">{detail}</p>}</article>;
 }
 
 export function SortIcon({ direction }: { direction: "asc" | "desc" | null }) {
