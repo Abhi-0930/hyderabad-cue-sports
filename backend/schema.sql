@@ -84,6 +84,9 @@ CREATE TABLE IF NOT EXISTS public.customers (
     email_encrypted TEXT,
     full_name TEXT,
     is_phone_verified BOOLEAN NOT NULL DEFAULT false,
+    status TEXT NOT NULL DEFAULT 'Active',
+    segment TEXT NOT NULL DEFAULT 'Retail',
+    notes TEXT,
     created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );

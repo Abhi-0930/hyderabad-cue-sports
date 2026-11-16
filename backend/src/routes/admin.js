@@ -1,8 +1,29 @@
 const crypto = require("crypto");
 const db = require("../db");
-const { signSessionJwt, verifySessionJwt, normalizeEmail } = require("../utils/crypto");
+const { signSessionJwt, verifySessionJwt, normalizeEmail, decryptPII } = require("../utils/crypto");
 
 const ADMIN_COOKIE_NAME = "hcs_admin_session";
+
+function getAuthenticatedAdmin(request) {
+  const cookieToken = request.cookies?.[ADMIN_COOKIE_NAME];
+  const authHeader = request.headers.authorization;
+  const bearerToken = authHeader?.startsWith("Bearer ")
+    ? authHeader.slice(7).trim()
+    : null;
+
+  const token = cookieToken || bearerToken;
+  if (!token) return null;
+
+  try {
+    const decoded = verifySessionJwt(token);
+    if (!decoded || !decoded.id || !["superadmin", "admin", "manager"].includes(decoded.role)) {
+      return null;
+    }
+    return decoded;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Verify a candidate password against the stored scrypt hash string: scrypt:<saltHex>:<hashHex>
@@ -201,6 +222,162 @@ async function adminRoutes(fastify) {
   fastify.post("/logout", async (request, reply) => {
     reply.clearCookie(ADMIN_COOKIE_NAME, { path: "/" });
     return { success: true, message: "Logged out successfully." };
+  });
+
+  // GET /api/admin/customers - List all registered customers from PostgreSQL with decrypted contact info
+  fastify.get("/customers", async (request, reply) => {
+    const admin = getAuthenticatedAdmin(request);
+    if (!admin) {
+      reply.status(401);
+      return { success: false, message: "Unauthorized admin request." };
+    }
+
+    try {
+      const customersRes = await db.query(`
+        SELECT c.id, c.full_name, c.phone_encrypted, c.email_encrypted, c.is_phone_verified,
+               c.status, c.segment, c.notes, c.created_at,
+               COALESCE(COUNT(o.id), 0)::int AS order_count,
+               COALESCE(SUM(o.total_amount), 0)::numeric AS total_spent
+        FROM public.customers c
+        LEFT JOIN public.orders o ON o.customer_id = c.id
+        GROUP BY c.id
+        ORDER BY c.created_at DESC
+      `);
+
+      const addressesRes = await db.query(`
+        SELECT id, customer_id, label, recipient_name, phone_encrypted, address_line1, address_line2, city, state, pincode
+        FROM public.customer_addresses
+        ORDER BY is_default DESC, created_at DESC
+      `);
+
+      const addressesByCustomer = new Map();
+      for (const addr of addressesRes.rows) {
+        if (!addressesByCustomer.has(addr.customer_id)) {
+          addressesByCustomer.set(addr.customer_id, []);
+        }
+        const fullAddress = [addr.address_line1, addr.address_line2, addr.city, addr.state, addr.pincode].filter(Boolean).join(", ");
+        addressesByCustomer.get(addr.customer_id).push({
+          label: addr.label || "Home",
+          address: fullAddress || "Address on file",
+        });
+      }
+
+      const formatted = customersRes.rows.map((row) => {
+        let phone = "";
+        let email = "";
+        try {
+          phone = row.phone_encrypted ? decryptPII(row.phone_encrypted) : "";
+        } catch {
+          phone = "";
+        }
+        try {
+          email = row.email_encrypted ? decryptPII(row.email_encrypted) : "";
+        } catch {
+          email = "";
+        }
+
+        const rawName = row.full_name || (email ? email.split("@")[0] : phone ? `Customer (${phone.slice(-4)})` : "Verified Customer");
+        const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        const initials = name
+          .split(" ")
+          .map((w) => w[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase() || "CU";
+
+        return {
+          id: row.id,
+          name,
+          email: email || "Not provided",
+          mobile: phone || "Not provided",
+          joined: new Date(row.created_at).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          orders: Number(row.order_count) || 0,
+          spent: Number(row.total_spent) || 0,
+          segment: row.segment || "Retail",
+          initials,
+          status: row.status || (row.is_phone_verified ? "Active" : "Active"),
+          addresses: addressesByCustomer.get(row.id) || [],
+          notes: row.notes || "Registered customer via storefront phone verification.",
+          recentActivity: [
+            {
+              label: "Account registered",
+              date: new Date(row.created_at).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              }),
+            },
+          ],
+        };
+      });
+
+      return { success: true, count: formatted.length, data: formatted };
+    } catch (err) {
+      request.log.error(err);
+      reply.status(500);
+      return { success: false, message: "Failed to fetch customers", error: err.message };
+    }
+  });
+
+  // PATCH /api/admin/customers/:id - Update customer notes, segment, or status
+  fastify.patch("/customers/:id", async (request, reply) => {
+    const admin = getAuthenticatedAdmin(request);
+    if (!admin) {
+      reply.status(401);
+      return { success: false, message: "Unauthorized admin request." };
+    }
+
+    const { id } = request.params;
+    const { status, notes, segment } = request.body || {};
+
+    try {
+      const updates = [];
+      const values = [];
+      let idx = 1;
+
+      if (status !== undefined) {
+        updates.push(`status = $${idx++}`);
+        values.push(status);
+      }
+      if (notes !== undefined) {
+        updates.push(`notes = $${idx++}`);
+        values.push(notes);
+      }
+      if (segment !== undefined) {
+        updates.push(`segment = $${idx++}`);
+        values.push(segment);
+      }
+
+      if (updates.length === 0) {
+        return { success: true, message: "No changes requested." };
+      }
+
+      updates.push(`updated_at = NOW()`);
+      values.push(id);
+
+      const query = `
+        UPDATE public.customers
+        SET ${updates.join(", ")}
+        WHERE id = $${idx}
+        RETURNING id, status, notes, segment
+      `;
+
+      const { rows } = await db.query(query, values);
+      if (rows.length === 0) {
+        reply.status(404);
+        return { success: false, message: "Customer not found." };
+      }
+
+      return { success: true, customer: rows[0] };
+    } catch (err) {
+      request.log.error(err);
+      reply.status(500);
+      return { success: false, message: "Failed to update customer." };
+    }
   });
 }
 
