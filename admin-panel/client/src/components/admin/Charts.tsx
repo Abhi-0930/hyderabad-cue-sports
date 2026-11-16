@@ -1,0 +1,17 @@
+import { Area, AreaChart, Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { categoryPerformance, revenueBreakdown, salesTrend, formatINR } from "@/data/mockData";
+import { SectionCard } from "@/components/admin/Primitives";
+
+const tooltipStyle = { border: "1px solid #e4e8e4", borderRadius: 10, boxShadow: "0 8px 24px rgba(16,55,41,.12)", background: "#fff", fontSize: 12 };
+
+export function SalesTrendChart() {
+  return <SectionCard title="Sales performance" eyebrow="Revenue & orders" action={<span className="chart-period">Last 6 months <span>⌄</span></span>}><div className="chart-legend"><span><i className="legend-dot forest-dot" />Revenue</span><span><i className="legend-dot gold-dot" />Orders</span></div><div className="chart-area"><ResponsiveContainer width="100%" height="100%"><AreaChart data={salesTrend} margin={{ top: 12, right: 12, left: -15, bottom: 0 }}><defs><linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#164B38" stopOpacity={0.2} /><stop offset="100%" stopColor="#164B38" stopOpacity={0} /></linearGradient></defs><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#8a948f", fontSize: 11 }} /><YAxis axisLine={false} tickLine={false} tick={{ fill: "#8a948f", fontSize: 11 }} tickFormatter={(value) => `₹${Math.round(value / 1000)}k`} /><Tooltip contentStyle={tooltipStyle} formatter={(value: number, name: string) => [name === "revenue" ? formatINR(value) : `${value} orders`, name === "revenue" ? "Revenue" : "Orders"]} /><Area type="monotone" dataKey="revenue" stroke="#164B38" strokeWidth={2.5} fill="url(#revenueFill)" /><Area type="monotone" dataKey="orders" stroke="#C9A451" strokeWidth={2} fill="none" /></AreaChart></ResponsiveContainer></div></SectionCard>;
+}
+
+export function CategoryChart() {
+  return <SectionCard title="Category performance" eyebrow="Revenue by product family"><div className="category-chart"><ResponsiveContainer width="100%" height="100%"><BarChart data={categoryPerformance} layout="vertical" margin={{ top: 4, right: 8, left: 8, bottom: 4 }}><XAxis type="number" hide /><YAxis type="category" dataKey="category" axisLine={false} tickLine={false} tick={{ fill: "#5f6e65", fontSize: 12 }} width={82} /><Tooltip cursor={{ fill: "#f7f8f6" }} contentStyle={tooltipStyle} formatter={(value: number) => [formatINR(value), "Revenue"]} /><Bar dataKey="revenue" fill="#164B38" radius={[0, 5, 5, 0]} barSize={17} /></BarChart></ResponsiveContainer></div></SectionCard>;
+}
+
+export function RevenueBreakdown() {
+  return <SectionCard title="Revenue mix" eyebrow="Share of sales"><div className="revenue-breakdown"><div className="donut-wrap"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={revenueBreakdown} dataKey="value" innerRadius={47} outerRadius={67} paddingAngle={3} stroke="none">{revenueBreakdown.map((entry) => <Cell key={entry.name} fill={entry.color} />)}</Pie><Tooltip contentStyle={tooltipStyle} formatter={(value: number) => [`${value}%`, "Share"]} /></PieChart></ResponsiveContainer><div className="donut-center"><strong>₹5.46L</strong><span>Total sales</span></div></div><div className="revenue-list">{revenueBreakdown.map((entry) => <div className="revenue-line" key={entry.name}><span><i style={{ background: entry.color }} />{entry.name}</span><strong>{entry.value}%</strong></div>)}</div></div></SectionCard>;
+}
