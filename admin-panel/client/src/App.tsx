@@ -16,6 +16,7 @@ import CmsModule from "./pages/CmsModule";
 import { phase2Products } from "./data/phase2Data";
 import { phase3Orders } from "./data/phase3Data";
 import { AdminShell } from "./components/admin/AdminShell";
+import { useRealtimeOrders } from "./hooks/useRealtimeOrders";
 import type { NavKey, OrderRecord, ProductRecord } from "./types/admin";
 
 function AdminApp() {
@@ -31,6 +32,18 @@ function AdminApp() {
   const [active, setActive] = useState<NavKey>("dashboard");
   const [products, setProducts] = useState<ProductRecord[]>(phase2Products);
   const [orders, setOrders] = useState<OrderRecord[]>(phase3Orders);
+
+  // Zero-polling real-time order listener via Supabase Realtime WebSocket stream
+  useRealtimeOrders({
+    onNewOrder: (newOrder) => {
+      setOrders((current) => [newOrder as OrderRecord, ...current]);
+    },
+    onUpdateOrder: (updated) => {
+      setOrders((current) =>
+        current.map((order) => (order.id === updated.id ? { ...order, ...updated } : order))
+      );
+    },
+  });
 
   // Background verification of active PostgreSQL admin session
   useEffect(() => {
