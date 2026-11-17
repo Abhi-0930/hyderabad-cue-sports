@@ -20,6 +20,15 @@ export type Product = {
   initials: string;
 };
 
+export type ProductVariant = {
+  id: string;
+  name: string;
+  sku: string;
+  price: number;
+  inventory: number;
+  availability: "In stock" | "Out of stock" | "Pre-order";
+};
+
 export type ProductRecord = Product & {
   salePrice: number;
   publication: PublicationStatus;
@@ -39,6 +48,37 @@ export type ProductRecord = Product & {
   seoDescription: string;
   slug: string;
   imageCount: number;
+
+  // Extended 10-step Add Product fields
+  productType?: "Physical Product" | "Digital Product" | "Service";
+  collection?: string;
+  images?: string[];
+  primaryImage?: string;
+  imageAltText?: string;
+  videoUrl?: string;
+  platformFeeType?: "Percentage" | "Fixed";
+  platformFeeValue?: number;
+  feeMode?: "on_top" | "deducted";
+  trackStock?: boolean;
+  allowBackorders?: boolean;
+  minOrderQuantity?: number;
+  variants?: ProductVariant[];
+  customSpecs?: { label: string; value: string }[];
+  shippingSkip?: boolean;
+  shippingClass?: "Standard" | "Heavy / Oversized" | "Fragile";
+  deliveryType?: "Standard Delivery" | "Express Delivery" | "Special Delivery";
+  installationRequired?: boolean;
+  installationType?: string;
+  shippingCharges?: "Free Shipping" | "Fixed Charge" | "Calculated at Checkout";
+  warrantyInfo?: string;
+  returnEligibility?: string;
+  measurementUnit?: "cm" | "mm" | "inches";
+  packageLength?: string;
+  packageWidth?: string;
+  packageHeight?: string;
+  focusKeyword?: string;
+  canonicalUrl?: string;
+  searchEngineVisibility?: "Index" | "No Index";
 };
 
 export type Category = {
