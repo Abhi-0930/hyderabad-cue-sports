@@ -822,7 +822,12 @@ button {
   transform: translateX(-3px);
 }
 
-/* Stepper Progress Strip (01 to 10) - Not fixed on top */
+/* Stepper Progress Strip (01 to 10) */
+.wizard-stepper-container {
+  position: static;
+  margin-bottom: 22px;
+}
+
 .wizard-stepper-strip {
   position: static;
   display: flex;
@@ -833,8 +838,15 @@ button {
   background: #ffffff;
   border: 1px solid #e3eae5;
   border-radius: 10px;
-  margin-bottom: 22px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.wizard-stepper-strip::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .stepper-node {
@@ -843,14 +855,15 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 9px;
+  padding: 8px 11px;
   border-radius: 6px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s ease;
+  transition: all 0.18s ease;
   color: #728177;
   font-size: 12px;
   font-weight: 500;
+  position: relative;
 }
 
 .stepper-node:hover {
@@ -862,6 +875,7 @@ button {
   background: #eef5f0;
   color: var(--forest);
   font-weight: 550;
+  box-shadow: inset 0 -2.5px 0 var(--forest);
 }
 
 .stepper-node.done {
@@ -965,39 +979,6 @@ button {
   font-weight: 500;
 }
 
-/* Notice banners */
-.merchandising-cms-notice {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 14px 16px;
-  background: #f7faf8;
-  border: 1px solid #d8e7dc;
-  border-radius: 8px;
-  color: #27382f;
-  margin-top: 6px;
-}
-
-.merchandising-cms-notice .notice-icon {
-  color: var(--forest);
-  flex: 0 0 auto;
-  margin-top: 2px;
-}
-
-.merchandising-cms-notice strong {
-  display: block;
-  font-size: 12.5px;
-  color: #111111;
-  margin-bottom: 2px;
-}
-
-.merchandising-cms-notice p {
-  margin: 0;
-  font-size: 12px;
-  color: #55665b;
-  line-height: 1.5;
-}
-
 /* Rich Text Editor Shell */
 .rich-editor-shell {
   border: 1px solid #dfe7e0;
@@ -1055,6 +1036,11 @@ button {
   color: var(--forest);
 }
 
+.toolbar-btn.active {
+  background: #e1ede4 !important;
+  color: var(--forest) !important;
+}
+
 .rich-textarea {
   width: 100%;
   border: 0;
@@ -1065,6 +1051,96 @@ button {
   outline: none;
   line-height: 1.55;
   background: transparent;
+}
+
+.rich-editor-content {
+  width: 100%;
+  min-height: 150px;
+  max-height: 380px;
+  overflow-y: auto;
+  border: 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #111111;
+  outline: none;
+  line-height: 1.6;
+  background: #ffffff;
+}
+
+.rich-editor-content:empty::before {
+  content: attr(data-placeholder);
+  color: #8c9890;
+  pointer-events: none;
+}
+
+.rich-editor-content h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #164b38;
+  margin: 10px 0 6px;
+  line-height: 1.35;
+}
+
+.rich-editor-content h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #103729;
+  margin: 8px 0 4px;
+  line-height: 1.35;
+}
+
+.rich-editor-content p {
+  margin: 0 0 6px;
+}
+
+.rich-editor-content ul,
+.rich-editor-content ol {
+  padding-left: 22px;
+  margin: 6px 0;
+}
+
+.rich-editor-content li {
+  margin-bottom: 3px;
+}
+
+.rich-editor-content strong,
+.rich-editor-content b {
+  font-weight: 700;
+  color: #000000;
+}
+
+.rich-editor-content em,
+.rich-editor-content i {
+  font-style: italic;
+}
+
+.rich-editor-content u {
+  text-decoration: underline;
+}
+
+.rich-editor-content a {
+  color: var(--forest);
+  text-decoration: underline;
+}
+
+.rich-editor-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  border: 1px solid #dce4de;
+}
+
+.rich-editor-content th,
+.rich-editor-content td {
+  border: 1px solid #dce4de;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.rich-editor-content th {
+  background: #f4faf6;
+  font-weight: 600;
+  color: #164b38;
 }
 
 /* Image Upload & Gallery */
@@ -1339,6 +1415,156 @@ button {
   gap: 8px;
   font-size: 13px;
   color: #33443a;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   CUSTOM BRAND CHECKBOXES & CARD PRESETS
+   ========================================================================== */
+
+.custom-checkbox-wrap {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 11px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.16s ease;
+}
+
+.custom-checkbox-wrap.is-card {
+  display: flex;
+  width: 100%;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1.5px solid #dce8df;
+  border-radius: 9px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  margin: 4px 0;
+}
+
+.custom-checkbox-wrap.is-card:hover {
+  border-color: #9cbda8;
+  background: #f8fbf9;
+}
+
+.custom-checkbox-wrap.is-card.is-checked {
+  border-color: var(--forest);
+  background: #f2f8f4;
+  box-shadow: 0 2px 8px rgba(22, 75, 56, 0.08);
+}
+
+.custom-checkbox-wrap.is-card.is-checked .custom-checkbox-label {
+  color: var(--forest);
+  font-weight: 600;
+}
+
+.custom-checkbox-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.custom-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+.custom-checkbox-box {
+  width: 19px;
+  height: 19px;
+  border-radius: 5px;
+  border: 1.5px solid #a3bda9;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  transition: all 0.16s ease;
+  flex-shrink: 0;
+}
+
+.custom-checkbox-wrap:hover .custom-checkbox-box {
+  border-color: var(--forest);
+  background: #f7faf8;
+}
+
+.custom-checkbox-wrap.is-checked .custom-checkbox-box {
+  background: var(--forest) !important;
+  border-color: var(--forest) !important;
+  box-shadow: 0 1px 3px rgba(22, 75, 56, 0.25);
+}
+
+.custom-checkbox-icon {
+  color: #ffffff;
+  opacity: 0;
+  transform: scale(0.65);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.custom-checkbox-wrap.is-checked .custom-checkbox-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.custom-checkbox-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.custom-checkbox-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1a221e;
+  line-height: 1.35;
+  transition: color 0.16s ease;
+}
+
+.custom-checkbox-desc {
+  font-size: 12px;
+  color: #5c6e63;
+  line-height: 1.45;
+}
+
+.custom-checkbox-field {
+  padding: 8px 0;
+}
+
+/* Custom styled radio input for fee cards */
+.fee-radio-card input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #b2c7b8;
+  background: #ffffff;
+  margin: 2px 0 0 0;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.fee-radio-card input[type="radio"]:hover {
+  border-color: var(--forest);
+}
+
+.fee-radio-card input[type="radio"]:checked {
+  border-color: var(--forest);
+  background: var(--forest);
+  box-shadow: inset 0 0 0 3.5px #ffffff;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--forest) !important;
   cursor: pointer;
 }
 
@@ -1753,4 +1979,221 @@ button {
 .wizard-next-btn:hover,
 .publish-product-btn:hover {
   background: var(--deep-green);
+}
+
+/* ==========================================================================
+   CUSTOM DROPDOWN (Replaces System Native <select>)
+   ========================================================================== */
+
+.custom-select-container {
+  position: relative;
+  width: 100%;
+  display: block;
+  user-select: none;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #dce4de;
+  border-radius: 7px;
+  color: #111111;
+  font-size: 13px;
+  font-weight: 450;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+  outline: none;
+}
+
+.custom-select-trigger:hover {
+  border-color: #a4b6ab;
+}
+
+.custom-select-container.open .custom-select-trigger,
+.custom-select-trigger:focus-visible {
+  border-color: var(--forest) !important;
+  box-shadow: 0 0 0 3px rgba(22, 75, 56, 0.08) !important;
+}
+
+.custom-select-value {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #111111;
+  font-size: 13px;
+}
+
+.custom-select-value.placeholder {
+  color: #8c9890;
+  font-weight: 400;
+}
+
+.custom-select-chevron {
+  color: var(--forest);
+  flex: 0 0 auto;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.custom-select-container.open .custom-select-chevron {
+  transform: rotate(180deg);
+}
+
+.custom-select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  min-width: 100%;
+  background: #ffffff;
+  border: 1px solid #dce4de;
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(16, 55, 41, 0.14), 0 2px 6px rgba(0, 0, 0, 0.04);
+  z-index: 1050;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: selectMenuPopIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes selectMenuPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.custom-select-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  font-weight: 450;
+  color: #1a221e;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease, color 0.12s ease;
+  line-height: 1.35;
+}
+
+.custom-select-item:hover {
+  background: #f4faf6;
+  color: var(--forest);
+}
+
+.custom-select-item.selected {
+  background: #eef5f0;
+  color: var(--forest);
+  font-weight: 550;
+}
+
+.custom-select-item-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-select-check {
+  color: var(--forest);
+  flex: 0 0 auto;
+  margin-left: 8px;
+}
+
+/* Compact version for table rows */
+.table-select-compact {
+  min-width: 130px;
+}
+
+.table-select-compact .custom-select-trigger {
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.table-select-compact .custom-select-value {
+  font-size: 12px;
+}
+
+.table-select-compact .custom-select-menu {
+  min-width: 140px;
+}
+
+.table-select-compact .custom-select-item {
+  padding: 6px 8px;
+  font-size: 11.5px;
+}
+
+/* Compact toolbar variation */
+.toolbar-filters .custom-select-container {
+  min-width: 130px;
+  width: auto;
+}
+
+.toolbar-filters .custom-select-trigger {
+  min-height: 32px;
+  padding: 5px 9px;
+  font-size: 11px;
+  border-radius: 7px;
+  background: white;
+}
+
+.toolbar-filters .custom-select-value {
+  font-size: 11px;
+}
+
+.toolbar-filters .custom-select-menu {
+  min-width: 160px;
+}
+
+.toolbar-filters .custom-select-item {
+  padding: 6px 9px;
+  font-size: 11px;
+}
+
+/* Editor toolbar custom select */
+.editor-select-custom {
+  width: 130px;
+  display: inline-block;
+}
+
+.editor-select-custom .custom-select-trigger {
+  min-height: 28px;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  border-radius: 5px;
+  background: #ffffff;
+}
+
+.editor-select-custom .custom-select-value {
+  font-size: 11.5px;
+}
+
+.editor-select-custom .custom-select-menu {
+  min-width: 140px;
+}
+
+.editor-select-custom .custom-select-item {
+  padding: 5px 8px;
+  font-size: 11px;
 }

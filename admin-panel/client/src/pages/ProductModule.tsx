@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -39,7 +39,7 @@ import {
 import { toast } from "sonner";
 import { categoryOptions } from "@/data/phase2Data";
 import { formatINR } from "@/data/mockData";
-import { Button, EmptyState, SectionCard, SelectField, SortIcon, StatusBadge } from "@/components/admin/Primitives";
+import { Button, Checkbox, EmptyState, SectionCard, SelectField, SortIcon, StatusBadge } from "@/components/admin/Primitives";
 import type { ProductRecord, ProductVariant, PublicationStatus } from "@/types/admin";
 
 type ProductView =
@@ -389,11 +389,9 @@ export default function ProductModule({
             <thead>
               <tr>
                 <th>
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={paged.length > 0 && selected.length === paged.length}
                     onChange={toggleAll}
-                    aria-label="Select all products"
                   />
                 </th>
                 <SortableHeader label="Product" sort={sort} sortKey="name" onSort={toggleSort} />
@@ -409,8 +407,7 @@ export default function ProductModule({
               {paged.map((product) => (
                 <tr key={product.id}>
                   <td>
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={selected.includes(product.id)}
                       onChange={() =>
                         setSelected((current) =>
@@ -419,7 +416,6 @@ export default function ProductModule({
                             : [...current, product.id]
                         )
                       }
-                      aria-label={`Select ${product.name}`}
                     />
                   </td>
                   <td>
@@ -653,7 +649,7 @@ function Fact({ label, value }: { label: string; value: string }) {
 
 const stepMetadata: { step: StepNumber; title: string; subtitle: string }[] = [
   { step: 1, title: "01. Product Identity", subtitle: "Define basic product identifiers, unique SKU, brand and type." },
-  { step: 2, title: "02. Category & Organisation", subtitle: "Select taxonomy and catalog organization (merchandising tags managed in CMS)." },
+  { step: 2, title: "02. Category & Organisation", subtitle: "Select taxonomy and catalog organization." },
   { step: 3, title: "03. Product Description & Media", subtitle: "Upload high-resolution photography, rich description, and video links." },
   { step: 4, title: "04. Pricing & Platform Fee", subtitle: "Configure regular pricing, discounts, and platform fee sharing model (no tax fields)." },
   { step: 5, title: "05. Inventory & Variants", subtitle: "Manage stock tracking, low stock thresholds, and optional variations." },
@@ -674,11 +670,185 @@ function ProductForm({
 }) {
   const [form, setForm] = useState<ProductRecord>(() => (product ? { ...product } : makeDraft()));
   const [currentStep, setCurrentStep] = useState<StepNumber>(1);
+  const [completedSteps, setCompletedSteps] = useState<Set<StepNumber>>(() => {
+    if (product) {
+      // For existing products, all steps start as completed
+      return new Set(stepMetadata.map((m) => m.step));
+    }
+    return new Set<StepNumber>();
+  });
   const [customKey, setCustomKey] = useState("");
   const [customVal, setCustomVal] = useState("");
 
   const set = <K extends keyof ProductRecord>(key: K, value: ProductRecord[K]) =>
     setForm((current) => ({ ...current, [key]: value }));
+
+  // Rich Text Editor State & Actions
+  const editorRef = useRef<HTMLDivElement>(null);
+  const savedRangeRef = useRef<Range | null>(null);
+  const [editorFormat, setEditorFormat] = useState("Normal text");
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+  const [isBulletList, setIsBulletList] = useState(false);
+  const [isNumList, setIsNumList] = useState(false);
+
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0 && editorRef.current?.contains(sel.anchorNode)) {
+      savedRangeRef.current = sel.getRangeAt(0).cloneRange();
+    }
+  };
+
+  const restoreSelection = () => {
+    if (savedRangeRef.current && editorRef.current) {
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(savedRangeRef.current);
+      }
+    }
+  };
+
+  const updateActiveFormats = () => {
+    saveSelection();
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || !editorRef.current?.contains(sel.anchorNode)) return;
+
+    const node = sel.anchorNode;
+    const el = node ? (node.nodeType === 1 ? (node as HTMLElement) : node.parentElement) : null;
+    if (el?.closest("h2")) {
+      setEditorFormat("Heading 2");
+    } else if (el?.closest("h3")) {
+      setEditorFormat("Heading 3");
+    } else {
+      setEditorFormat("Normal text");
+    }
+
+    try {
+      setIsBold(document.queryCommandState("bold"));
+      setIsItalic(document.queryCommandState("italic"));
+      setIsUnderline(document.queryCommandState("underline"));
+      setIsBulletList(document.queryCommandState("insertUnorderedList"));
+      setIsNumList(document.queryCommandState("insertOrderedList"));
+    } catch {}
+  };
+
+  // Synchronize editor DOM with form.description when Step 03 is mounted
+  useEffect(() => {
+    if (currentStep === 3 && editorRef.current) {
+      if (!editorRef.current.innerHTML.trim() || editorRef.current.innerHTML !== (form.description || "")) {
+        editorRef.current.innerHTML = form.description || "<p><br></p>";
+      }
+      try {
+        document.execCommand("defaultParagraphSeparator", false, "p");
+      } catch {}
+    }
+  }, [currentStep]);
+
+  const executeEditorCmd = (cmd: string, val: string | undefined = undefined) => {
+    restoreSelection();
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+    document.execCommand(cmd, false, val);
+    if (editorRef.current) {
+      set("description", editorRef.current.innerHTML);
+      saveSelection();
+    }
+    setTimeout(updateActiveFormats, 10);
+  };
+
+  const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter") {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        const node = sel.anchorNode;
+        const el = node ? (node.nodeType === 1 ? (node as HTMLElement) : node.parentElement) : null;
+        const headingEl = el?.closest("h2, h3") as HTMLElement | null;
+
+        if (headingEl && editorRef.current?.contains(headingEl)) {
+          e.preventDefault();
+          const newP = document.createElement("p");
+          newP.innerHTML = "<br>";
+          if (headingEl.nextSibling) {
+            headingEl.parentNode?.insertBefore(newP, headingEl.nextSibling);
+          } else {
+            headingEl.parentNode?.appendChild(newP);
+          }
+          const range = document.createRange();
+          range.setStart(newP, 0);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+          savedRangeRef.current = range.cloneRange();
+          setEditorFormat("Normal text");
+          if (editorRef.current) {
+            set("description", editorRef.current.innerHTML);
+          }
+          return;
+        }
+      }
+    }
+    setTimeout(updateActiveFormats, 0);
+  };
+
+  const handleFormatChange = (format: string) => {
+    setEditorFormat(format);
+    restoreSelection();
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+
+    const node = sel.anchorNode;
+    const el = node ? (node.nodeType === 1 ? (node as HTMLElement) : node.parentElement) : null;
+    const currentBlock = el?.closest("h2, h3, p, div") as HTMLElement | null;
+
+    if (currentBlock && currentBlock !== editorRef.current && editorRef.current?.contains(currentBlock)) {
+      let targetTag = "p";
+      if (format === "Heading 2") targetTag = "h2";
+      if (format === "Heading 3") targetTag = "h3";
+
+      if (currentBlock.tagName.toLowerCase() !== targetTag) {
+        const replacement = document.createElement(targetTag);
+        replacement.innerHTML = currentBlock.innerHTML || "<br>";
+        currentBlock.parentNode?.replaceChild(replacement, currentBlock);
+
+        const range = document.createRange();
+        range.selectNodeContents(replacement);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        savedRangeRef.current = range.cloneRange();
+      }
+    } else {
+      if (format === "Heading 2") document.execCommand("formatBlock", false, "<h2>");
+      else if (format === "Heading 3") document.execCommand("formatBlock", false, "<h3>");
+      else document.execCommand("formatBlock", false, "<p>");
+    }
+
+    if (editorRef.current) {
+      set("description", editorRef.current.innerHTML);
+      saveSelection();
+    }
+  };
+
+  const handleAddLink = () => {
+    restoreSelection();
+    const url = window.prompt("Enter URL (e.g. https://...):", "https://");
+    if (url) {
+      executeEditorCmd("createLink", url);
+    }
+  };
+
+  const handleInsertTable = () => {
+    restoreSelection();
+    const tableMarkup = `<table style="width:100%; border-collapse:collapse; margin:10px 0; border:1px solid #dce4de;"><thead><tr style="background:#f4faf6;"><th style="border:1px solid #dce4de; padding:6px 10px; text-align:left;">Specification</th><th style="border:1px solid #dce4de; padding:6px 10px; text-align:left;">Details</th></tr></thead><tbody><tr><td style="border:1px solid #dce4de; padding:6px 10px;">Cushion Rubber</td><td style="border:1px solid #dce4de; padding:6px 10px;">Northern Rubber (UK)</td></tr><tr><td style="border:1px solid #dce4de; padding:6px 10px;">Cloth Type</td><td style="border:1px solid #dce4de; padding:6px 10px;">Strachan 6811 Tournament</td></tr></tbody></table><p><br></p>`;
+    executeEditorCmd("insertHTML", tableMarkup);
+  };
 
   // Dynamic Subcategories based on Category
   const currentSubcategories = categorySubcategories[form.category] || ["General"];
@@ -741,57 +911,103 @@ function ProductForm({
     set("variants", (form.variants || []).filter((v) => v.id !== variantId));
   };
 
-  // Step Validation before progressing
+  // Step validation rules for required fields
+  const getStepValidationError = (step: StepNumber): string | null => {
+    if (step === 1) {
+      if (!form.name.trim()) return "Please enter Product Name in Step 01";
+      if (!form.sku.trim()) return "Please enter Unique SKU in Step 01";
+    }
+    if (step === 2) {
+      if (!form.category || !form.category.trim()) return "Please select a Primary Category in Step 02";
+    }
+    if (step === 4) {
+      if (!form.price || Number(form.price) <= 0) return "Please provide a valid Regular Price in Step 04";
+    }
+    return null;
+  };
+
+  // Check if a step is genuinely completed and valid
+  const isStepDone = (step: StepNumber): boolean => {
+    if (step === currentStep) return false;
+    if (getStepValidationError(step) !== null) return false;
+    return completedSteps.has(step);
+  };
+
+  // Step click navigation with prerequisite validation
+  const handleStepClick = (targetStep: StepNumber) => {
+    if (targetStep === currentStep) return;
+
+    const targetIndex = stepMetadata.findIndex((m) => m.step === targetStep);
+    const currentIndex = stepMetadata.findIndex((m) => m.step === currentStep);
+
+    // If navigating backward, always allow
+    if (targetIndex < currentIndex) {
+      if (!getStepValidationError(currentStep)) {
+        setCompletedSteps((prev) => new Set(prev).add(currentStep));
+      }
+      setCurrentStep(targetStep);
+      return;
+    }
+
+    // If navigating forward, ensure current step is valid
+    const currentError = getStepValidationError(currentStep);
+    if (currentError) {
+      toast.error(currentError);
+      return;
+    }
+
+    // Ensure all preceding steps up to targetIndex are valid
+    for (let i = 0; i < targetIndex; i++) {
+      const stepItem = stepMetadata[i];
+      const error = getStepValidationError(stepItem.step);
+      if (error) {
+        toast.error(error);
+        setCurrentStep(stepItem.step);
+        return;
+      }
+    }
+
+    // Mark current step as completed and proceed
+    setCompletedSteps((prev) => new Set(prev).add(currentStep));
+    setCurrentStep(targetStep);
+  };
+
+  // Step Validation before progressing via "Continue"
   const validateAndNext = () => {
+    const error = getStepValidationError(currentStep);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+
+    setCompletedSteps((prev) => new Set(prev).add(currentStep));
+
     if (currentStep === 1) {
-      if (!form.name.trim()) {
-        toast.error("Product name is required");
-        return;
-      }
-      if (!form.sku.trim()) {
-        toast.error("Unique SKU is required");
-        return;
-      }
       setCurrentStep(2);
-      return;
-    }
-    if (currentStep === 2) {
+    } else if (currentStep === 2) {
       setCurrentStep(3);
-      return;
-    }
-    if (currentStep === 3) {
+    } else if (currentStep === 3) {
       setCurrentStep(4);
-      return;
-    }
-    if (currentStep === 4) {
-      if (!form.price || form.price <= 0) {
-        toast.error("Please provide a valid Regular Price");
-        return;
-      }
+    } else if (currentStep === 4) {
       setCurrentStep(5);
-      return;
-    }
-    if (currentStep === 5) {
+    } else if (currentStep === 5) {
       setCurrentStep(6);
-      return;
-    }
-    if (currentStep === 6) {
+    } else if (currentStep === 6) {
       setCurrentStep(7);
-      return;
-    }
-    if (currentStep === 7) {
+    } else if (currentStep === 7) {
       // Step 08 is removed from wizard (handled dynamically by recommendation service)
       setCurrentStep(9);
-      return;
-    }
-    if (currentStep === 9) {
+    } else if (currentStep === 9) {
       setCurrentStep(10);
-      return;
     }
   };
 
   // Previous Step
   const handlePrev = () => {
+    if (!getStepValidationError(currentStep)) {
+      setCompletedSteps((prev) => new Set(prev).add(currentStep));
+    }
+
     if (currentStep === 1) {
       onBack();
     } else if (currentStep === 2) {
@@ -825,6 +1041,11 @@ function ProductForm({
       setCurrentStep(1);
       return;
     }
+    if (!form.category || !form.category.trim()) {
+      toast.error("Primary category is required (Step 02)");
+      setCurrentStep(2);
+      return;
+    }
     if (!form.price || form.price <= 0) {
       toast.error("Regular price is required (Step 04)");
       setCurrentStep(4);
@@ -856,6 +1077,17 @@ function ProductForm({
   };
 
   const currentMeta = stepMetadata.find((m) => m.step === currentStep) || stepMetadata[0];
+  const stepperStripRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll the stepper strip to center the active step
+  useEffect(() => {
+    if (stepperStripRef.current) {
+      const activeNode = stepperStripRef.current.querySelector(".stepper-node.current") as HTMLElement | null;
+      if (activeNode) {
+        activeNode.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      }
+    }
+  }, [currentStep]);
 
   return (
     <div className="product-form-page dedicated-wizard-container">
@@ -891,29 +1123,31 @@ function ProductForm({
         </div>
       </div>
 
-      {/* HORIZONTAL STEPPER PROGRESS STRIP (Exact Order: 01 to 10) */}
-      <div className="wizard-stepper-strip">
-        {stepMetadata.map((meta, index) => {
-          const isCurrent = currentStep === meta.step;
-          const isDone = currentStep > meta.step;
-          return (
-            <button
-              key={meta.step}
-              type="button"
-              className={`stepper-node ${isCurrent ? "current" : isDone ? "done" : ""}`}
-              onClick={() => setCurrentStep(meta.step)}
-              title={meta.title}
-            >
-              <span className="step-circle">
-                {isDone ? <Check size={13} /> : String(meta.step).padStart(2, "0")}
-              </span>
-              <span className="step-label-text">
-                {meta.title.replace(/^\d+\.\s*/, "")}
-              </span>
-              {index < stepMetadata.length - 1 && <span className="step-arrow" />}
-            </button>
-          );
-        })}
+      {/* HORIZONTAL STEPPER PROGRESS STRIP */}
+      <div className="wizard-stepper-container">
+        <div className="wizard-stepper-strip" ref={stepperStripRef}>
+          {stepMetadata.map((meta, index) => {
+            const isCurrent = currentStep === meta.step;
+            const isDone = isStepDone(meta.step);
+            return (
+              <button
+                key={meta.step}
+                type="button"
+                className={`stepper-node ${isCurrent ? "current" : isDone ? "done" : ""}`}
+                onClick={() => handleStepClick(meta.step)}
+                title={meta.title}
+              >
+                <span className="step-circle">
+                  {isDone ? <Check size={13} strokeWidth={2.4} /> : String(meta.step).padStart(2, "0")}
+                </span>
+                <span className="step-label-text">
+                  {meta.title.replace(/^\d+\.\s*/, "")}
+                </span>
+                {index < stepMetadata.length - 1 && <span className="step-arrow" />}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* FOCUSED SINGLE-CARD STEP CONTAINER */}
@@ -992,16 +1226,6 @@ function ProductForm({
                 placeholder="e.g. Tournament Pro Series, Club Commercial, Heritage Woodwork"
                 wide
               />
-
-              <div className="field-wide merchandising-cms-notice">
-                <AlertCircle size={18} className="notice-icon" />
-                <div>
-                  <strong>Merchandising Labels Removed:</strong>
-                  <p>
-                    <em>Featured</em>, <em>Bestseller</em>, and <em>New Arrival</em> labels are managed separately in the <strong>Website CMS</strong>, where they can be configured dynamically based on marketing campaigns, seasonal sales, and business decisions.
-                  </p>
-                </div>
-              </div>
             </div>
           )}
 
@@ -1024,41 +1248,103 @@ function ProductForm({
                 <span className="form-label">Full Description (Rich Text Editor)</span>
                 <div className="rich-editor-shell">
                   <div className="rich-editor-toolbar">
-                    <select className="editor-select">
-                      <option>Normal text</option>
-                      <option>Heading 2</option>
-                      <option>Heading 3</option>
-                    </select>
+                    <SelectField
+                      value={editorFormat}
+                      options={["Normal text", "Heading 2", "Heading 3"]}
+                      onChange={handleFormatChange}
+                      className="editor-select-custom"
+                    />
                     <div className="toolbar-divider" />
-                    <button type="button" className="toolbar-btn" title="Bold">
+                    <button
+                      type="button"
+                      className={`toolbar-btn ${isBold ? "active" : ""}`}
+                      title="Bold (Ctrl+B)"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        executeEditorCmd("bold");
+                      }}
+                    >
                       <Bold size={14} />
                     </button>
-                    <button type="button" className="toolbar-btn" title="Italic">
+                    <button
+                      type="button"
+                      className={`toolbar-btn ${isItalic ? "active" : ""}`}
+                      title="Italic (Ctrl+I)"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        executeEditorCmd("italic");
+                      }}
+                    >
                       <Italic size={14} />
                     </button>
-                    <button type="button" className="toolbar-btn" title="Underline">
+                    <button
+                      type="button"
+                      className={`toolbar-btn ${isUnderline ? "active" : ""}`}
+                      title="Underline (Ctrl+U)"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        executeEditorCmd("underline");
+                      }}
+                    >
                       <Underline size={14} />
                     </button>
                     <div className="toolbar-divider" />
-                    <button type="button" className="toolbar-btn" title="Bullet List">
+                    <button
+                      type="button"
+                      className={`toolbar-btn ${isBulletList ? "active" : ""}`}
+                      title="Bullet List"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        executeEditorCmd("insertUnorderedList");
+                      }}
+                    >
                       <List size={14} />
                     </button>
-                    <button type="button" className="toolbar-btn" title="Numbered List">
+                    <button
+                      type="button"
+                      className={`toolbar-btn ${isNumList ? "active" : ""}`}
+                      title="Numbered List"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        executeEditorCmd("insertOrderedList");
+                      }}
+                    >
                       <ListOrdered size={14} />
                     </button>
-                    <button type="button" className="toolbar-btn" title="Add Link">
+                    <button
+                      type="button"
+                      className="toolbar-btn"
+                      title="Add Link"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleAddLink();
+                      }}
+                    >
                       <Link2 size={14} />
                     </button>
-                    <button type="button" className="toolbar-btn" title="Insert Table">
+                    <button
+                      type="button"
+                      className="toolbar-btn"
+                      title="Insert Table"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleInsertTable();
+                      }}
+                    >
                       <TableIcon size={14} />
                     </button>
                   </div>
-                  <textarea
-                    className="rich-textarea"
-                    value={form.description}
-                    onChange={(event) => set("description", event.target.value)}
-                    placeholder="Comprehensive product craftsmanship details, slate specifications, timber grain, tournament certifications, and included accessories..."
-                    rows={6}
+                  <div
+                    ref={editorRef}
+                    className="rich-editor-content"
+                    contentEditable
+                    suppressContentEditableWarning
+                    onInput={(e) => set("description", e.currentTarget.innerHTML)}
+                    onKeyDown={handleEditorKeyDown}
+                    onKeyUp={updateActiveFormats}
+                    onMouseUp={updateActiveFormats}
+                    onSelect={updateActiveFormats}
+                    data-placeholder="Comprehensive product craftsmanship details, slate specifications, timber grain, tournament certifications, and included accessories..."
                   />
                 </div>
               </div>
@@ -1252,23 +1538,13 @@ function ProductForm({
           {currentStep === 5 && (
             <div className="step-form-grid">
               <div className="form-field field-wide">
-                <span className="form-label">Inventory Tracking</span>
-                <div className="toggle-switch-row">
-                  <button
-                    type="button"
-                    className={`tracking-pill ${form.trackStock ? "active" : ""}`}
-                    onClick={() => set("trackStock", true)}
-                  >
-                    <Check size={14} /> Track Stock
-                  </button>
-                  <button
-                    type="button"
-                    className={`tracking-pill ${!form.trackStock ? "active" : ""}`}
-                    onClick={() => set("trackStock", false)}
-                  >
-                    Don't Track Stock
-                  </button>
-                </div>
+                <Checkbox
+                  card
+                  checked={!!form.trackStock}
+                  onChange={(checked) => set("trackStock", checked)}
+                  label="Track inventory quantity for this product"
+                  description="Maintains exact inventory counts and triggers low-stock alerts when inventory drops to threshold."
+                />
               </div>
 
               <Field
@@ -1306,14 +1582,13 @@ function ProductForm({
               />
 
               <div className="form-field field-wide">
-                <label className="checkbox-row">
-                  <input
-                    type="checkbox"
-                    checked={!!form.allowBackorders}
-                    onChange={(e) => set("allowBackorders", e.target.checked)}
-                  />
-                  <span>Allow backorders when this product is out of stock</span>
-                </label>
+                <Checkbox
+                  card
+                  checked={!!form.allowBackorders}
+                  onChange={(checked) => set("allowBackorders", checked)}
+                  label="Allow customer backorders when this product is out of stock"
+                  description="Shoppers can still complete purchase when local warehouse inventory is zero. Fulfillment occurs upon restock."
+                />
               </div>
 
               {/* Product Variants Table */}
@@ -1391,18 +1666,16 @@ function ProductForm({
                               />
                             </td>
                             <td>
-                              <select
+                              <SelectField
                                 value={variant.availability}
-                                onChange={(e) => {
+                                options={["In stock", "Out of stock", "Pre-order"]}
+                                onChange={(val) => {
                                   const next = [...(form.variants || [])];
-                                  next[index].availability = e.target.value as ProductVariant["availability"];
+                                  next[index].availability = val as ProductVariant["availability"];
                                   set("variants", next);
                                 }}
-                              >
-                                <option value="In stock">In stock</option>
-                                <option value="Out of stock">Out of stock</option>
-                                <option value="Pre-order">Pre-order</option>
-                              </select>
+                                className="table-select-compact"
+                              />
                             </td>
                             <td>
                               <button
@@ -1501,17 +1774,13 @@ function ProductForm({
           {currentStep === 7 && (
             <div className="step-form-grid">
               <div className="field-wide">
-                <label className="skip-shipping-toggle-large">
-                  <input
-                    type="checkbox"
-                    checked={!!form.shippingSkip}
-                    onChange={(e) => set("shippingSkip", e.target.checked)}
-                  />
-                  <div>
-                    <strong>Skip shipping configuration for this product</strong>
-                    <p>Enable this when shipping dimensions or freight setup are not applicable.</p>
-                  </div>
-                </label>
+                <Checkbox
+                  card
+                  checked={!!form.shippingSkip}
+                  onChange={(checked) => set("shippingSkip", checked)}
+                  label="Skip shipping configuration for this product"
+                  description="Enable this when parcel dimensions, weight or custom freight calculations are not applicable (standard store shipping applies)."
+                />
               </div>
 
               {!form.shippingSkip ? (
@@ -1574,24 +1843,14 @@ function ProductForm({
                     onChange={(val) => set("shippingCharges", val as ProductRecord["shippingCharges"])}
                   />
 
-                  <div className="form-field">
-                    <span className="form-label">Installation Required?</span>
-                    <div className="toggle-switch-row">
-                      <button
-                        type="button"
-                        className={`tracking-pill ${form.installationRequired ? "active" : ""}`}
-                        onClick={() => set("installationRequired", true)}
-                      >
-                        <Wrench size={14} /> Yes, Required
-                      </button>
-                      <button
-                        type="button"
-                        className={`tracking-pill ${!form.installationRequired ? "active" : ""}`}
-                        onClick={() => set("installationRequired", false)}
-                      >
-                        Self Assembly / Not Required
-                      </button>
-                    </div>
+                  <div className="form-field field-wide">
+                    <Checkbox
+                      card
+                      checked={!!form.installationRequired}
+                      onChange={(checked) => set("installationRequired", checked)}
+                      label="Professional On-Site Installation Required"
+                      description="Requires a specialized cue sports installation team for precision leveling, slating, and baize fitting."
+                    />
                   </div>
 
                   {form.installationRequired && (
@@ -1715,7 +1974,7 @@ function ProductForm({
               <div className="review-block">
                 <div className="review-block-header">
                   <strong>01. Product Identity</strong>
-                  <button type="button" onClick={() => setCurrentStep(1)}>
+                  <button type="button" onClick={() => handleStepClick(1)}>
                     <Pencil size={13} /> Edit
                   </button>
                 </div>
@@ -1743,7 +2002,7 @@ function ProductForm({
               <div className="review-block">
                 <div className="review-block-header">
                   <strong>02. Category & Organisation</strong>
-                  <button type="button" onClick={() => setCurrentStep(2)}>
+                  <button type="button" onClick={() => handleStepClick(2)}>
                     <Pencil size={13} /> Edit
                   </button>
                 </div>
@@ -1771,7 +2030,7 @@ function ProductForm({
               <div className="review-block">
                 <div className="review-block-header">
                   <strong>03. Description & Media</strong>
-                  <button type="button" onClick={() => setCurrentStep(3)}>
+                  <button type="button" onClick={() => handleStepClick(3)}>
                     <Pencil size={13} /> Edit
                   </button>
                 </div>
@@ -1799,7 +2058,7 @@ function ProductForm({
               <div className="review-block">
                 <div className="review-block-header">
                   <strong>04. Pricing & Platform Fee</strong>
-                  <button type="button" onClick={() => setCurrentStep(4)}>
+                  <button type="button" onClick={() => handleStepClick(4)}>
                     <Pencil size={13} /> Edit
                   </button>
                 </div>
@@ -1829,7 +2088,7 @@ function ProductForm({
               <div className="review-block">
                 <div className="review-block-header">
                   <strong>05. Inventory & Variants</strong>
-                  <button type="button" onClick={() => setCurrentStep(5)}>
+                  <button type="button" onClick={() => handleStepClick(5)}>
                     <Pencil size={13} /> Edit
                   </button>
                 </div>
@@ -1857,7 +2116,7 @@ function ProductForm({
               <div className="review-block">
                 <div className="review-block-header">
                   <strong>06. Specifications</strong>
-                  <button type="button" onClick={() => setCurrentStep(6)}>
+                  <button type="button" onClick={() => handleStepClick(6)}>
                     <Pencil size={13} /> Edit
                   </button>
                 </div>
@@ -1874,7 +2133,7 @@ function ProductForm({
               <div className="review-block">
                 <div className="review-block-header">
                   <strong>07. Shipping & Delivery</strong>
-                  <button type="button" onClick={() => setCurrentStep(7)}>
+                  <button type="button" onClick={() => handleStepClick(7)}>
                     <Pencil size={13} /> Edit
                   </button>
                 </div>
@@ -1902,7 +2161,7 @@ function ProductForm({
               <div className="review-block">
                 <div className="review-block-header">
                   <strong>09. SEO & Search Visibility</strong>
-                  <button type="button" onClick={() => setCurrentStep(9)}>
+                  <button type="button" onClick={() => handleStepClick(9)}>
                     <Pencil size={13} /> Edit
                   </button>
                 </div>
@@ -2060,9 +2319,9 @@ function SelectForm({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="form-field">
+    <div className="form-field">
       <span className="form-label">{label}</span>
       <SelectField value={value} onChange={onChange} options={options} />
-    </label>
+    </div>
   );
 }
