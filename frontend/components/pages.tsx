@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowDown, ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, Filter, Heart, Minus, Plus, Ruler, Search, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles, Star, Truck, X } from "lucide-react";
-import { accessoryCategories, accessoryDeals, collectionCards, formatInr, getProduct, Product, products } from "@/lib/products";
+import { ArrowDown, ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, Filter, Heart, Loader2, Minus, Plus, Ruler, Search, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles, Star, Truck, X } from "lucide-react";
+import { accessoryCategories, accessoryDeals, collectionCards, formatInr, getProduct, Product, products, fetchStorefrontProducts, fetchStorefrontProductBySlug } from "@/lib/products";
 import { ArrowLink, ProductCard, QuickViewModal, SectionHeading, SliderArrows, useStorefront } from "@/components/storefront-shell";
 import { AnimatedAddToCart } from "@/components/animated-add-to-cart";
 import { PromoBannerCarousel } from "@/components/promo-banner-carousel";
 import { ShopByEquipment } from "@/components/shop-by-equipment";
-import { buildProductUrl } from "@/lib/url";
+import { buildProductUrl, verifyProductUrlSignature } from "@/lib/url";
 
 export function HomePage() {
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
@@ -19,6 +19,15 @@ export function HomePage() {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [featuredProductsList, setFeaturedProductsList] = useState<Product[]>(() => products.slice(0, 8));
+
+  useEffect(() => {
+    fetchStorefrontProducts().then((all) => {
+      if (all && all.length > 0) {
+        setFeaturedProductsList(all.slice(0, 8));
+      }
+    });
+  }, []);
 
   const updateScrollButtons = () => {
     if (!sliderRef.current) return;
@@ -184,7 +193,7 @@ export function HomePage() {
           </button>
 
           <div className="featured-cards-grid" ref={sliderRef}>
-            {products.slice(0, 8).map((product) => {
+            {featuredProductsList.map((product) => {
               const isSaved = wishlist.includes(product.id);
               return (
                 <div key={product.id} className="featured-product-card">
@@ -296,6 +305,15 @@ export function ShopPage() {
   const [sort, setSort] = useState("featured");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
+  const [liveProducts, setLiveProducts] = useState<Product[]>(products);
+
+  useEffect(() => {
+    fetchStorefrontProducts().then((data) => {
+      if (data && data.length > 0) {
+        setLiveProducts(data);
+      }
+    });
+  }, []);
 
   // Sync state if URL query params change (e.g. clicking top navbar links)
   useEffect(() => {
@@ -308,7 +326,7 @@ export function ShopPage() {
   }, [searchParams]);
 
   const filteredProducts = useMemo(() => {
-    let result = products.filter((product) => {
+    let result = liveProducts.filter((product) => {
       const matchesQuery = !query || `${product.name} ${product.category} ${product.size} ${product.tags.join(" ")}`.toLowerCase().includes(query);
       const matchesSize = size === "all" || product.size === size;
       const matchesType = type === "all" || product.type === type;
@@ -328,14 +346,14 @@ export function ShopPage() {
     if (sort === "high") result = [...result].sort((a, b) => b.price - a.price);
     if (sort === "new") result = [...result].reverse();
     return result;
-  }, [availability, category, price, query, size, sort, type]);
+  }, [availability, category, liveProducts, price, query, size, sort, type]);
 
   const clearFilters = () => { setSize("all"); setType("all"); setCategory("all"); setAvailability("all"); setPrice("all"); };
   const activeFilterCount = [size !== "all", type !== "all", category !== "all", availability !== "all", price !== "all"].filter(Boolean).length;
 
   return <>
     <section className="shop-hero"><div className="container shop-hero-inner"><div><span className="eyebrow">The collection · Official catalogue</span><h1>Explore our <em>cue sports collection.</em></h1><p>Premium snooker tables, cue equipment, table accessories, and scoreboards crafted for players across India.</p></div><div className="shop-hero-stat"><span>01 — 16</span><strong>Official<br />catalog range</strong></div></div></section>
-    <section className="shop-section section"><div className="container"><div className="shop-toolbar"><div><span className="result-count">Showing {filteredProducts.length} of {products.length} products</span>{query && <span className="query-chip">Search: {query}<X size={12} /></span>}</div><div className="toolbar-actions"><button className="filter-toggle" onClick={() => setFiltersOpen((open) => !open)}><Filter size={16} /> Filters {activeFilterCount > 0 && <span>{activeFilterCount}</span>}</button><label className="sort-control"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="new">Newest Arrivals</option></select><ChevronDown size={15} /></label></div></div><div className={`shop-layout ${filtersOpen ? "mobile-filters-open" : ""}`}><aside className="filter-sidebar"><div className="filter-sidebar-header"><div><span className="eyebrow">Refine</span><h3>Filter collection</h3></div><button className="clear-filters" onClick={clearFilters}>Clear all</button></div><FilterGroup title="Product category"><label className="radio-label"><input type="radio" name="category" checked={category === "all"} onChange={() => setCategory("all")} />All products<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "snooker tables"} onChange={() => setCategory("Snooker Tables")} />Snooker tables<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "cues" || category.toLowerCase() === "cue equipment"} onChange={() => setCategory("Cues")} />Cue equipment<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "table accessories"} onChange={() => setCategory("Table Accessories")} />Table accessories<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "scoreboards"} onChange={() => setCategory("Scoreboards")} />Scoreboards<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "hoodies"} onChange={() => setCategory("Hoodies")} />Hoodies<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "t-shirts"} onChange={() => setCategory("T-Shirts")} />T-Shirts<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "cue cases"} onChange={() => setCategory("Cue Cases")} />Cue cases<span /></label></FilterGroup><FilterGroup title="Table size"><label className="check-label"><input type="checkbox" checked={size === "8 FT"} onChange={() => setSize(size === "8 FT" ? "all" : "8 FT")} /><span className="custom-check"><Check size={12} /></span>8 FT</label><label className="check-label"><input type="checkbox" checked={size === "10 FT"} onChange={() => setSize(size === "10 FT" ? "all" : "10 FT")} /><span className="custom-check"><Check size={12} /></span>10 FT</label><label className="check-label"><input type="checkbox" checked={size === "12 FT"} onChange={() => setSize(size === "12 FT" ? "all" : "12 FT")} /><span className="custom-check"><Check size={12} /></span>12 FT</label></FilterGroup><FilterGroup title="Price range"><label className="radio-label"><input type="radio" name="price" checked={price === "all"} onChange={() => setPrice("all")} />All prices<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "under-5k"} onChange={() => setPrice("under-5k")} />Under ₹5,000<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "5k-50k"} onChange={() => setPrice("5k-50k")} />₹5,000 — ₹50,000<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "50k-200k"} onChange={() => setPrice("50k-200k")} />₹50,000 — ₹2,00,000<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "over-200k"} onChange={() => setPrice("over-200k")} />Over ₹2,00,000<span /></label></FilterGroup><FilterGroup title="Availability"><label className="radio-label"><input type="radio" name="availability" checked={availability === "all"} onChange={() => setAvailability("all")} />All availability<span /></label><label className="radio-label"><input type="radio" name="availability" checked={availability === "In stock"} onChange={() => setAvailability("In stock")} />In stock<span /></label><label className="radio-label"><input type="radio" name="availability" checked={availability === "Made to order"} onChange={() => setAvailability("Made to order")} />Made to order<span /></label><label className="radio-label"><input type="radio" name="availability" checked={availability === "Low stock"} onChange={() => setAvailability("Low stock")} />Low stock<span /></label></FilterGroup></aside><div className="shop-results">{filteredProducts.length > 0 ? <div className="product-grid shop-product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div> : <div className="empty-state"><div className="empty-state-mark"><Search size={24} /></div><span className="eyebrow">No matching pieces</span><h2>Nothing in this frame.</h2><p>Try a different size, category or price range to see more of our collection.</p><button className="button button-dark" onClick={clearFilters}>Clear filters <ArrowRight size={16} /></button></div>}</div></div></div></section>
+    <section className="shop-section section"><div className="container"><div className="shop-toolbar"><div><span className="result-count">Showing {filteredProducts.length} of {liveProducts.length} products</span>{query && <span className="query-chip">Search: {query}<X size={12} /></span>}</div><div className="toolbar-actions"><button className="filter-toggle" onClick={() => setFiltersOpen((open) => !open)}><Filter size={16} /> Filters {activeFilterCount > 0 && <span>{activeFilterCount}</span>}</button><label className="sort-control"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="new">Newest Arrivals</option></select><ChevronDown size={15} /></label></div></div><div className={`shop-layout ${filtersOpen ? "mobile-filters-open" : ""}`}><aside className="filter-sidebar"><div className="filter-sidebar-header"><div><span className="eyebrow">Refine</span><h3>Filter collection</h3></div><button className="clear-filters" onClick={clearFilters}>Clear all</button></div><FilterGroup title="Product category"><label className="radio-label"><input type="radio" name="category" checked={category === "all"} onChange={() => setCategory("all")} />All products<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "snooker tables"} onChange={() => setCategory("Snooker Tables")} />Snooker tables<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "cues" || category.toLowerCase() === "cue equipment"} onChange={() => setCategory("Cues")} />Cue equipment<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "table accessories"} onChange={() => setCategory("Table Accessories")} />Table accessories<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "scoreboards"} onChange={() => setCategory("Scoreboards")} />Scoreboards<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "hoodies"} onChange={() => setCategory("Hoodies")} />Hoodies<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "t-shirts"} onChange={() => setCategory("T-Shirts")} />T-Shirts<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "cue cases"} onChange={() => setCategory("Cue Cases")} />Cue cases<span /></label></FilterGroup><FilterGroup title="Table size"><label className="check-label"><input type="checkbox" checked={size === "8 FT"} onChange={() => setSize(size === "8 FT" ? "all" : "8 FT")} /><span className="custom-check"><Check size={12} /></span>8 FT</label><label className="check-label"><input type="checkbox" checked={size === "10 FT"} onChange={() => setSize(size === "10 FT" ? "all" : "10 FT")} /><span className="custom-check"><Check size={12} /></span>10 FT</label><label className="check-label"><input type="checkbox" checked={size === "12 FT"} onChange={() => setSize(size === "12 FT" ? "all" : "12 FT")} /><span className="custom-check"><Check size={12} /></span>12 FT</label></FilterGroup><FilterGroup title="Price range"><label className="radio-label"><input type="radio" name="price" checked={price === "all"} onChange={() => setPrice("all")} />All prices<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "under-5k"} onChange={() => setPrice("under-5k")} />Under ₹5,000<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "5k-50k"} onChange={() => setPrice("5k-50k")} />₹5,000 — ₹50,000<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "50k-200k"} onChange={() => setPrice("50k-200k")} />₹50,000 — ₹2,00,000<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "over-200k"} onChange={() => setPrice("over-200k")} />Over ₹2,00,000<span /></label></FilterGroup><FilterGroup title="Availability"><label className="radio-label"><input type="radio" name="availability" checked={availability === "all"} onChange={() => setAvailability("all")} />All availability<span /></label><label className="radio-label"><input type="radio" name="availability" checked={availability === "In stock"} onChange={() => setAvailability("In stock")} />In stock<span /></label><label className="radio-label"><input type="radio" name="availability" checked={availability === "Made to order"} onChange={() => setAvailability("Made to order")} />Made to order<span /></label><label className="radio-label"><input type="radio" name="availability" checked={availability === "Low stock"} onChange={() => setAvailability("Low stock")} />Low stock<span /></label></FilterGroup></aside><div className="shop-results">{filteredProducts.length > 0 ? <div className="product-grid shop-product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div> : <div className="empty-state"><div className="empty-state-mark"><Search size={24} /></div><span className="eyebrow">No matching pieces</span><h2>Nothing in this frame.</h2><p>Try a different size, category or price range to see more of our collection.</p><button className="button button-dark" onClick={clearFilters}>Clear filters <ArrowRight size={16} /></button></div>}</div></div></div></section>
     <section className="shop-note"><div className="container shop-note-inner"><Sparkles size={18} /><p><strong>Every product, price and specification on this page is illustrative demo content.</strong> The catalogue is designed to be edited when final business information is available.</p></div></section>
     <QuickViewModal product={quickProduct} onClose={() => setQuickProduct(null)} />
   </>;
@@ -345,23 +363,48 @@ export function ProductPage({
   slug,
   pid,
   isTampered,
+  signature,
 }: {
   slug?: string;
   pid?: string;
   isTampered?: boolean;
+  signature?: string;
 }) {
-  const product = pid
-    ? products.find((p) => p.id === pid) || (slug ? getProduct(slug) : undefined)
-    : slug
-    ? getProduct(slug)
-    : undefined;
+  const [currentProduct, setCurrentProduct] = useState<Product | undefined>(() => {
+    return pid
+      ? products.find((p) => p.id === pid) || (slug ? getProduct(slug) : undefined)
+      : slug
+      ? getProduct(slug)
+      : undefined;
+  });
 
+  const [loading, setLoading] = useState(!currentProduct);
+  const [tamperedState, setTamperedState] = useState(Boolean(isTampered));
   const { addToCart } = useStorefront();
-  const [selectedImage, setSelectedImage] = useState(product?.image ?? "");
+  const [selectedImage, setSelectedImage] = useState(currentProduct?.image ?? "");
+
+  useEffect(() => {
+    if (slug) {
+      fetchStorefrontProductBySlug(slug)
+        .then((p) => {
+          if (p) {
+            setCurrentProduct(p);
+            setSelectedImage(p.image);
+            if (signature && !verifyProductUrlSignature(p.id, p.slug, signature)) {
+              setTamperedState(true);
+            }
+          }
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }
+  }, [slug, pid, signature]);
+
+  const product = currentProduct;
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("details");
 
-  if (isTampered) {
+  if (tamperedState) {
     return (
       <section className="not-found section">
         <div className="container">
@@ -376,6 +419,14 @@ export function ProductPage({
           </Link>
         </div>
       </section>
+    );
+  }
+
+  if (loading && !product) {
+    return (
+      <div className="container" style={{ minHeight: "60vh", display: "grid", placeItems: "center" }}>
+        <Loader2 size={28} className="hcs-spin" />
+      </div>
     );
   }
 

@@ -52,7 +52,7 @@ export function Checkbox({
           className="custom-checkbox-input"
         />
         <span className="custom-checkbox-box">
-          <Check size={12} strokeWidth={3} className="custom-checkbox-icon" />
+          <Check size={9} strokeWidth={3.5} className="custom-checkbox-icon" />
         </span>
       </span>
       {(label || description) && (

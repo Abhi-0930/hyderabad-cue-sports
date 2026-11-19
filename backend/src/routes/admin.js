@@ -165,6 +165,7 @@ async function adminRoutes(fastify) {
       return {
         success: false,
         message: "An internal database or authentication error occurred.",
+        error: err.message,
       };
     }
   });
@@ -377,6 +378,240 @@ async function adminRoutes(fastify) {
       request.log.error(err);
       reply.status(500);
       return { success: false, message: "Failed to update customer." };
+    }
+  });
+
+  // =========================================================================
+  // ADMIN PRODUCTS MANAGEMENT
+  // =========================================================================
+
+  // GET /api/admin/products - List all products with admin metadata
+  fastify.get("/products", async (request, reply) => {
+    try {
+      const { rows } = await db.query(`
+        SELECT * FROM public.products
+        ORDER BY updated_at DESC, created_at DESC
+      `);
+
+      const formatted = rows.map((r) => {
+        const extra = r.extra_meta || {};
+        return {
+          id: r.id,
+          name: r.name,
+          category: r.category,
+          subcategory: extra.subcategory || "General",
+          sku: r.sku || extra.sku || r.id,
+          price: Number(r.price) || 0,
+          salePrice: Number(r.compare_at) || 0,
+          inventory: Number(r.stock_quantity) || 0,
+          status: r.availability || "In stock",
+          publication: r.publication_status || "Published",
+          brand: r.brand || extra.brand || "HCS Studio",
+          accent: extra.accent || "#c5d6c3",
+          initials: r.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "HC",
+          shortDescription: extra.shortDescription || r.description?.slice(0, 160) || "",
+          description: r.description || "",
+          tax: extra.tax || "GST 18%",
+          lowStockThreshold: extra.lowStockThreshold ?? 2,
+          weight: extra.weight || "",
+          dimensions: r.size || extra.dimensions || "",
+          specs: r.specs && typeof r.specs === "object" ? r.specs : {},
+          featured: Boolean(r.is_featured),
+          bestseller: Boolean(extra.bestseller),
+          newArrival: Boolean(extra.newArrival),
+          seoTitle: extra.seoTitle || r.name,
+          seoDescription: extra.seoDescription || r.description?.slice(0, 160) || "",
+          slug: r.slug,
+          imageCount: Array.isArray(r.gallery) ? r.gallery.length : 1,
+          images: Array.isArray(r.gallery) && r.gallery.length > 0 ? r.gallery : [r.image],
+          primaryImage: r.image,
+          productType: r.type === "table" ? "Physical Product" : extra.productType || "Physical Product",
+          collection: extra.collection || "",
+          feeMode: extra.feeMode || "on_top",
+          platformFeeType: extra.platformFeeType || "Percentage",
+          platformFeeValue: extra.platformFeeValue ?? 5,
+          trackStock: extra.trackStock !== false,
+          allowBackorders: Boolean(extra.allowBackorders),
+          minOrderQuantity: extra.minOrderQuantity || 1,
+          variants: extra.variants || [],
+          customSpecs: extra.customSpecs || [],
+          shippingSkip: Boolean(extra.shippingSkip),
+          shippingClass: extra.shippingClass || "Standard",
+          deliveryType: extra.deliveryType || "Standard Delivery",
+          shippingCharges: extra.shippingCharges || "Fixed Charge",
+          installationRequired: Boolean(extra.installationRequired),
+          installationType: extra.installationType || "",
+          warrantyInfo: extra.warrantyInfo || "",
+          returnEligibility: extra.returnEligibility || "",
+          measurementUnit: extra.measurementUnit || "cm",
+          packageLength: extra.packageLength || "",
+          packageWidth: extra.packageWidth || "",
+          packageHeight: extra.packageHeight || "",
+          focusKeyword: extra.focusKeyword || "",
+          canonicalUrl: extra.canonicalUrl || "",
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+        };
+      });
+
+      return { success: true, count: formatted.length, data: formatted };
+    } catch (err) {
+      request.log.error(err);
+      reply.status(500);
+      return { success: false, message: "Failed to fetch products", error: err.message };
+    }
+  });
+
+  // POST /api/admin/products - Create or update a product in PostgreSQL
+  fastify.post("/products", async (request, reply) => {
+    try {
+      const prod = request.body || {};
+      if (!prod.name || !prod.name.trim()) {
+        reply.status(400);
+        return { success: false, message: "Product name is required" };
+      }
+      if (!prod.sku || !prod.sku.trim()) {
+        reply.status(400);
+        return { success: false, message: "Unique SKU is required" };
+      }
+
+      const id = prod.id || `prod-${Date.now()}`;
+      const baseSlug = prod.slug?.trim() || prod.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      const name = prod.name.trim();
+      const sku = prod.sku.trim().toUpperCase();
+      const brand = prod.brand || "HCS Studio";
+      const category = prod.category || "Tables";
+      const type = category.toLowerCase().includes("table") ? "table" : "accessory";
+      const size = prod.dimensions || prod.size || "Standard";
+      const price = Number(prod.price) || 0;
+      const compare_at = Number(prod.salePrice) || null;
+      const image = prod.primaryImage || prod.images?.[0] || prod.image || "/images/products/featured-table-12ft.jpg";
+      const gallery = JSON.stringify(prod.images || [image]);
+      const badge = prod.featured ? "Featured" : prod.bestseller ? "Best Seller" : prod.newArrival ? "New Arrival" : null;
+      const availability = prod.status || "In stock";
+      const description = prod.description || prod.shortDescription || "";
+      const details = JSON.stringify(Array.isArray(prod.details) ? prod.details : []);
+      const specs = JSON.stringify(typeof prod.specs === "object" ? prod.specs : {});
+      const tags = [prod.category, prod.brand, prod.productType].filter(Boolean);
+      const stock_quantity = Number(prod.inventory) || 0;
+      const is_featured = Boolean(prod.featured);
+      const publication_status = prod.publication || "Published";
+
+      // Prevent duplicate slug collision with a different product ID
+      let slug = baseSlug;
+      const slugCheck = await db.query(
+        "SELECT id FROM public.products WHERE slug = $1 AND id != $2 LIMIT 1",
+        [slug, id]
+      );
+      if (slugCheck.rows.length > 0) {
+        slug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
+      }
+
+      const extra_meta = JSON.stringify({
+        subcategory: prod.subcategory,
+        shortDescription: prod.shortDescription,
+        tax: prod.tax,
+        lowStockThreshold: prod.lowStockThreshold,
+        weight: prod.weight,
+        dimensions: prod.dimensions,
+        productType: prod.productType,
+        collection: prod.collection,
+        feeMode: prod.feeMode,
+        platformFeeType: prod.platformFeeType,
+        platformFeeValue: prod.platformFeeValue,
+        trackStock: prod.trackStock,
+        allowBackorders: prod.allowBackorders,
+        minOrderQuantity: prod.minOrderQuantity,
+        variants: prod.variants,
+        customSpecs: prod.customSpecs,
+        shippingSkip: prod.shippingSkip,
+        shippingClass: prod.shippingClass,
+        deliveryType: prod.deliveryType,
+        shippingCharges: prod.shippingCharges,
+        installationRequired: prod.installationRequired,
+        installationType: prod.installationType,
+        warrantyInfo: prod.warrantyInfo,
+        returnEligibility: prod.returnEligibility,
+        measurementUnit: prod.measurementUnit,
+        packageLength: prod.packageLength,
+        packageWidth: prod.packageWidth,
+        packageHeight: prod.packageHeight,
+        seoTitle: prod.seoTitle,
+        seoDescription: prod.seoDescription,
+        focusKeyword: prod.focusKeyword,
+        canonicalUrl: prod.canonicalUrl,
+        bestseller: prod.bestseller,
+        newArrival: prod.newArrival,
+      });
+
+      const upsertQuery = `
+        INSERT INTO public.products (
+          id, slug, name, sku, brand, category, type, size, price, compare_at,
+          image, gallery, badge, availability, description, details, specs,
+          tags, stock_quantity, is_featured, publication_status, extra_meta,
+          updated_at
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+          $11, $12, $13, $14, $15, $16, $17,
+          $18, $19, $20, $21, $22,
+          NOW()
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          slug = EXCLUDED.slug,
+          name = EXCLUDED.name,
+          sku = EXCLUDED.sku,
+          brand = EXCLUDED.brand,
+          category = EXCLUDED.category,
+          type = EXCLUDED.type,
+          size = EXCLUDED.size,
+          price = EXCLUDED.price,
+          compare_at = EXCLUDED.compare_at,
+          image = EXCLUDED.image,
+          gallery = EXCLUDED.gallery,
+          badge = EXCLUDED.badge,
+          availability = EXCLUDED.availability,
+          description = EXCLUDED.description,
+          details = EXCLUDED.details,
+          specs = EXCLUDED.specs,
+          tags = EXCLUDED.tags,
+          stock_quantity = EXCLUDED.stock_quantity,
+          is_featured = EXCLUDED.is_featured,
+          publication_status = EXCLUDED.publication_status,
+          extra_meta = EXCLUDED.extra_meta,
+          updated_at = NOW()
+        RETURNING *;
+      `;
+
+      const values = [
+        id, slug, name, sku, brand, category, type, size, price, compare_at,
+        image, gallery, badge, availability, description, details, specs,
+        tags, stock_quantity, is_featured, publication_status, extra_meta,
+      ];
+
+      const { rows } = await db.query(upsertQuery, values);
+      request.log.info({ productId: rows[0].id, name: rows[0].name, status: publication_status }, "Product saved to PostgreSQL");
+      return { success: true, product: rows[0] };
+    } catch (err) {
+      request.log.error(err);
+      reply.status(500);
+      return { success: false, message: "Failed to save product", error: err.message };
+    }
+  });
+
+  // DELETE /api/admin/products/:id - Delete product from PostgreSQL
+  fastify.delete("/products/:id", async (request, reply) => {
+    const { id } = request.params;
+    try {
+      const { rowCount } = await db.query("DELETE FROM public.products WHERE id = $1", [id]);
+      if (rowCount === 0) {
+        reply.status(404);
+        return { success: false, message: "Product not found" };
+      }
+      return { success: true, message: "Product deleted" };
+    } catch (err) {
+      request.log.error(err);
+      reply.status(500);
+      return { success: false, message: "Failed to delete product", error: err.message };
     }
   });
 }

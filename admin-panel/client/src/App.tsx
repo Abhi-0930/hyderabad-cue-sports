@@ -33,6 +33,24 @@ function AdminApp() {
   const [products, setProducts] = useState<ProductRecord[]>(phase2Products);
   const [orders, setOrders] = useState<OrderRecord[]>(phase3Orders);
 
+  // Fetch live products from PostgreSQL backend on mount
+  useEffect(() => {
+    const fetchAdminProducts = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/admin/products");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            setProducts(json.data);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load products from backend, using cached products:", err);
+      }
+    };
+    fetchAdminProducts();
+  }, []);
+
   // Zero-polling real-time order listener via Supabase Realtime WebSocket stream
   useRealtimeOrders({
     onNewOrder: (newOrder) => {

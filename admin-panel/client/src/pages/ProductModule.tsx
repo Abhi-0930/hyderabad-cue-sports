@@ -93,35 +93,35 @@ const categorySubcategories: Record<string, string[]> = {
   ],
 };
 
-const defaultCategorySpecs: Record<string, { key: string; label: string; placeholder: string; defaultVal?: string }[]> = {
+const defaultCategorySpecs: Record<string, { key: string; label: string; placeholder: string }[]> = {
   Tables: [
-    { key: "Table size", label: "Table Size", placeholder: "e.g. 12 FT (366cm x 183cm)", defaultVal: "10 FT" },
-    { key: "Slate thickness", label: "Slate Thickness", placeholder: "e.g. 5-piece 45mm Italian Slate", defaultVal: "45mm Italian Slate" },
-    { key: "Frame material", label: "Frame Material", placeholder: "e.g. Solid Seasoned Teak / Mahogany", defaultVal: "Solid Seasoned Hardwood" },
-    { key: "Cloth type", label: "Cloth Type", placeholder: "e.g. Strachan 6811 Pure Wool 30oz", defaultVal: "Strachan 6811 Pure Wool" },
-    { key: "Table finish", label: "Table Finish", placeholder: "e.g. Traditional Hand-Rubbed Gloss Mahogany", defaultVal: "Classic Mahogany Polish" },
-    { key: "Number of legs", label: "Number of Legs", placeholder: "e.g. 8 Turned Solid Legs with Brass Levelers", defaultVal: "8 Turned Solid Legs" },
-    { key: "Installation", label: "Installation Requirements", placeholder: "e.g. Ground floor / freight elevator, 4-man team", defaultVal: "Professional on-site installation required" },
+    { key: "Table size", label: "Table Size", placeholder: "e.g. 12 FT (366cm x 183cm)" },
+    { key: "Slate thickness", label: "Slate Thickness", placeholder: "e.g. 5-piece 45mm Italian Slate" },
+    { key: "Frame material", label: "Frame Material", placeholder: "e.g. Solid Seasoned Teak / Mahogany" },
+    { key: "Cloth type", label: "Cloth Type", placeholder: "e.g. Strachan 6811 Pure Wool 30oz" },
+    { key: "Table finish", label: "Table Finish", placeholder: "e.g. Traditional Hand-Rubbed Gloss Mahogany" },
+    { key: "Number of legs", label: "Number of Legs", placeholder: "e.g. 8 Turned Solid Legs with Brass Levelers" },
+    { key: "Installation", label: "Installation Requirements", placeholder: "e.g. Ground floor / freight elevator, 4-man team" },
   ],
   Cues: [
-    { key: "Cue length", label: "Cue Length", placeholder: "e.g. Standard 58 inches (147cm)", defaultVal: "58 inches" },
-    { key: "Cue weight", label: "Cue Weight", placeholder: "e.g. 18.2 oz", defaultVal: "18.2 oz" },
-    { key: "Tip size", label: "Tip Size & Grade", placeholder: "e.g. 9.5mm Laminated Pressed Leather", defaultVal: "9.5mm Pressed Leather" },
-    { key: "Shaft wood", label: "Shaft Wood", placeholder: "e.g. Grade AAA North American Ash", defaultVal: "North American Ash" },
-    { key: "Joint type", label: "Joint Type", placeholder: "e.g. Quick-release precision brass vacuum joint", defaultVal: "Quick-Release Brass Joint" },
-    { key: "Butt splice", label: "Butt Splice", placeholder: "e.g. 4-point hand-spliced solid ebony", defaultVal: "4-Point Hand Spliced" },
+    { key: "Cue length", label: "Cue Length", placeholder: "e.g. Standard 58 inches (147cm)" },
+    { key: "Cue weight", label: "Cue Weight", placeholder: "e.g. 18.2 oz" },
+    { key: "Tip size", label: "Tip Size & Grade", placeholder: "e.g. 9.5mm Laminated Pressed Leather" },
+    { key: "Shaft wood", label: "Shaft Wood", placeholder: "e.g. Grade AAA North American Ash" },
+    { key: "Joint type", label: "Joint Type", placeholder: "e.g. Quick-release precision brass vacuum joint" },
+    { key: "Butt splice", label: "Butt Splice", placeholder: "e.g. 4-point hand-spliced solid ebony" },
   ],
   "Table Accessories": [
-    { key: "Cloth grade", label: "Grade / Material", placeholder: "e.g. 100% Pure Wool, 32oz / Phenolic Resin", defaultVal: "100% Pure Wool 30oz" },
-    { key: "Cut dimensions", label: "Cut Dimensions / Size", placeholder: "e.g. 12 FT Bed & 6 Cushion Strips", defaultVal: "Bed & Cushion Set" },
-    { key: "Surface finish", label: "Surface Finish", placeholder: "e.g. Directional short nap / High-gloss polish", defaultVal: "Directional Wool Nap" },
-    { key: "Compatibility", label: "Compatibility", placeholder: "e.g. Standard 10ft & 12ft Snooker Tables", defaultVal: "Universal Snooker Standard" },
+    { key: "Cloth grade", label: "Grade / Material", placeholder: "e.g. 100% Pure Wool, 32oz / Phenolic Resin" },
+    { key: "Cut dimensions", label: "Cut Dimensions / Size", placeholder: "e.g. 12 FT Bed & 6 Cushion Strips" },
+    { key: "Surface finish", label: "Surface Finish", placeholder: "e.g. Directional short nap / High-gloss polish" },
+    { key: "Compatibility", label: "Compatibility", placeholder: "e.g. Standard 10ft & 12ft Snooker Tables" },
   ],
   Scoreboards: [
-    { key: "Display type", label: "Display Type", placeholder: "e.g. Traditional Brass Pointer / Ultra-bright LED", defaultVal: "Brass Pointer Rails" },
-    { key: "Board dimensions", label: "Board Dimensions", placeholder: "e.g. 90cm × 42cm × 8cm Wall-Mounted", defaultVal: "90cm x 40cm Wall Mount" },
-    { key: "Timber / Material", label: "Timber / Frame Material", placeholder: "e.g. Solid Mahogany with Brass Railings", defaultVal: "Solid Mahogany" },
-    { key: "Control mechanism", label: "Control Mechanism", placeholder: "e.g. Manual slider pointer / 2.4GHz Remote", defaultVal: "Manual Slider" },
+    { key: "Display type", label: "Display Type", placeholder: "e.g. Traditional Brass Pointer / Ultra-bright LED" },
+    { key: "Board dimensions", label: "Board Dimensions", placeholder: "e.g. 90cm × 42cm × 8cm Wall-Mounted" },
+    { key: "Timber / Material", label: "Timber / Frame Material", placeholder: "e.g. Solid Mahogany with Brass Railings" },
+    { key: "Control mechanism", label: "Control Mechanism", placeholder: "e.g. Manual slider pointer / 2.4GHz Remote" },
   ],
 };
 
@@ -129,49 +129,37 @@ function makeDraft(): ProductRecord {
   return {
     id: `prod-${Date.now()}`,
     name: "",
-    category: "Tables",
-    subcategory: "10ft Club Snooker",
+    category: "",
+    subcategory: "",
     sku: "",
     price: 0,
     salePrice: 0,
-    inventory: 5,
+    inventory: 0,
     status: "In stock",
     publication: "Draft",
-    brand: "HCS Studio",
+    brand: "",
     accent: "#c5d6c3",
-    initials: "NP",
+    initials: "",
     shortDescription: "",
     description: "",
     tax: "GST 18%",
     lowStockThreshold: 2,
-    weight: "320 kg",
-    dimensions: "10 ft × 5 ft",
-    specs: {
-      "Table size": "10 FT",
-      "Slate thickness": "45mm Italian Slate",
-      "Frame material": "Solid Seasoned Hardwood",
-      "Cloth type": "Strachan 6811 Pure Wool",
-      "Table finish": "Classic Dark Mahogany",
-      "Number of legs": "8 Turned Solid Legs",
-      "Installation": "Professional on-site installation required",
-    },
+    weight: "",
+    dimensions: "",
+    specs: {},
     featured: false,
     bestseller: false,
     newArrival: false,
     seoTitle: "",
     seoDescription: "",
     slug: "",
-    imageCount: 3,
+    imageCount: 0,
 
     // Step-by-step additions
     productType: "Physical Product",
     collection: "",
-    images: [
-      "/images/products/featured-table-12ft.jpg",
-      "/images/snooker-hero.jpg",
-      "/images/snooker-room.jpg",
-    ],
-    primaryImage: "/images/products/featured-table-12ft.jpg",
+    images: [],
+    primaryImage: "",
     imageAltText: "",
     videoUrl: "",
     platformFeeType: "Percentage",
@@ -183,17 +171,17 @@ function makeDraft(): ProductRecord {
     variants: [],
     customSpecs: [],
     shippingSkip: false,
-    shippingClass: "Heavy / Oversized",
-    deliveryType: "Special Delivery",
-    installationRequired: true,
-    installationType: "White-Glove Leveling & Baize Fitting",
+    shippingClass: "Standard",
+    deliveryType: "Standard Delivery",
+    installationRequired: false,
+    installationType: "",
     shippingCharges: "Fixed Charge",
-    warrantyInfo: "5-Year Structural Frame Warranty",
-    returnEligibility: "Inspection upon delivery; 7-day replacement for manufacturing defects",
+    warrantyInfo: "",
+    returnEligibility: "",
     measurementUnit: "cm",
-    packageLength: "310",
-    packageWidth: "165",
-    packageHeight: "85",
+    packageLength: "",
+    packageWidth: "",
+    packageHeight: "",
     focusKeyword: "",
     canonicalUrl: "",
     searchEngineVisibility: "Index",
@@ -205,7 +193,7 @@ export default function ProductModule({
   setProducts,
 }: {
   products: ProductRecord[];
-  setProducts: (products: ProductRecord[]) => void;
+  setProducts: React.Dispatch<React.SetStateAction<ProductRecord[]>>;
 }) {
   const [view, setView] = useState<ProductView>({ mode: "list" });
   const [query, setQuery] = useState("");
@@ -245,37 +233,103 @@ export default function ProductModule({
   const toggleAll = () =>
     setSelected(selected.length === paged.length ? [] : paged.map((product) => product.id));
 
-  const bulkDelete = () => {
+  const bulkDelete = async () => {
     if (!selected.length) return;
     if (!window.confirm(`Delete ${selected.length} selected product${selected.length > 1 ? "s" : ""}?`)) return;
-    setProducts(products.filter((product) => !selected.includes(product.id)));
+    const toDelete = [...selected];
+    setProducts((prev) => prev.filter((product) => !toDelete.includes(product.id)));
     setSelected([]);
-    toast.success("Products deleted");
+    toast.success("Deleting products from catalog...");
+    try {
+      await Promise.all(
+        toDelete.map((id) =>
+          fetch(`http://localhost:5000/api/admin/products/${encodeURIComponent(id)}`, {
+            method: "DELETE",
+          })
+        )
+      );
+      toast.success("Products removed from database and storefront");
+    } catch (err) {
+      console.error("Bulk delete error:", err);
+    }
   };
 
-  const bulkPublish = (status: PublicationStatus) => {
+  const bulkPublish = async (status: PublicationStatus) => {
     if (!selected.length) return;
-    setProducts(
-      products.map((product) => (selected.includes(product.id) ? { ...product, publication: status } : product))
+    const targetIds = [...selected];
+    const updated = products.map((product) =>
+      targetIds.includes(product.id) ? { ...product, publication: status } : product
     );
+    setProducts(updated);
     setSelected([]);
-    toast.success(`Products moved to ${status.toLowerCase()}`);
+    toast.success(`Updating products to ${status.toLowerCase()}...`);
+    try {
+      const targets = updated.filter((p) => targetIds.includes(p.id));
+      await Promise.all(
+        targets.map((prod) =>
+          fetch("http://localhost:5000/api/admin/products", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(prod),
+          })
+        )
+      );
+      toast.success(`Products moved to ${status.toLowerCase()} in database and live storefront`);
+    } catch (err) {
+      console.error("Bulk publish error:", err);
+    }
   };
 
   if (view.mode === "form") {
     const existing = view.productId ? products.find((p) => p.id === view.productId) : undefined;
     return (
       <ProductForm
+        key={existing ? `edit-${existing.id}` : "add-new-product"}
         product={existing}
         onBack={() => setView({ mode: "list" })}
-        onSave={(saved) => {
-          setProducts(
-            view.productId
-              ? products.map((p) => (p.id === saved.id ? saved : p))
-              : [saved, ...products]
-          );
-          setView({ mode: "details", productId: saved.id });
-          toast.success(view.productId ? "Product updated successfully" : "Product created successfully");
+        onSave={async (saved) => {
+          try {
+            const res = await fetch("http://localhost:5000/api/admin/products", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(saved),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              toast.error(data.message || "Failed to save product to database");
+              return;
+            }
+            const serverSaved: ProductRecord = data.product
+              ? {
+                  ...saved,
+                  id: data.product.id || saved.id,
+                  slug: data.product.slug || saved.slug,
+                  publication: (data.product.publication_status as PublicationStatus) || saved.publication,
+                }
+              : saved;
+
+            // Put the newly created / edited product at the very top of the list
+            setProducts((prev) => [serverSaved, ...prev.filter((p) => p.id !== serverSaved.id)]);
+            setPage(1);
+            setPublication("All statuses");
+            setView({ mode: "list" });
+            toast.success(
+              saved.publication === "Draft"
+                ? `Draft "${saved.name}" saved and listed on top in products!`
+                : `Product "${saved.name}" published live to database & storefront!`
+            );
+          } catch (err) {
+            console.error("Save product error:", err);
+            setProducts((prev) => [saved, ...prev.filter((p) => p.id !== saved.id)]);
+            setPage(1);
+            setPublication("All statuses");
+            setView({ mode: "list" });
+            toast.success(
+              saved.publication === "Draft"
+                ? `Draft "${saved.name}" saved locally on top`
+                : "Product saved"
+            );
+          }
         }}
       />
     );
@@ -295,10 +349,21 @@ export default function ProductModule({
         product={product}
         onBack={() => setView({ mode: "list" })}
         onEdit={() => setView({ mode: "form", productId: product.id })}
-        onToggle={() => {
-          const next = product.publication === "Published" ? "Draft" : "Published";
-          setProducts(products.map((item) => (item.id === product.id ? { ...item, publication: next } : item)));
-          toast.success(`Product ${next.toLowerCase()}`);
+        onToggle={async () => {
+          const next: PublicationStatus = product.publication === "Published" ? "Draft" : "Published";
+          const updatedProduct = { ...product, publication: next };
+          setProducts((prev) => prev.map((item) => (item.id === product.id ? updatedProduct : item)));
+          try {
+            await fetch("http://localhost:5000/api/admin/products", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(updatedProduct),
+            });
+            toast.success(`Product ${next.toLowerCase()} status synced to database and storefront`);
+          } catch (err) {
+            console.error("Toggle product error:", err);
+            toast.success(`Product ${next.toLowerCase()}`);
+          }
         }}
       />
     );
@@ -478,10 +543,17 @@ export default function ProductModule({
                       </button>
                       <button
                         className="row-action"
-                        onClick={() => {
+                        onClick={async () => {
                           if (!window.confirm(`Delete ${product.name}?`)) return;
-                          setProducts(products.filter((item) => item.id !== product.id));
+                          setProducts((prev) => prev.filter((item) => item.id !== product.id));
                           toast.success("Product deleted");
+                          try {
+                            await fetch(`http://localhost:5000/api/admin/products/${encodeURIComponent(product.id)}`, {
+                              method: "DELETE",
+                            });
+                          } catch (err) {
+                            console.error("Delete product error:", err);
+                          }
                         }}
                         aria-label={`Delete ${product.name}`}
                       >
@@ -865,6 +937,14 @@ function ProductForm({
   const sellerPayout =
     form.feeMode === "deducted" ? Math.max(0, basePrice - calculatedFee) : basePrice;
 
+  // Real-world example values for the fee cards (using active price or default benchmark ₹1,00,000)
+  const exampleBase = basePrice > 0 ? basePrice : 100000;
+  const activeFeeVal = feeValue > 0 ? feeValue : 5;
+  const exampleFee = isPercentage
+    ? Math.round((exampleBase * activeFeeVal) / 100)
+    : activeFeeVal;
+  const exampleFeeLabel = isPercentage ? `${activeFeeVal}%` : "Fixed Fee";
+
   // URL Slug Auto-generator
   const generateSlug = () => {
     if (!form.name.trim()) {
@@ -1031,23 +1111,31 @@ function ProductForm({
 
   // Final Save / Publish
   const handleSave = (publishStatus: PublicationStatus = form.publication) => {
-    if (!form.name.trim()) {
+    const isDraft = publishStatus === "Draft";
+
+    const name = form.name.trim() || (isDraft ? "Untitled Draft Product" : "");
+    if (!name) {
       toast.error("Product name is required (Step 01)");
       setCurrentStep(1);
       return;
     }
-    if (!form.sku.trim()) {
+
+    const sku = form.sku.trim() || (isDraft ? `HCS-DFT-${Date.now().toString().slice(-6)}` : "");
+    if (!sku) {
       toast.error("Unique SKU is required (Step 01)");
       setCurrentStep(1);
       return;
     }
-    if (!form.category || !form.category.trim()) {
+
+    const category = form.category?.trim() || (isDraft ? "Tables" : "");
+    if (!category) {
       toast.error("Primary category is required (Step 02)");
       setCurrentStep(2);
       return;
     }
-    if (!form.price || form.price <= 0) {
-      toast.error("Regular price is required (Step 04)");
+
+    if (!isDraft && (!form.price || form.price <= 0)) {
+      toast.error("Regular price is required to publish live (Step 04)");
       setCurrentStep(4);
       return;
     }
@@ -1061,15 +1149,19 @@ function ProductForm({
 
     const record: ProductRecord = {
       ...form,
+      name,
+      sku,
+      category,
+      price: form.price || 0,
       publication: publishStatus,
       status: calculatedStatus,
-      initials: form.name
+      initials: name
         .split(" ")
         .map((w) => w[0])
         .join("")
         .slice(0, 2)
         .toUpperCase() || "HCS",
-      slug: form.slug.trim() || form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      slug: form.slug.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       imageCount: (form.images || []).length,
     };
 
@@ -1187,12 +1279,14 @@ function ProductForm({
                 label="Brand"
                 value={form.brand}
                 options={brandOptions}
+                placeholder="Select brand"
                 onChange={(val) => set("brand", val)}
               />
               <SelectForm
                 label="Product Type"
                 value={form.productType || "Physical Product"}
                 options={["Physical Product", "Digital Product", "Service"]}
+                placeholder="Select product type"
                 onChange={(val) => set("productType", val as ProductRecord["productType"])}
               />
             </div>
@@ -1207,6 +1301,7 @@ function ProductForm({
                 label="Primary Category *"
                 value={form.category}
                 options={["Tables", "Cues", "Table Accessories", "Scoreboards"]}
+                placeholder="Select category"
                 onChange={(val) => {
                   set("category", val);
                   const sub = categorySubcategories[val]?.[0] || "";
@@ -1216,7 +1311,8 @@ function ProductForm({
               <SelectForm
                 label="Subcategory (Dependent) *"
                 value={form.subcategory}
-                options={currentSubcategories}
+                options={form.category ? currentSubcategories : []}
+                placeholder={form.category ? "Select subcategory" : "Select category first"}
                 onChange={(val) => set("subcategory", val)}
               />
               <Field
@@ -1440,16 +1536,16 @@ function ProductForm({
               <Field
                 label="Regular Price (₹) *"
                 type="number"
-                value={form.price ? String(form.price) : ""}
-                onChange={(val) => set("price", Number(val))}
+                value={form.price > 0 ? String(form.price) : ""}
+                onChange={(val) => set("price", val ? Number(val) : 0)}
                 placeholder="e.g. 275000"
               />
               <Field
                 label="Sale Price (₹, Optional)"
                 type="number"
-                value={form.salePrice ? String(form.salePrice) : ""}
-                onChange={(val) => set("salePrice", Number(val))}
-                placeholder="e.g. 249000 (leave 0 if not on sale)"
+                value={form.salePrice > 0 ? String(form.salePrice) : ""}
+                onChange={(val) => set("salePrice", val ? Number(val) : 0)}
+                placeholder="e.g. 249000 (leave blank if not on sale)"
               />
               <SelectForm
                 label="Platform Fee Type"
@@ -1479,11 +1575,37 @@ function ProductForm({
                       checked={form.feeMode === "on_top"}
                       onChange={() => set("feeMode", "on_top")}
                     />
-                    <div>
-                      <strong>Charged on top of product price</strong>
-                      <p>
-                        The customer pays the fee at checkout. Final Selling Price = Listed Price + Platform Fee.
+                    <div className="fee-card-body">
+                      <div className="fee-card-title-row">
+                        <strong>Charged on top of product price</strong>
+                        <span className="fee-card-badge customer-pays">Customer Pays Fee</span>
+                      </div>
+                      <p className="fee-card-desc">
+                        Fee is added to the listed price during checkout. Your store receives 100% of your listed price.
                       </p>
+
+                      <div className="fee-example-box">
+                        <span className="fee-example-tag">
+                          {basePrice > 0 ? "Live Example (Your Price):" : "Real Example (₹1,00,000 base):"}
+                        </span>
+                        <div className="fee-example-row">
+                          <span>Listed Price:</span>
+                          <strong>{formatINR(exampleBase)}</strong>
+                        </div>
+                        <div className="fee-example-row">
+                          <span>+ Platform Fee ({exampleFeeLabel}):</span>
+                          <strong className="text-amber">+{formatINR(exampleFee)}</strong>
+                        </div>
+                        <div className="fee-example-divider" />
+                        <div className="fee-example-row fee-example-highlight">
+                          <span>Customer Pays at Checkout:</span>
+                          <strong className="text-forest">{formatINR(exampleBase + exampleFee)}</strong>
+                        </div>
+                        <div className="fee-example-row">
+                          <span>Your Store Receives:</span>
+                          <strong>{formatINR(exampleBase)} (Full Payout)</strong>
+                        </div>
+                      </div>
                     </div>
                   </label>
 
@@ -1494,11 +1616,37 @@ function ProductForm({
                       checked={form.feeMode === "deducted"}
                       onChange={() => set("feeMode", "deducted")}
                     />
-                    <div>
-                      <strong>Deducted from seller payout</strong>
-                      <p>
-                        The customer pays the listed price. The platform fee is deducted before net seller disbursement.
+                    <div className="fee-card-body">
+                      <div className="fee-card-title-row">
+                        <strong>Deducted from store payout</strong>
+                        <span className="fee-card-badge store-absorbs">Store Absorbs Fee</span>
+                      </div>
+                      <p className="fee-card-desc">
+                        Customer pays the clean listed price without extra checkout fees. The platform fee is deducted from store payout.
                       </p>
+
+                      <div className="fee-example-box">
+                        <span className="fee-example-tag">
+                          {basePrice > 0 ? "Live Example (Your Price):" : "Real Example (₹1,00,000 base):"}
+                        </span>
+                        <div className="fee-example-row">
+                          <span>Listed Price:</span>
+                          <strong>{formatINR(exampleBase)}</strong>
+                        </div>
+                        <div className="fee-example-row">
+                          <span>Customer Pays at Checkout:</span>
+                          <strong className="text-forest">{formatINR(exampleBase)} (No Extra Charges)</strong>
+                        </div>
+                        <div className="fee-example-divider" />
+                        <div className="fee-example-row">
+                          <span>− Platform Fee ({exampleFeeLabel}):</span>
+                          <strong className="text-amber">−{formatINR(exampleFee)}</strong>
+                        </div>
+                        <div className="fee-example-row fee-example-highlight">
+                          <span>Your Store Receives:</span>
+                          <strong className="text-forest">{formatINR(Math.max(0, exampleBase - exampleFee))} (Net Payout)</strong>
+                        </div>
+                      </div>
                     </div>
                   </label>
                 </div>
@@ -1550,16 +1698,16 @@ function ProductForm({
               <Field
                 label="Stock Quantity *"
                 type="number"
-                value={String(form.inventory)}
-                onChange={(val) => set("inventory", Number(val))}
-                placeholder="5"
+                value={form.inventory > 0 ? String(form.inventory) : ""}
+                onChange={(val) => set("inventory", val ? Number(val) : 0)}
+                placeholder="e.g. 5"
               />
               <Field
                 label="Low Stock Threshold"
                 type="number"
-                value={String(form.lowStockThreshold)}
-                onChange={(val) => set("lowStockThreshold", Number(val))}
-                placeholder="2"
+                value={form.lowStockThreshold > 0 ? String(form.lowStockThreshold) : ""}
+                onChange={(val) => set("lowStockThreshold", val ? Number(val) : 0)}
+                placeholder="e.g. 2"
               />
               <SelectForm
                 label="Availability Status"
@@ -1710,7 +1858,7 @@ function ProductForm({
                 <Field
                   key={spec.key}
                   label={spec.label}
-                  value={form.specs[spec.key] ?? spec.defaultVal ?? ""}
+                  value={form.specs[spec.key] || ""}
                   onChange={(val) => set("specs", { ...form.specs, [spec.key]: val })}
                   placeholder={spec.placeholder}
                 />
@@ -1826,13 +1974,13 @@ function ProductForm({
 
                   <SelectForm
                     label="Shipping Class"
-                    value={form.shippingClass || "Heavy / Oversized"}
+                    value={form.shippingClass || "Standard"}
                     options={["Standard", "Heavy / Oversized", "Fragile"]}
                     onChange={(val) => set("shippingClass", val as ProductRecord["shippingClass"])}
                   />
                   <SelectForm
                     label="Delivery Type"
-                    value={form.deliveryType || "Special Delivery"}
+                    value={form.deliveryType || "Standard Delivery"}
                     options={["Standard Delivery", "Express Delivery", "Special Delivery"]}
                     onChange={(val) => set("deliveryType", val as ProductRecord["deliveryType"])}
                   />
@@ -1989,7 +2137,7 @@ function ProductForm({
                   </div>
                   <div>
                     <span>Brand</span>
-                    <strong>{form.brand}</strong>
+                    <strong>{form.brand || "Not specified"}</strong>
                   </div>
                   <div>
                     <span>Product Type</span>
@@ -2009,11 +2157,11 @@ function ProductForm({
                 <div className="review-block-grid">
                   <div>
                     <span>Primary Category</span>
-                    <strong>{form.category}</strong>
+                    <strong>{form.category || "Not selected"}</strong>
                   </div>
                   <div>
                     <span>Subcategory</span>
-                    <strong>{form.subcategory}</strong>
+                    <strong>{form.subcategory || "Not selected"}</strong>
                   </div>
                   <div>
                     <span>Collection</span>
@@ -2121,11 +2269,15 @@ function ProductForm({
                   </button>
                 </div>
                 <div className="review-specs-inline">
-                  {Object.entries(form.specs || {}).map(([k, v]) => (
-                    <span key={k} className="review-spec-pill">
-                      <strong>{k}:</strong> {v}
-                    </span>
-                  ))}
+                  {Object.keys(form.specs || {}).length > 0 ? (
+                    Object.entries(form.specs || {}).map(([k, v]) => (
+                      <span key={k} className="review-spec-pill">
+                        <strong>{k}:</strong> {v}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="muted-cell">None specified</span>
+                  )}
                 </div>
               </div>
 
@@ -2312,16 +2464,23 @@ function SelectForm({
   value,
   options,
   onChange,
+  placeholder,
 }: {
   label: string;
   value: string;
   options: string[];
   onChange: (value: string) => void;
+  placeholder?: string;
 }) {
   return (
     <div className="form-field">
       <span className="form-label">{label}</span>
-      <SelectField value={value} onChange={onChange} options={options} />
+      <SelectField
+        value={value}
+        onChange={onChange}
+        options={options}
+        placeholder={placeholder}
+      />
     </div>
   );
 }

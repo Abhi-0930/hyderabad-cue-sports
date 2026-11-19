@@ -502,3 +502,34 @@ export const accessoryDeals = [
 export const formatInr = (amount: number) => `₹${amount.toLocaleString("en-IN")}`;
 
 export const getProduct = (slug: string) => products.find((product) => product.slug === slug);
+
+export async function fetchStorefrontProducts(): Promise<Product[]> {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const res = await fetch(`${apiUrl}/api/products`, { cache: "no-store" });
+    if (!res.ok) return products;
+    const json = await res.json();
+    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+      return json.data as Product[];
+    }
+  } catch (err) {
+    // Backend offline or unreachable: gracefully fall back to local catalog
+  }
+  return products;
+}
+
+export async function fetchStorefrontProductBySlug(slug: string): Promise<Product | undefined> {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const res = await fetch(`${apiUrl}/api/products/${encodeURIComponent(slug)}`, { cache: "no-store" });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && json.data) {
+        return json.data as Product;
+      }
+    }
+  } catch (err) {
+    // Backend offline or unreachable: fall back to local getProduct
+  }
+  return getProduct(slug);
+}

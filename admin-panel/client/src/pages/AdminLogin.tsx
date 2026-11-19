@@ -47,7 +47,9 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
         localStorage.setItem("hcs_admin_user", JSON.stringify(data.admin));
         onLogin(data.admin);
       } else {
-        setError(data?.message || "Invalid admin credentials. Please try again.");
+        const msg = data?.message || "Invalid admin credentials. Please try again.";
+        const extra = data?.error ? ` (${data.error})` : "";
+        setError(`${msg}${extra}`);
       }
     } catch {
       setError("Unable to connect to security server. Please ensure backend is running on port 5000.");

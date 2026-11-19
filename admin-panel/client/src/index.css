@@ -1288,34 +1288,132 @@ button {
 .fee-radio-card {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 14px 16px;
-  border: 1px solid #dfe6e0;
+  gap: 9px;
+  padding: 11px 13px;
+  border: 1.2px solid #dfe6e0;
   border-radius: 8px;
   cursor: pointer;
   background: #ffffff;
-  transition: all 0.15s ease;
+  transition: all 0.16s ease;
 }
 
 .fee-radio-card.selected {
   border-color: var(--forest);
   background: #f6faf7;
-  box-shadow: 0 0 0 2px rgba(22, 75, 56, 0.08);
+  box-shadow: 0 1px 4px rgba(22, 75, 56, 0.08);
 }
 
-.fee-radio-card strong {
-  display: block;
-  font-size: 13px;
+.fee-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fee-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fee-card-title-row strong {
+  font-size: 12.5px;
   color: #111111;
-  font-weight: 550;
-  margin-bottom: 2px;
+  font-weight: 600;
+  margin: 0;
 }
 
-.fee-radio-card p {
+.fee-card-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.fee-card-badge.customer-pays {
+  background: #eaf5ee;
+  color: #1b533d;
+  border: 1px solid #cbe4d3;
+}
+
+.fee-card-badge.store-absorbs {
+  background: #fdf6ec;
+  color: #8c580d;
+  border: 1px solid #fae3c3;
+}
+
+.fee-card-desc {
   margin: 0;
-  font-size: 12px;
-  color: #6d7b72;
-  line-height: 1.45;
+  font-size: 11px;
+  color: #5c6e63;
+  line-height: 1.35;
+}
+
+.fee-example-box {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #f9fbf9;
+  border: 1px solid #e2ede5;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fee-radio-card.selected .fee-example-box {
+  background: #ffffff;
+  border-color: #c7ded0;
+}
+
+.fee-example-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #4b6354;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 1px;
+}
+
+.fee-example-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #55665d;
+}
+
+.fee-example-row strong {
+  font-size: 11.5px;
+  color: #1a221e;
+  font-weight: 550;
+  margin: 0;
+}
+
+.fee-example-divider {
+  height: 1px;
+  background: #e4eee7;
+  margin: 1px 0;
+}
+
+.fee-example-highlight {
+  font-weight: 600;
+}
+
+.fee-example-highlight span {
+  color: #164b38;
+  font-weight: 600;
+}
+
+.text-amber {
+  color: #b45309 !important;
+}
+
+.text-forest {
+  color: var(--forest) !important;
 }
 
 .calculation-breakdown-card {
@@ -1419,13 +1517,13 @@ button {
 }
 
 /* ==========================================================================
-   CUSTOM BRAND CHECKBOXES & CARD PRESETS
+   CUSTOM BRAND CHECKBOXES & CARD PRESETS (Compact & Refined)
    ========================================================================== */
 
 .custom-checkbox-wrap {
   display: inline-flex;
   align-items: flex-start;
-  gap: 11px;
+  gap: 8px;
   cursor: pointer;
   user-select: none;
   transition: all 0.16s ease;
@@ -1434,12 +1532,12 @@ button {
 .custom-checkbox-wrap.is-card {
   display: flex;
   width: 100%;
-  padding: 14px 16px;
+  padding: 9px 12px;
   background: #ffffff;
-  border: 1.5px solid #dce8df;
-  border-radius: 9px;
+  border: 1.2px solid #dce8df;
+  border-radius: 7px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-  margin: 4px 0;
+  margin: 3px 0;
 }
 
 .custom-checkbox-wrap.is-card:hover {
@@ -1450,12 +1548,12 @@ button {
 .custom-checkbox-wrap.is-card.is-checked {
   border-color: var(--forest);
   background: #f2f8f4;
-  box-shadow: 0 2px 8px rgba(22, 75, 56, 0.08);
+  box-shadow: 0 1px 4px rgba(22, 75, 56, 0.08);
 }
 
 .custom-checkbox-wrap.is-card.is-checked .custom-checkbox-label {
   color: var(--forest);
-  font-weight: 600;
+  font-weight: 550;
 }
 
 .custom-checkbox-control {
@@ -1464,7 +1562,7 @@ button {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1.5px;
 }
 
 .custom-checkbox-input {
@@ -1477,14 +1575,14 @@ button {
 }
 
 .custom-checkbox-box {
-  width: 19px;
-  height: 19px;
-  border-radius: 5px;
-  border: 1.5px solid #a3bda9;
+  width: 14px;
+  height: 14px;
+  border-radius: 3.5px;
+  border: 1.2px solid #a3bda9;
   background: #ffffff;
   display: grid;
   place-items: center;
-  transition: all 0.16s ease;
+  transition: all 0.15s ease;
   flex-shrink: 0;
 }
 
@@ -1496,13 +1594,13 @@ button {
 .custom-checkbox-wrap.is-checked .custom-checkbox-box {
   background: var(--forest) !important;
   border-color: var(--forest) !important;
-  box-shadow: 0 1px 3px rgba(22, 75, 56, 0.25);
+  box-shadow: 0 1px 2px rgba(22, 75, 56, 0.2);
 }
 
 .custom-checkbox-icon {
   color: #ffffff;
   opacity: 0;
-  transform: scale(0.65);
+  transform: scale(0.6);
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
@@ -1514,43 +1612,43 @@ button {
 .custom-checkbox-content {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   flex: 1;
 }
 
 .custom-checkbox-label {
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 500;
   color: #1a221e;
-  line-height: 1.35;
+  line-height: 1.3;
   transition: color 0.16s ease;
 }
 
 .custom-checkbox-desc {
-  font-size: 12px;
+  font-size: 11px;
   color: #5c6e63;
-  line-height: 1.45;
+  line-height: 1.35;
 }
 
 .custom-checkbox-field {
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
-/* Custom styled radio input for fee cards */
+/* Compact custom-styled radio input for fee cards */
 .fee-radio-card input[type="radio"] {
   appearance: none;
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  border: 2px solid #b2c7b8;
+  border: 1.5px solid #b2c7b8;
   background: #ffffff;
   margin: 2px 0 0 0;
   display: grid;
   place-items: center;
   flex-shrink: 0;
   cursor: pointer;
-  transition: all 0.16s ease;
+  transition: all 0.15s ease;
 }
 
 .fee-radio-card input[type="radio"]:hover {
@@ -1560,7 +1658,7 @@ button {
 .fee-radio-card input[type="radio"]:checked {
   border-color: var(--forest);
   background: var(--forest);
-  box-shadow: inset 0 0 0 3.5px #ffffff;
+  box-shadow: inset 0 0 0 2.5px #ffffff;
 }
 
 input[type="checkbox"] {

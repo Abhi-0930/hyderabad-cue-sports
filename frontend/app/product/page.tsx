@@ -25,6 +25,7 @@ function ProductQueryContent() {
       slug={product?.slug || slug || ""}
       pid={product?.id || pid || ""}
       isTampered={isTampered}
+      signature={sig || undefined}
     />
   );
 }
