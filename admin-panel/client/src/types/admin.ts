@@ -8,6 +8,11 @@ export type PaymentStatus = "Paid" | "Pending" | "Refunded" | "Partially refunde
 export type AccountStatus = "Active" | "Invited" | "Suspended";
 export type ReturnStatus = "Requested" | "Approved" | "Rejected" | "Refunded";
 
+export type ProductType = "Simple" | "Variable" | "Made-to-Order" | "Bundle" | "Service" | "Physical Product" | "Digital Product";
+export type SalesMode = "Buy Now" | "Request a Quote" | "Hybrid" | "Booking with Advance";
+export type ProductApprovalStatus = "Draft" | "In Review" | "Scheduled" | "Published" | "Archived";
+export type ProductVisibility = "Public" | "Hidden" | "B2B Only";
+
 export type Product = {
   id: string;
   name: string;
@@ -27,6 +32,44 @@ export type ProductVariant = {
   price: number;
   inventory: number;
   availability: "In stock" | "Out of stock" | "Pre-order";
+  image?: string;
+};
+
+export type ConfiguratorOption = {
+  id: string;
+  category: string;
+  label: string;
+  priceDelta: number;
+  leadTimeDeltaDays: number;
+};
+
+export type B2BPriceTier = {
+  minQty: number;
+  maxQty: number;
+  discountPercent: number;
+  customerGroup: string;
+};
+
+export type ShippingCrate = {
+  id: string;
+  label: string;
+  weightKg: number;
+  lengthCm: number;
+  widthCm: number;
+  heightCm: number;
+};
+
+export type MediaItem = {
+  url: string;
+  tag: "Hero" | "Detail / Macro" | "Lifestyle" | "Dimension Diagram" | "360° Spin";
+  altText: string;
+};
+
+export type DownloadableDoc = {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
 };
 
 export type ProductRecord = Product & {
@@ -49,36 +92,128 @@ export type ProductRecord = Product & {
   slug: string;
   imageCount: number;
 
-  // Extended 10-step Add Product fields
-  productType?: "Physical Product" | "Digital Product" | "Service";
+  // Extended 12-step Wizard Fields
+  productType?: ProductType;
+  salesMode?: SalesMode;
+  modelName?: string;
+  gtinBarcode?: string;
+  countryOfOrigin?: string;
+  manufacturerDetails?: string;
+  netQuantity?: string;
+  internalNotes?: string;
+  approvalStatus?: ProductApprovalStatus;
+
+  // Category & Organisation
   collection?: string;
+  gameTypes?: string[];
+  customerSegments?: string[];
+  productBadges?: string[];
+  bestsellerOverride?: "auto" | "force_on" | "force_off";
+  newArrivalOverride?: "auto" | "force_on" | "force_off";
+
+  // Specifications
+  specVisibility?: Record<string, { showOnStorefront: boolean; useAsFilter: boolean }>;
+  customSpecs?: { label: string; value: string }[];
+  customSpecsList?: {
+    label: string;
+    value: string;
+    unit?: string;
+    group?: string;
+    showOnStorefront?: boolean;
+    useAsFilter?: boolean;
+  }[];
+
+  // Variants & Configurator
+  variants?: ProductVariant[];
+  configuratorOptions?: ConfiguratorOption[];
+
+  // Pricing, Tax & India Compliance
+  mrp?: number;
+  costPrice?: number;
+  saleStartDate?: string;
+  saleEndDate?: string;
+  priceOnRequest?: boolean;
+  advanceBookingType?: "Percentage" | "Fixed";
+  advanceBookingValue?: number;
+  installationCharge?: number;
+  emiEligible?: boolean;
+  hsnCode?: string;
+  hsnGstRate?: number;
+  b2bTiers?: B2BPriceTier[];
+  platformFeeType?: "Percentage" | "Fixed";
+  platformFeeValue?: number;
+  feeMode?: "on_top" | "deducted";
+
+  // Inventory & Tracking
+  trackStock?: boolean;
+  allowBackorders?: boolean;
+  minOrderQuantity?: number;
+  maxOrderQuantity?: number;
+  productionLeadTime?: string;
+  warehouseLocation?: string;
+  serialTrackingEnabled?: boolean;
+  dyeLotNumber?: string;
+  dyeLotDate?: string;
+
+  // Description & Media
   images?: string[];
   primaryImage?: string;
   imageAltText?: string;
   videoUrl?: string;
-  platformFeeType?: "Percentage" | "Fixed";
-  platformFeeValue?: number;
-  feeMode?: "on_top" | "deducted";
-  trackStock?: boolean;
-  allowBackorders?: boolean;
-  minOrderQuantity?: number;
-  variants?: ProductVariant[];
-  customSpecs?: { label: string; value: string }[];
+  mediaItems?: MediaItem[];
+  downloadableDocs?: DownloadableDoc[];
+
+  // Shipping, Delivery & Installation
   shippingSkip?: boolean;
   shippingClass?: "Standard" | "Heavy / Oversized" | "Fragile";
   deliveryType?: "Standard Delivery" | "Express Delivery" | "Special Delivery";
   installationRequired?: boolean;
   installationType?: string;
   shippingCharges?: "Free Shipping" | "Fixed Charge" | "Calculated at Checkout";
-  warrantyInfo?: string;
-  returnEligibility?: string;
+  packages?: ShippingCrate[];
+  dispatchDays?: number;
+  installationModel?: "Included" | "Paid Add-on" | "Not Required" | "Optional";
+  technicianTeamSize?: string;
+  onSiteDuration?: string;
+  siteSurveyRequired?: boolean;
+  minRoomLengthFt?: number;
+  minRoomWidthFt?: number;
+  minDoorWidthCm?: number;
+  liftAccessRequired?: boolean;
+  minFloorLoadRating?: string;
   measurementUnit?: "cm" | "mm" | "inches";
   packageLength?: string;
   packageWidth?: string;
   packageHeight?: string;
+
+  // Warranty, Returns & Documents
+  warrantyInfo?: string;
+  warrantySlate?: string;
+  warrantyFrame?: string;
+  warrantyCushions?: string;
+  warrantyCloth?: string;
+  warrantyExclusions?: string;
+  returnEligibility?: string;
+  returnWindowDays?: number;
+  restockingFeePercent?: number;
+  certificateOfAuthenticity?: boolean;
+
+  // Related Products
+  autoCompatibilityMatching?: boolean;
+  roomBundleItems?: string[];
+  roomBundleDiscount?: number;
+  spareParts?: string[];
+
+  // SEO & Schema
   focusKeyword?: string;
   canonicalUrl?: string;
   searchEngineVisibility?: "Index" | "No Index";
+  ogImage?: string;
+  oldSlug?: string;
+
+  // Review & Publish
+  visibility?: ProductVisibility;
+  scheduledPublishAt?: string;
 };
 
 export type Category = {
