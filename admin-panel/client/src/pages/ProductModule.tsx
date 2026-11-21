@@ -1214,18 +1214,18 @@ function Fact({ label, value }: { label: string; value: string }) {
    ========================================================================= */
 
 const stepMetadata: { step: StepNumber; title: string; subtitle: string }[] = [
-  { step: 1, title: "01. Product Identity", subtitle: "Sales mode, product type, brand, SKU and India compliance" },
-  { step: 2, title: "02. Category & Organisation", subtitle: "Taxonomy, game types, customer segments and badges" },
-  { step: 3, title: "03. Specifications", subtitle: "Technical parameters, storefront visibility & filter flags" },
-  { step: 4, title: "04. Variants & Configuration", subtitle: "Variant matrix and bespoke made-to-order configurator" },
-  { step: 5, title: "05. Pricing & Tax", subtitle: "MRP compliance, cost margin, advance booking, HSN & B2B club tiers" },
-  { step: 6, title: "06. Inventory & Tracking", subtitle: "Stock levels, lead times, serial number & cloth dye lot tracking" },
-  { step: 7, title: "07. Description & Media", subtitle: "High-resolution photography, rich narrative, video and documents" },
-  { step: 8, title: "08. Shipping, Delivery & Installation", subtitle: "Multi-crate breakdown, volumetric weight, room size calculation & assembly" },
-  { step: 9, title: "09. Warranty, Returns & Documents", subtitle: "Component warranty, exclusions, return eligibility & authenticity" },
-  { step: 10, title: "10. Related Products", subtitle: "Rule-based compatibility, room bundle package & spare parts" },
-  { step: 11, title: "11. SEO & Schema", subtitle: "Search indexing, 301 redirect tracker, OG preview & JSON-LD schema" },
-  { step: 12, title: "12. Review & Publish", subtitle: "Pre-flight audit checklist, desktop/mobile preview & deployment" },
+  { step: 1, title: "Product Identity", subtitle: "Sales mode, product type, brand, SKU and India compliance" },
+  { step: 2, title: "Category & Organisation", subtitle: "Taxonomy, game types, customer segments and badges" },
+  { step: 3, title: "Specifications", subtitle: "Technical parameters, storefront visibility & filter flags" },
+  { step: 4, title: "Variants & Configuration", subtitle: "Variant matrix and bespoke made-to-order configurator" },
+  { step: 5, title: "Pricing & Tax", subtitle: "MRP compliance, cost margin, advance booking, HSN & B2B club tiers" },
+  { step: 6, title: "Inventory & Tracking", subtitle: "Stock levels, lead times, serial number & cloth dye lot tracking" },
+  { step: 7, title: "Description & Media", subtitle: "High-resolution photography, rich narrative, video and documents" },
+  { step: 8, title: "Shipping, Delivery & Installation", subtitle: "Multi-crate breakdown, volumetric weight, room size calculation & assembly" },
+  { step: 9, title: "Warranty, Returns & Documents", subtitle: "Component warranty, exclusions, return eligibility & authenticity" },
+  { step: 10, title: "Related Products", subtitle: "Rule-based compatibility, room bundle package & spare parts" },
+  { step: 11, title: "SEO & Schema", subtitle: "Search indexing, 301 redirect tracker, OG preview & JSON-LD schema" },
+  { step: 12, title: "Review & Publish", subtitle: "Pre-flight audit checklist, desktop/mobile preview & deployment" },
 ];
 
 function ProductForm({
@@ -1921,9 +1921,6 @@ function ProductForm({
             <h2>{currentMeta.title}</h2>
             <p>{currentMeta.subtitle}</p>
           </div>
-          <span className="step-counter-tag">
-            Step {currentStep} of {stepMetadata.length}
-          </span>
         </div>
 
         <div className="wizard-step-content">
@@ -3806,7 +3803,7 @@ function ProductForm({
               {/* Review Section 1: Product Identity */}
               <div className="review-block">
                 <div className="review-block-header">
-                  <strong>01. Product Identity & Compliance</strong>
+                  <strong>Product Identity & Compliance</strong>
                   <button type="button" onClick={() => handleStepClick(1)}>
                     <Pencil size={13} /> Edit
                   </button>
@@ -3822,11 +3819,11 @@ function ProductForm({
                   </div>
                   <div>
                     <span>Sales Mode</span>
-                    <strong>{form.salesMode}</strong>
+                    <strong>{form.salesMode || "Not selected"}</strong>
                   </div>
                   <div>
                     <span>Product Type</span>
-                    <strong>{form.productType}</strong>
+                    <strong>{form.productType || "Not selected"}</strong>
                   </div>
                   <div>
                     <span>Country of Origin</span>
@@ -3842,7 +3839,7 @@ function ProductForm({
               {/* Review Section 2: Category & Organisation */}
               <div className="review-block">
                 <div className="review-block-header">
-                  <strong>02. Category & Organisation</strong>
+                  <strong>Category & Organisation</strong>
                   <button type="button" onClick={() => handleStepClick(2)}>
                     <Pencil size={13} /> Edit
                   </button>
@@ -3870,7 +3867,7 @@ function ProductForm({
               {/* Review Section 3: Specifications */}
               <div className="review-block">
                 <div className="review-block-header">
-                  <strong>03. Specifications</strong>
+                  <strong>Specifications</strong>
                   <button type="button" onClick={() => handleStepClick(3)}>
                     <Pencil size={13} /> Edit
                   </button>
@@ -3891,7 +3888,7 @@ function ProductForm({
               {/* Review Section 5: Pricing & Tax */}
               <div className="review-block">
                 <div className="review-block-header">
-                  <strong>05. Pricing & Tax</strong>
+                  <strong>Pricing & Tax</strong>
                   <button type="button" onClick={() => handleStepClick(5)}>
                     <Pencil size={13} /> Edit
                   </button>
