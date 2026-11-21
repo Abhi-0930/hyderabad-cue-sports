@@ -3944,12 +3944,11 @@ function ProductForm({
           <button
             type="button"
             onClick={handlePrev}
-            className="wizard-back-btn"
+            className="wizard-back-arrow-btn"
             aria-label="Previous step"
             title={currentStep === 1 ? "Cancel and return to list" : "Previous step"}
           >
-            <ArrowLeft size={16} strokeWidth={2.2} />
-            <span>{currentStep === 1 ? "Back to Products" : "Previous Step"}</span>
+            <ArrowLeft size={22} strokeWidth={2.3} />
           </button>
 
           <div className="wizard-right-actions">
