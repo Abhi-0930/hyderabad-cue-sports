@@ -48,7 +48,7 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .side-nav { display: flex; flex-direction: column; gap: 4px; }
 .side-nav-item { width: 100%; display: flex; align-items: center; gap: 11px; border: 0; border-radius: 8px; background: transparent; color: rgba(255,255,255,.6); text-align: left; padding: 10px 10px; transition: background .18s, color .18s; }
 .side-nav-item:hover { background: rgba(255,255,255,.08); color: white; }
-.side-nav-item.active { background: var(--forest); color: white; box-shadow: inset 3px 0 0 var(--gold); }
+.side-nav-item.active { background: var(--forest); color: white; box-shadow: none; }
 .nav-item-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
 .nav-item-copy strong { font-size: 12px; font-weight: 600; }
 .nav-item-copy small { color: rgba(255,255,255,.4); font-size: 10px; }
@@ -874,8 +874,8 @@ button {
 .stepper-node.current {
   background: #eef5f0;
   color: var(--forest);
-  font-weight: 550;
-  box-shadow: inset 0 -2.5px 0 var(--forest);
+  font-weight: 600;
+  box-shadow: none;
 }
 
 .stepper-node.done {

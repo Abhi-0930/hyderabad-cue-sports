@@ -549,8 +549,8 @@ function makeDraft(): ProductRecord {
     imageCount: 0,
 
     // Step 01: Product Identity & India Compliance
-    productType: "Simple",
-    salesMode: "Buy Now",
+    productType: undefined,
+    salesMode: undefined,
     modelName: "",
     gtinBarcode: "",
     countryOfOrigin: "India",
@@ -1796,6 +1796,8 @@ function ProductForm({
       name,
       sku,
       category,
+      productType: form.productType || "Simple",
+      salesMode: form.salesMode || "Buy Now",
       price: form.price || 0,
       publication: publishStatus,
       status: calculatedStatus,
@@ -1863,11 +1865,7 @@ function ProductForm({
           </button>
           <div>
             <h1>{product ? `Edit: ${product.name}` : "Add Product"}</h1>
-            <div className="wizard-subtitle-badge">
-              <span className="badge-pill">{form.productType || "Simple"}</span>
-              <span className="badge-pill sales-pill">{form.salesMode || "Buy Now"}</span>
-              {form.modelName && <span className="model-text">{form.modelName}</span>}
-            </div>
+            {product && form.modelName && <span className="model-text">{form.modelName}</span>}
           </div>
         </div>
         <div className="heading-actions">
