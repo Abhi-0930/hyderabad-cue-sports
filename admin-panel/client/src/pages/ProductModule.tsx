@@ -1528,9 +1528,9 @@ function ProductForm({
         set("minRoomLengthFt", 15.5);
         set("minRoomWidthFt", 12.5);
       }
+      toast.success(`Applied ${val} specs & calculated minimum room clearance`);
     }
     set("specs", nextSpecs);
-    toast.success(`Applied ${val} specs & calculated minimum room clearance`);
   };
 
   // Add Custom Specification
@@ -2321,24 +2321,22 @@ function ProductForm({
                     </div>
 
                     {spec.options ? (
-                      <select
+                      <SelectField
                         value={specVal}
-                        onChange={(e) => {
-                          const val = e.target.value;
+                        placeholder={`Select ${spec.label}...`}
+                        options={
+                          specVal
+                            ? [{ label: `— Clear selection —`, value: "" }, ...spec.options]
+                            : spec.options
+                        }
+                        onChange={(val) => {
                           if (spec.key === "Table size") {
                             handleTableSizeSelect(val);
                           } else {
                             set("specs", { ...form.specs, [spec.key]: val });
                           }
                         }}
-                      >
-                        <option value="">Select {spec.label}...</option>
-                        {spec.options.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
+                      />
                     ) : (
                       <input
                         type="text"
