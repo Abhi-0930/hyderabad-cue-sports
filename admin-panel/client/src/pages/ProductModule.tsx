@@ -1067,11 +1067,7 @@ export default function ProductModule({
           )}
         </div>
         <div className="table-footer">
-          <span>
-            Showing {visibleProducts.length ? (page - 1) * pageSize + 1 : 0}–
-            {Math.min(page * pageSize, visibleProducts.length)} of {visibleProducts.length}
-          </span>
-          <div className="pagination">
+          <div className="pagination" style={{ marginLeft: "auto" }}>
             <Button
               variant="outline"
               size="sm"
