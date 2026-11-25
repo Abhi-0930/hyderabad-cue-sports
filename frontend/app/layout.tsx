@@ -1,7 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BackToTop, CartDrawer, FloatingWhatsApp, SiteFooter, SiteHeader, StorefrontProvider } from "@/components/storefront-shell";
 import { Toaster } from "sonner";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   title: "Hyderabad Cue Sports — Premium Snooker Boards, Cues & Apparel",

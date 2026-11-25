@@ -17,27 +17,28 @@ export function getSiteBaseUrl(): string {
 }
 
 /**
- * Generates an Amazon/Flipkart-style opaque random alphanumeric token.
+ * Generates an Amazon/Flipkart-style deterministic alphanumeric token.
+ * Uses a stable pseudo-random sequence seeded by the input string
+ * to guarantee identical server-side and client-side hydration.
  */
-export function generateRandomToken(length = 36): string {
+export function generateDeterministicToken(seed: string, length = 36): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < seed.length; i++) {
+    hash ^= seed.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
   let result = "AfmBO";
   for (let i = result.length; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+    hash = Math.imul(hash ^ (i + 1), 0x01000193);
+    const index = Math.abs(hash) % chars.length;
+    result += chars.charAt(index);
   }
   return result;
 }
 
-/**
- * Generates a short random hex string for listing IDs.
- */
-function generateRandomHex(length = 8): string {
-  const hex = "0123456789abcdef";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += hex.charAt(Math.floor(Math.random() * hex.length));
-  }
-  return result;
+export function generateRandomToken(length = 36): string {
+  return generateDeterministicToken("hcs_token_seed", length);
 }
 
 /**
@@ -75,7 +76,7 @@ export function verifyProductUrlSignature(
 
 /**
  * Builds an Amazon & Flipkart-style query-parameterized Product URL.
- * Includes tracking randomness (qid, sr, srsltid, lid) and tamper-proof signature (sig).
+ * Deterministic across SSR and client hydration to eliminate hydration mismatches.
  */
 export function buildProductUrl(
   product: Product,
@@ -88,18 +89,16 @@ export function buildProductUrl(
   const pid = product.id;
   const slug = product.slug;
   const sig = generateProductSignature(pid, slug);
-  const qid = Date.now().toString();
   const sr = options?.position ? `1-${options.position}` : "1-1";
   const ref = options?.ref || `sr_1_${options?.position || 1}`;
-  const lid = `LST_${pid.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()}_${generateRandomHex(6)}`;
-  const srsltid = generateRandomToken(42);
+  const lid = `LST_${pid.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()}_${sig.slice(0, 6)}`;
+  const srsltid = generateDeterministicToken(`${pid}:${slug}`, 42);
 
   const searchParams = new URLSearchParams({
     pid,
     slug,
     lid,
     marketplace: "HYDERABAD_CUE_SPORTS",
-    qid,
     sr,
     ref,
     srsltid,
@@ -115,6 +114,7 @@ export function buildProductUrl(
 
 /**
  * Builds an Amazon & Flipkart-style query-parameterized Shop/Catalog URL.
+ * Deterministic across SSR and client hydration.
  */
 export function buildShopUrl(params?: {
   category?: string;
@@ -135,13 +135,11 @@ export function buildShopUrl(params?: {
     searchParams.set("query", params.query.trim());
   }
 
-  searchParams.set("qid", Date.now().toString());
   if (params?.ref) {
     searchParams.set("ref", params.ref);
   } else {
     searchParams.set("ref", "hcs_cat_browse");
   }
-  searchParams.set("srsltid", generateRandomToken(36));
 
   const relativePath = `/shop?${searchParams.toString()}`;
   if (params?.fullUrl) {
@@ -162,11 +160,11 @@ export function buildHomeUrl(options?: { fullUrl?: boolean }): string {
 
 /**
  * Builds the canonical Login URL with tracking query parameters.
+ * Deterministic across SSR and client hydration.
  */
 export function buildLoginUrl(options?: { fullUrl?: boolean; ref?: string }): string {
   const searchParams = new URLSearchParams({
     ref: options?.ref || "hcs_header_nav",
-    qid: Date.now().toString(),
   });
   const relativePath = `/login?${searchParams.toString()}`;
   if (options?.fullUrl) {

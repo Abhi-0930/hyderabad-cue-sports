@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { formatINR } from "@/data/mockData";
 import { Badge, Button, EmptyState, LoadingState, SectionCard, SelectField, SortIcon } from "@/components/admin/Primitives";
 import type { AccountStatus, CustomerRecord } from "@/types/admin";
+import { API_BASE } from "@/lib/api";
 
 type CustomerView = { mode: "list" } | { mode: "detail"; customerId: string };
 
@@ -31,7 +32,7 @@ export default function CustomerModule() {
       const headers: Record<string, string> = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch("http://localhost:5000/api/admin/customers", {
+      const res = await fetch(`${API_BASE}/api/admin/customers`, {
         credentials: "include",
         headers,
       });
@@ -64,7 +65,7 @@ export default function CustomerModule() {
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      await fetch(`http://localhost:5000/api/admin/customers/${customerId}`, {
+      await fetch(`${API_BASE}/api/admin/customers/${customerId}`, {
         method: "PATCH",
         credentials: "include",
         headers,

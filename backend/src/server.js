@@ -55,17 +55,49 @@ async function buildServer() {
     }),
   });
 
-  const ALLOWED_ORIGINS = new Set([
-    FRONTEND_URL,
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
-  ]);
+  const isAllowedOrigin = (origin) => {
+    if (!origin) return true;
+    if (
+      origin === FRONTEND_URL ||
+      origin === "http://localhost:3000" ||
+      origin === "http://127.0.0.1:3000" ||
+      origin === "http://localhost:3001" ||
+      origin === "http://127.0.0.1:3001" ||
+      origin === "http://localhost:5000" ||
+      origin === "http://127.0.0.1:5000"
+    ) {
+      return true;
+    }
+    try {
+      const parsed = new URL(origin);
+      const hostname = parsed.hostname;
+      // Localhost / Loopback
+      if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") {
+        return true;
+      }
+      // Private LAN subnets (RFC 1918): 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+      if (
+        /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+        /^172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+        /^192\.168\.\d{1,3}\.\d{1,3}$/.test(hostname)
+      ) {
+        return true;
+      }
+    } catch {
+      return false;
+    }
+    return false;
+  };
 
   // 3. CORS & Signed Cookies
   await fastify.register(cors, {
-    origin: Array.from(ALLOWED_ORIGINS),
+    origin: (origin, cb) => {
+      if (isAllowedOrigin(origin)) {
+        cb(null, true);
+        return;
+      }
+      cb(new Error("CORS policy violation: unauthorized origin"), false);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   });
@@ -78,7 +110,7 @@ async function buildServer() {
   fastify.addHook("preHandler", async (request, reply) => {
     if (["POST", "PUT", "PATCH", "DELETE"].includes(request.method)) {
       const origin = request.headers.origin;
-      if (origin && !ALLOWED_ORIGINS.has(origin)) {
+      if (origin && !isAllowedOrigin(origin)) {
         request.log.warn({ origin }, "CSRF Alert: Unauthorized request origin blocked.");
         reply.status(403);
         throw new Error("Cross-origin request blocked by security policy.");

@@ -67,6 +67,7 @@ import type {
   SalesMode,
   ShippingCrate,
 } from "@/types/admin";
+import { API_BASE } from "@/lib/api";
 
 type ProductView =
   | { mode: "list" }
@@ -737,7 +738,7 @@ export default function ProductModule({
     try {
       await Promise.all(
         toDelete.map((id) =>
-          fetch(`http://localhost:5000/api/admin/products/${encodeURIComponent(id)}`, {
+          fetch(`${API_BASE}/api/admin/products/${encodeURIComponent(id)}`, {
             method: "DELETE",
           })
         )
@@ -761,7 +762,7 @@ export default function ProductModule({
       const targets = updated.filter((p) => targetIds.includes(p.id));
       await Promise.all(
         targets.map((prod) =>
-          fetch("http://localhost:5000/api/admin/products", {
+          fetch(`${API_BASE}/api/admin/products`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(prod),
@@ -783,7 +784,7 @@ export default function ProductModule({
         onBack={() => setView({ mode: "list" })}
         onSave={async (saved) => {
           try {
-            const res = await fetch("http://localhost:5000/api/admin/products", {
+            const res = await fetch(`${API_BASE}/api/admin/products`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(saved),
@@ -848,7 +849,7 @@ export default function ProductModule({
           const updatedProduct = { ...product, publication: next };
           setProducts((prev) => prev.map((item) => (item.id === product.id ? updatedProduct : item)));
           try {
-            await fetch("http://localhost:5000/api/admin/products", {
+            await fetch(`${API_BASE}/api/admin/products`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(updatedProduct),
@@ -1042,7 +1043,7 @@ export default function ProductModule({
                           setProducts((prev) => prev.filter((item) => item.id !== product.id));
                           toast.success("Product deleted");
                           try {
-                            await fetch(`http://localhost:5000/api/admin/products/${encodeURIComponent(product.id)}`, {
+                            await fetch(`${API_BASE}/api/admin/products/${encodeURIComponent(product.id)}`, {
                               method: "DELETE",
                             });
                           } catch (err) {

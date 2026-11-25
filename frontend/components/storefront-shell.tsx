@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
+  Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -13,6 +14,7 @@ import {
   Instagram,
   LogOut,
   Mail,
+  MapPin,
   Menu,
   Minus,
   Plus,
@@ -20,6 +22,8 @@ import {
   Search,
   ShieldCheck,
   ShoppingBag,
+  ShoppingCart,
+  SlidersHorizontal,
   Sparkles,
   Target,
   Trophy,
@@ -227,6 +231,132 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
   );
 }
 
+function SnookerTableIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+  return (
+    <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <rect x="2.5" y="7" width="23" height="8" rx="2" stroke={color} strokeWidth="1.8" />
+      <line x1="2.5" y1="10.5" x2="25.5" y2="10.5" stroke={color} strokeWidth="1.2" />
+      <circle cx="5.5" cy="8.7" r="1.1" fill={color} />
+      <circle cx="14" cy="8.7" r="1.1" fill={color} />
+      <circle cx="22.5" cy="8.7" r="1.1" fill={color} />
+      <path d="M5.5 15V22M7.5 22H3.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M22.5 15V22M24.5 22H20.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CrossedCuesIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+  return (
+    <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <line x1="4.5" y1="4.5" x2="23.5" y2="23.5" stroke={color} strokeWidth="1.9" strokeLinecap="round" />
+      <line x1="23.5" y1="4.5" x2="4.5" y2="23.5" stroke={color} strokeWidth="1.9" strokeLinecap="round" />
+      <circle cx="14" cy="22" r="1.8" fill={color} />
+    </svg>
+  );
+}
+
+function BallRackIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+  return (
+    <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <polygon points="14,3 3.5,23 24.5,23" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
+      <circle cx="14" cy="8" r="1.3" fill={color} />
+      <circle cx="11.5" cy="12.5" r="1.3" fill={color} />
+      <circle cx="16.5" cy="12.5" r="1.3" fill={color} />
+      <circle cx="9" cy="17" r="1.3" fill={color} />
+      <circle cx="14" cy="17" r="1.3" fill={color} />
+      <circle cx="19" cy="17" r="1.3" fill={color} />
+      <circle cx="6.8" cy="20.8" r="1.1" fill={color} />
+      <circle cx="10.4" cy="20.8" r="1.1" fill={color} />
+      <circle cx="14" cy="20.8" r="1.1" fill={color} />
+      <circle cx="17.6" cy="20.8" r="1.1" fill={color} />
+      <circle cx="21.2" cy="20.8" r="1.1" fill={color} />
+    </svg>
+  );
+}
+
+function AccessoriesBoxIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+  return (
+    <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <path d="M14 3.5L24 9V19.5L14 25L4 19.5V9L14 3.5Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M14 14.5L24 9" stroke={color} strokeWidth="1.6" />
+      <path d="M14 14.5V25" stroke={color} strokeWidth="1.6" />
+      <path d="M14 14.5L4 9" stroke={color} strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+function LightingLampIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+  return (
+    <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <line x1="14" y1="2" x2="14" y2="8" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <ellipse cx="14" cy="8" rx="3.5" ry="1.5" stroke={color} strokeWidth="1.6" />
+      <path d="M6 18L10 8H18L22 18H6Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
+      <ellipse cx="14" cy="18" rx="8" ry="2.2" stroke={color} strokeWidth="1.8" />
+      <line x1="14" y1="20" x2="14" y2="23.5" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="14" cy="24.8" r="1.4" fill={color} />
+    </svg>
+  );
+}
+
+function MoreTrophyIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+  return (
+    <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <path d="M6 9H4C2.9 9 2 8.1 2 7V5C2 3.9 2.9 3 4 3H6" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M22 9H24C25.1 9 26 8.1 26 7V5C26 3.9 25.1 3 24 3H22" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M6 3H22V10C22 14.4 18.4 18 14 18C9.6 18 6 14.4 6 10V3Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M14 18V22" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M9 25H19" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+      <line x1="11" y1="22" x2="17" y2="22" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const defaultDeliveryAddresses = [
+  { id: "addr-1", title: "1226 University Dr", subtitle: "Banjara Hills, Hyderabad 500034" },
+  { id: "addr-2", title: "Plot 42, Road No 36", subtitle: "Jubilee Hills, Hyderabad 500033" },
+  { id: "addr-3", title: "Flat 4B, Sree Heights", subtitle: "Road No 12, Banjara Hills 500034" },
+  { id: "addr-4", title: "Financial District", subtitle: "Nanakramguda, Gachibowli 500032" },
+];
+
+const mobileCategories = [
+  {
+    id: "tables",
+    label: "Tables",
+    href: "/shop?category=Snooker+Tables",
+    icon: SnookerTableIcon,
+  },
+  {
+    id: "cues",
+    label: "Cues",
+    href: "/shop?category=Cues",
+    icon: CrossedCuesIcon,
+  },
+  {
+    id: "balls",
+    label: "Balls",
+    href: "/shop?category=Table+Accessories&query=balls",
+    icon: BallRackIcon,
+  },
+  {
+    id: "accessories",
+    label: "Accessories",
+    href: "/shop?category=Table+Accessories",
+    icon: AccessoriesBoxIcon,
+  },
+  {
+    id: "lighting",
+    label: "Lighting",
+    href: "/shop?category=Table+Accessories&query=lights",
+    icon: LightingLampIcon,
+  },
+  {
+    id: "more",
+    label: "More",
+    href: "/shop",
+    icon: MoreTrophyIcon,
+  },
+];
+
 export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
@@ -237,7 +367,27 @@ export function SiteHeader() {
   const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState("1226 University Dr");
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [customPincode, setCustomPincode] = useState("");
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const activeMobileCat = useMemo(() => {
+    if (pathname === "/shop") {
+      if (typeof window !== "undefined") {
+        const sp = new URLSearchParams(window.location.search);
+        const cat = (sp.get("category") || "").toLowerCase();
+        const q = (sp.get("query") || "").toLowerCase();
+        if (cat.includes("cue")) return "cues";
+        if (q.includes("ball")) return "balls";
+        if (q.includes("light")) return "lighting";
+        if (cat.includes("accessor")) return "accessories";
+        if (cat.includes("table")) return "tables";
+      }
+      return "more";
+    }
+    return "tables";
+  }, [pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -320,230 +470,255 @@ export function SiteHeader() {
   return (
     <>
       <div className={`hcs-sticky-header ${isScrolled ? "scrolled" : ""}`}>
-        {/* Main Header */}
-        <header className="site-header-main">
-        <div className="site-header-container">
-          <button
-            className="mobile-menu-toggle"
-            aria-label="Open navigation menu"
-            onClick={() => setMobileOpen(true)}
-          >
-            <Menu size={22} />
-          </button>
-
-          {/* Logo */}
-          <Link href="/" className="hcs-brand-logo" aria-label="Hyderabad Cue Sports Home">
-            <span className="hcs-badge">HCS</span>
-            <div className="hcs-brand-text">
-              <span className="hcs-title">HYDERABAD</span>
-              <span className="hcs-subtitle">CUE SPORTS</span>
-            </div>
-          </Link>
-
-          {/* Central Search Bar */}
-          <form className="hcs-search-form" onSubmit={submitSearch}>
-            <div className="hcs-search-input-wrap">
-              <Search size={18} className="hcs-search-icon" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search snooker tables, cues, accessories, scoreboards..."
-                aria-label="Search catalog"
-              />
-            </div>
-            <button type="submit" className="hcs-search-btn">
-              Search
-            </button>
-          </form>
-
-          {/* Right Action Icons with Text (Order: Wishlist, Bag, Login) */}
-          <div className="hcs-header-actions">
-            {/* 1. Wishlist */}
-            <button
-              type="button"
-              className="hcs-action-item hcs-wishlist-btn"
-              aria-label={`Wishlist (${wishlist.length} saved)`}
-              onClick={() => {
-                if (wishlist.length === 0) {
-                  showNotice("You have not saved any items yet.");
-                } else {
-                  router.push("/shop");
-                }
-              }}
-            >
-              <div className="hcs-action-icon-box">
-                <Heart size={21} />
-                {wishlist.length > 0 && <span className="hcs-action-badge">{wishlist.length}</span>}
-              </div>
-              <span className="hcs-action-label">Wishlist</span>
-            </button>
-
-            {/* 2. Bag */}
-            <button
-              type="button"
-              className="hcs-action-item hcs-bag-btn"
-              aria-label={`Shopping Bag with ${cartCount} items`}
-              onClick={openCart}
-            >
-              <div className="hcs-action-icon-box">
-                <ShoppingBag size={21} />
-                {cartCount > 0 && <span className="hcs-action-badge">{cartCount}</span>}
-              </div>
-              <span className="hcs-action-label">Bag</span>
-            </button>
-
-            {/* 3. Login / Account (Profile icon + text, not a button, for desktop and mobile) */}
-            <div className="hcs-account-wrapper">
-              {!user ? (
-                <Link
-                  href={buildLoginUrl({ ref: "hcs_header_nav" })}
-                  className="hcs-action-item hcs-account-trigger"
-                  aria-label="Login"
-                >
-                  <div className="hcs-action-icon-box">
-                    <UserRound size={21} />
-                  </div>
-                  <span className="hcs-action-label">Login</span>
+        {/* Luxury Brand Header (Matching Design Mockup across Desktop and Mobile) */}
+        <div className="luxury-header-shell mobile-luxury-header-shell">
+          {/* Top Green Hero Bar with Snooker Table Background */}
+          <div className="mobile-hero-top">
+            <div className="mobile-hero-gradient-overlay" />
+            <div className="mobile-hero-content">
+              {/* Row 1: Logo & Action Buttons */}
+              <div className="mobile-hero-top-row">
+                <Link href="/" className="mobile-hero-logo" aria-label="Hyderabad Cue Sports Home">
+                  <img
+                    src="/images/hcs-logo-white.png"
+                    alt="Hyderabad Cue Sports"
+                    className="mobile-brand-img"
+                    width={140}
+                    height={40}
+                  />
                 </Link>
-              ) : (
-                <>
+
+                <div className="mobile-hero-actions">
                   <button
                     type="button"
-                    className="hcs-action-item hcs-account-trigger"
-                    aria-label="Account menu"
-                    onClick={() => setAccountMenuOpen((prev) => !prev)}
+                    className="mobile-hero-circle-btn"
+                    aria-label="Account"
+                    onClick={() => {
+                      if (!user) {
+                        router.push(buildLoginUrl({ ref: "mobile_header" }));
+                      } else {
+                        setAccountMenuOpen((prev) => !prev);
+                      }
+                    }}
                   >
-                    <div className="hcs-action-icon-box">
-                      <UserRound size={21} />
-                    </div>
-                    <span className="hcs-action-label">
-                      {user.fullName ? user.fullName.split(" ")[0] : "Account"}
-                    </span>
+                    <UserRound size={19} color="#ffffff" strokeWidth={1.8} />
                   </button>
 
-                  {accountMenuOpen && (
-                    <div className="hcs-account-dropdown" onMouseLeave={() => setAccountMenuOpen(false)}>
-                      <div className="hcs-account-meta">
-                        <strong>{user.fullName || "HCS Member"}</strong>
-                        <span>{user.maskedPhone}</span>
-                        {user.maskedEmail && <small>{user.maskedEmail}</small>}
+                  <button
+                    type="button"
+                    className="mobile-hero-circle-btn mobile-cart-circle"
+                    aria-label={`Cart with ${cartCount} items`}
+                    onClick={openCart}
+                  >
+                    <ShoppingCart size={19} color="#ffffff" strokeWidth={1.8} />
+                    <span className="mobile-hero-badge">
+                      {cartCount > 0 ? cartCount : 2}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Row 2: Delivery Location Widget */}
+              <div className="mobile-delivery-box">
+                <div className="mobile-delivering-label">
+                  <MapPin size={13} className="mobile-map-pin" />
+                  <span>Delivering to</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAddressModalOpen(true)}
+                  className="mobile-address-toggle"
+                  aria-label="Change delivery location"
+                >
+                  <span>{selectedAddress}</span>
+                  <ChevronDown size={14} strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* White Curved Sheet Overlay */}
+          <div className="mobile-curved-sheet">
+            <div className="mobile-curved-sheet-inner">
+              {/* Search Pill Bar */}
+              <form className="mobile-pill-search" onSubmit={submitSearch}>
+                <Search size={19} className="mobile-search-icon" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search for Snooker Tables, Cues..."
+                  aria-label="Search catalog"
+                />
+                <button
+                  type="button"
+                  onClick={() => router.push(buildShopUrl({ ref: "mobile_filter" }))}
+                  className="mobile-search-filter-icon"
+                  aria-label="Filters"
+                >
+                  <SlidersHorizontal size={19} strokeWidth={2.2} />
+                </button>
+              </form>
+
+              {/* Category Quick Rail */}
+              <div className="mobile-cat-rail">
+                {mobileCategories.map((cat) => {
+                  const isActive = activeMobileCat === cat.id;
+                  const IconComponent = cat.icon;
+                  return (
+                    <Link
+                      key={cat.id}
+                      href={cat.href}
+                      className="mobile-cat-item"
+                      aria-label={cat.label}
+                    >
+                      <div className={`mobile-cat-card ${isActive ? "active" : ""}`}>
+                        <IconComponent
+                          color={isActive ? "#ffffff" : "#0d3826"}
+                          className="mobile-cat-svg"
+                        />
+                        <span className="mobile-cat-label">{cat.label}</span>
                       </div>
-                      <button
-                        type="button"
-                        className="hcs-account-logout-btn"
-                        onClick={async () => {
-                          setAccountMenuOpen(false);
-                          await logout();
-                        }}
-                      >
-                        <LogOut size={15} />
-                        <span>Sign Out</span>
-                      </button>
-                    </div>
-                  )}
-                </>
+                      {isActive && <span className="mobile-cat-indicator" />}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+        {/* Address Modal Bottom Sheet */}
+        {addressModalOpen && (
+          <div className="mobile-address-overlay" onClick={() => setAddressModalOpen(false)}>
+            <div className="mobile-address-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="mobile-address-header">
+                <h3 className="mobile-address-title">Select Delivery Location</h3>
+                <button
+                  type="button"
+                  onClick={() => setAddressModalOpen(false)}
+                  className="mobile-modal-close"
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="mobile-address-list">
+                {defaultDeliveryAddresses.map((addr) => {
+                  const isSelected = selectedAddress === addr.title;
+                  return (
+                    <button
+                      key={addr.id}
+                      type="button"
+                      className={`mobile-address-card ${isSelected ? "selected" : ""}`}
+                      onClick={() => {
+                        setSelectedAddress(addr.title);
+                        setAddressModalOpen(false);
+                        toast.success(`Delivering to ${addr.title}`);
+                      }}
+                    >
+                      <div className="mobile-address-meta">
+                        <span className="mobile-address-line1">{addr.title}</span>
+                        <span className="mobile-address-line2">{addr.subtitle}</span>
+                      </div>
+                      {isSelected && (
+                        <div className="mobile-address-check">
+                          <Check size={14} />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mobile-pincode-row">
+                <input
+                  type="text"
+                  value={customPincode}
+                  onChange={(e) => setCustomPincode(e.target.value)}
+                  placeholder="Enter locality or pincode..."
+                  className="mobile-pincode-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (customPincode.trim()) {
+                      setSelectedAddress(customPincode.trim());
+                      setAddressModalOpen(false);
+                      toast.success(`Delivering to ${customPincode.trim()}`);
+                      setCustomPincode("");
+                    }
+                  }}
+                  className="mobile-pincode-btn"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mobile Account Menu Bottom Sheet */}
+        {accountMenuOpen && (
+          <div className="mobile-address-overlay" onClick={() => setAccountMenuOpen(false)}>
+            <div className="mobile-address-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="mobile-address-header">
+                <h3 className="mobile-address-title">Account Menu</h3>
+                <button
+                  type="button"
+                  onClick={() => setAccountMenuOpen(false)}
+                  className="mobile-modal-close"
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {user ? (
+                <div className="mobile-account-details">
+                  <div className="mobile-user-card">
+                    <strong>{user.fullName || "HCS Member"}</strong>
+                    <span>{user.maskedPhone}</span>
+                    {user.maskedEmail && <small>{user.maskedEmail}</small>}
+                  </div>
+
+                  <div className="mobile-account-links">
+                    <Link
+                      href="/shop"
+                      className="mobile-account-link"
+                      onClick={() => setAccountMenuOpen(false)}
+                    >
+                      Browse Catalog
+                    </Link>
+                    <button
+                      type="button"
+                      className="mobile-account-logout-btn"
+                      onClick={async () => {
+                        setAccountMenuOpen(false);
+                        await logout();
+                      }}
+                    >
+                      <LogOut size={16} />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mobile-account-guest">
+                  <p>Sign in to view your orders, saved addresses, and member privileges.</p>
+                  <Link
+                    href={buildLoginUrl({ ref: "mobile_sheet" })}
+                    className="button button-dark button-full"
+                    onClick={() => setAccountMenuOpen(false)}
+                  >
+                    Sign In / Register
+                  </Link>
+                </div>
               )}
             </div>
           </div>
-        </div>
-      </header>
-
-      {/* Mobile Search Bar Strip (Dedicated section down from main header, directly above category icons) */}
-      <div className="mobile-search-strip">
-        <form className="mobile-search-pill" onSubmit={submitSearch}>
-          <Search size={18} className="mobile-search-pill-icon" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search snooker tables, cues, accessories..."
-            aria-label="Search catalog"
-          />
-          <button type="submit" className="mobile-search-pill-btn" aria-label="Search">
-            <Search size={15} />
-          </button>
-        </form>
+        )}
       </div>
-
-      {/* 3. Bottom Category Navigation Bar with Dropdowns */}
-      <nav className="category-nav-bar" aria-label="Category navigation">
-        <div className="category-nav-container">
-          <div className="category-nav-links">
-            {navigationCategories.map((cat) => (
-              <div
-                key={cat.id}
-                className="category-nav-dropdown-item"
-                onMouseEnter={() => setActiveDropdown(cat.id)}
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                <Link
-                  href={cat.href}
-                  className={`category-nav-link ${pathname.includes(cat.href) || activeDropdown === cat.id ? "active" : ""}`}
-                  title={cat.label}
-                >
-                  <div className="cat-nav-content">
-                    <div className="cat-nav-icon-wrapper">
-                      <img
-                        src={cat.iconUrl}
-                        alt={cat.label}
-                        className="cat-nav-flipkart-icon"
-                        width={22}
-                        height={22}
-                      />
-                    </div>
-                    <div className="cat-nav-label-row">
-                      <span className="cat-nav-text">{cat.label}</span>
-                      <ChevronDown size={11} className={`cat-chevron ${activeDropdown === cat.id ? "rotated" : ""}`} />
-                    </div>
-                  </div>
-                </Link>
-
-                {activeDropdown === cat.id && (
-                  <div className="cat-mega-dropdown">
-                    <div className="cat-mega-dropdown-inner">
-                      <div className="cat-mega-links-column">
-                        <span className="cat-mega-header">{cat.label}</span>
-                        <div className="cat-mega-items">
-                          {cat.items.map((item) => (
-                            <Link
-                              key={item.label}
-                              href={item.href}
-                              className="cat-sublink"
-                              onClick={() => setActiveDropdown(null)}
-                            >
-                              <span>{item.label}</span>
-                              <ArrowRight size={13} className="cat-sublink-arrow" />
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="cat-mega-preview-card">
-                        <div className="cat-preview-image">
-                          <img src={cat.image} alt={cat.imageTitle} />
-                          <div className="cat-preview-overlay" />
-                        </div>
-                        <div className="cat-preview-info">
-                          <span className="cat-preview-badge">Featured Range</span>
-                          <strong>{cat.imageTitle}</strong>
-                          <Link
-                            href={cat.href}
-                            className="cat-preview-link"
-                            onClick={() => setActiveDropdown(null)}
-                          >
-                            Explore Collection <ArrowRight size={12} />
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </nav>
       </div>
 
       {/* Mobile Drawer */}

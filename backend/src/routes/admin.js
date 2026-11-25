@@ -162,9 +162,16 @@ async function adminRoutes(fastify) {
     } catch (err) {
       request.log.error(err);
       reply.status(500);
+      const isDbTimeout =
+        err.message?.includes("Connection terminated") ||
+        err.message?.includes("connection timeout") ||
+        err.message?.includes("ETIMEDOUT");
+
       return {
         success: false,
-        message: "An internal database or authentication error occurred.",
+        message: isDbTimeout
+          ? "Database connection timed out. If on a college or restricted Wi-Fi network, port 6543 is blocked — please switch to mobile hotspot."
+          : "An internal database or authentication error occurred.",
         error: err.message,
       };
     }

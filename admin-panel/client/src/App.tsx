@@ -18,6 +18,7 @@ import { phase3Orders } from "./data/phase3Data";
 import { AdminShell } from "./components/admin/AdminShell";
 import { useRealtimeOrders } from "./hooks/useRealtimeOrders";
 import type { NavKey, OrderRecord, ProductRecord } from "./types/admin";
+import { API_BASE } from "@/lib/api";
 
 function AdminApp() {
   const [adminUser, setAdminUser] = useState<AdminUser | null>(() => {
@@ -37,7 +38,7 @@ function AdminApp() {
   useEffect(() => {
     const fetchAdminProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/admin/products");
+        const res = await fetch(`${API_BASE}/api/admin/products`);
         if (res.ok) {
           const json = await res.json();
           if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -72,7 +73,7 @@ function AdminApp() {
         if (adminUser.token) {
           headers["Authorization"] = `Bearer ${adminUser.token}`;
         }
-        const res = await fetch("http://localhost:5000/api/admin/me", {
+        const res = await fetch(`${API_BASE}/api/admin/me`, {
           credentials: "include",
           headers,
         });
@@ -89,7 +90,7 @@ function AdminApp() {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:5000/api/admin/logout", {
+      await fetch(`${API_BASE}/api/admin/logout`, {
         method: "POST",
         credentials: "include",
       });

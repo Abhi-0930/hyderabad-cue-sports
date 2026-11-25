@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import { API_BASE } from "@/lib/api";
 
 export type AdminUser = {
   email: string;
@@ -32,7 +33,7 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/admin/login", {
+      const response = await fetch(`${API_BASE}/api/admin/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,12 +48,27 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
         localStorage.setItem("hcs_admin_user", JSON.stringify(data.admin));
         onLogin(data.admin);
       } else {
-        const msg = data?.message || "Invalid admin credentials. Please try again.";
-        const extra = data?.error ? ` (${data.error})` : "";
-        setError(`${msg}${extra}`);
+        const errorText = `${data?.message || "Invalid admin credentials."} ${data?.error || ""}`.toLowerCase();
+        const isDbTimeout =
+          errorText.includes("timeout") ||
+          errorText.includes("connection terminated") ||
+          errorText.includes("port 6543");
+
+        if (isDbTimeout) {
+          setError(
+            data?.message ||
+              "Database connection timed out. If on a college or restricted Wi-Fi, port 6543 is blocked — please connect to your mobile hotspot."
+          );
+        } else {
+          const msg = data?.message || "Invalid admin credentials. Please try again.";
+          const extra = data?.error ? ` (${data.error})` : "";
+          setError(`${msg}${extra}`);
+        }
       }
-    } catch {
-      setError("Unable to connect to security server. Please ensure backend is running on port 5000.");
+    } catch (err: any) {
+      console.error("Admin login network/server error:", err);
+      const detail = err?.message ? ` (${err.message})` : "";
+      setError(`Unable to connect to security server at ${API_BASE}. Please ensure backend is running.${detail}`);
     } finally {
       setLoading(false);
     }
