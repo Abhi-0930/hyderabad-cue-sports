@@ -535,13 +535,8 @@ export function SiteHeader() {
                   />
                 </Link>
               </div>
-            </div>
-          </div>
 
-          {/* White Curved Sheet Overlay */}
-          <div className="mobile-curved-sheet">
-            <div className="mobile-curved-sheet-inner">
-              {/* Search Pill Bar */}
+              {/* Row 3: Floating Search Pill Bar on Green Hero */}
               <form className="mobile-pill-search" onSubmit={submitSearch}>
                 <Search size={19} className="mobile-search-icon" />
                 <input
@@ -560,7 +555,12 @@ export function SiteHeader() {
                   <SlidersHorizontal size={19} strokeWidth={2.2} />
                 </button>
               </form>
+            </div>
+          </div>
 
+          {/* Soft Linen Curved Sheet with Categories */}
+          <div className="mobile-curved-sheet">
+            <div className="mobile-curved-sheet-inner">
               {/* Category Quick Rail */}
               <div className="mobile-cat-rail">
                 {mobileCategories.map((cat) => {
