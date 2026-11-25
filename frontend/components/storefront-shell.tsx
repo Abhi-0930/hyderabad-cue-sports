@@ -288,12 +288,11 @@ function AccessoriesBoxIcon({ className = "", color = "currentColor" }: { classN
 function LightingLampIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
   return (
     <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <line x1="14" y1="2" x2="14" y2="8" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
-      <ellipse cx="14" cy="8" rx="3.5" ry="1.5" stroke={color} strokeWidth="1.6" />
-      <path d="M6 18L10 8H18L22 18H6Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
-      <ellipse cx="14" cy="18" rx="8" ry="2.2" stroke={color} strokeWidth="1.8" />
-      <line x1="14" y1="20" x2="14" y2="23.5" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
-      <circle cx="14" cy="24.8" r="1.4" fill={color} />
+      <line x1="14" y1="3" x2="14" y2="9" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M5 16C5.5 11.2 9.2 8.5 14 8.5C18.8 8.5 22.5 11.2 23 16" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <line x1="4" y1="16" x2="24" y2="16" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="14" cy="18.5" r="1.6" fill={color} />
+      <line x1="14" y1="20" x2="14" y2="23" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }
@@ -476,17 +475,23 @@ export function SiteHeader() {
           <div className="mobile-hero-top">
             <div className="mobile-hero-gradient-overlay" />
             <div className="mobile-hero-content">
-              {/* Row 1: Logo & Action Buttons */}
+              {/* Row 1: Delivery Location on Left, User & Cart Buttons on Right */}
               <div className="mobile-hero-top-row">
-                <Link href="/" className="mobile-hero-logo" aria-label="Hyderabad Cue Sports Home">
-                  <img
-                    src="/images/hcs-logo-white.png"
-                    alt="Hyderabad Cue Sports"
-                    className="mobile-brand-img"
-                    width={140}
-                    height={40}
-                  />
-                </Link>
+                <div className="mobile-delivery-box">
+                  <div className="mobile-delivering-label">
+                    <MapPin size={13} className="mobile-map-pin" />
+                    <span>Delivering to</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAddressModalOpen(true)}
+                    className="mobile-address-toggle"
+                    aria-label="Change delivery location"
+                  >
+                    <span>{selectedAddress}</span>
+                    <ChevronDown size={14} strokeWidth={2.5} />
+                  </button>
+                </div>
 
                 <div className="mobile-hero-actions">
                   <button
@@ -518,21 +523,17 @@ export function SiteHeader() {
                 </div>
               </div>
 
-              {/* Row 2: Delivery Location Widget */}
-              <div className="mobile-delivery-box">
-                <div className="mobile-delivering-label">
-                  <MapPin size={13} className="mobile-map-pin" />
-                  <span>Delivering to</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setAddressModalOpen(true)}
-                  className="mobile-address-toggle"
-                  aria-label="Change delivery location"
-                >
-                  <span>{selectedAddress}</span>
-                  <ChevronDown size={14} strokeWidth={2.5} />
-                </button>
+              {/* Row 2: HCS Brand Logo */}
+              <div className="mobile-hero-brand-row">
+                <Link href="/" className="mobile-hero-logo" aria-label="Hyderabad Cue Sports Home">
+                  <img
+                    src="/images/hcs-logo-white.png"
+                    alt="Hyderabad Cue Sports"
+                    className="mobile-brand-img"
+                    width={150}
+                    height={44}
+                  />
+                </Link>
               </div>
             </div>
           </div>
@@ -569,17 +570,31 @@ export function SiteHeader() {
                     <Link
                       key={cat.id}
                       href={cat.href}
-                      className="mobile-cat-item"
+                      className={`mobile-cat-item ${isActive ? "active" : ""}`}
                       aria-label={cat.label}
                     >
-                      <div className={`mobile-cat-card ${isActive ? "active" : ""}`}>
-                        <IconComponent
-                          color={isActive ? "#ffffff" : "#0d3826"}
-                          className="mobile-cat-svg"
-                        />
-                        <span className="mobile-cat-label">{cat.label}</span>
-                      </div>
-                      {isActive && <span className="mobile-cat-indicator" />}
+                      {isActive ? (
+                        <>
+                          <div className="mobile-cat-card active">
+                            <IconComponent
+                              color="#ffffff"
+                              className="mobile-cat-svg"
+                            />
+                            <span className="mobile-cat-label-inside">{cat.label}</span>
+                          </div>
+                          <span className="mobile-cat-indicator" />
+                        </>
+                      ) : (
+                        <>
+                          <div className="mobile-cat-card inactive">
+                            <IconComponent
+                              color="#0b3824"
+                              className="mobile-cat-svg"
+                            />
+                          </div>
+                          <span className="mobile-cat-label-outside">{cat.label}</span>
+                        </>
+                      )}
                     </Link>
                   );
                 })}

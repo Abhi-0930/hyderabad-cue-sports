@@ -788,12 +788,12 @@
 /* 1. Green Hero Top Area */
 .mobile-hero-top {
   position: relative;
-  background-color: #0b2e1e;
+  background-color: #072414;
   background-image: url('/images/mobile-header-bg.jpg');
   background-repeat: no-repeat;
-  background-position: right center;
+  background-position: right top;
   background-size: cover;
-  padding: 16px 14px 36px 14px;
+  padding: 16px 14px 44px 14px;
   overflow: hidden;
   box-sizing: border-box;
   width: 100%;
@@ -802,7 +802,7 @@
 .mobile-hero-gradient-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #092619 0%, rgba(13, 56, 38, 0.94) 44%, rgba(13, 56, 38, 0.55) 70%, rgba(13, 56, 38, 0.15) 100%);
+  background: linear-gradient(90deg, rgba(7, 36, 20, 0.4) 0%, rgba(7, 36, 20, 0.15) 45%, rgba(7, 36, 20, 0) 65%);
   pointer-events: none;
 }
 
@@ -824,21 +824,48 @@
   box-sizing: border-box;
 }
 
-.mobile-hero-logo {
+/* Location delivery widget (Top Left) */
+.mobile-delivery-box {
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobile-delivering-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #9eccb4;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.mobile-delivering-label .mobile-map-pin {
+  color: #34d399;
+}
+
+.mobile-address-toggle {
   display: inline-flex;
   align-items: center;
-  text-decoration: none;
-  flex-shrink: 0;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  text-align: left;
 }
 
-.mobile-brand-img {
-  height: 34px;
-  width: auto;
-  max-width: 130px;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25));
+.mobile-address-toggle svg {
+  color: rgba(255, 255, 255, 0.9);
 }
 
+/* Top Right Action Icons */
 .mobile-hero-actions {
   display: flex;
   align-items: center;
@@ -892,45 +919,27 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Location delivery widget */
-.mobile-delivery-box {
+/* Row 2: Brand Logo Row */
+.mobile-hero-brand-row {
   margin-top: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.mobile-delivering-label {
+  margin-bottom: 2px;
   display: flex;
   align-items: center;
-  gap: 5px;
-  color: #9eccb4;
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
 }
 
-.mobile-delivering-label .mobile-map-pin {
-  color: #34d399;
-}
-
-.mobile-address-toggle {
+.mobile-hero-logo {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: #ffffff;
-  font-size: 17px;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: -0.01em;
-  text-align: left;
+  text-decoration: none;
+  flex-shrink: 0;
 }
 
-.mobile-address-toggle svg {
-  color: rgba(255, 255, 255, 0.9);
+.mobile-brand-img {
+  height: 38px;
+  width: auto;
+  max-width: 155px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25));
 }
 
 /* 2. White Curved Sheet Overlay */
@@ -1033,67 +1042,76 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
   text-decoration: none;
   flex-shrink: 0;
   scroll-snap-align: start;
   cursor: pointer;
+  min-width: 60px;
 }
 
-.mobile-cat-card {
+/* Active card: dark green squircle with icon and label inside */
+.mobile-cat-card.active {
   width: 66px;
   height: 66px;
   border-radius: 19px;
+  background: #0b3824;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 4px;
+  box-shadow: 0 4px 14px rgba(11, 56, 36, 0.28);
+  transition: transform 0.15s ease;
 }
 
-.mobile-cat-card:active {
+.mobile-cat-card.active:active {
   transform: scale(0.94);
 }
 
-/* Active card (Tables by default or active category) */
-.mobile-cat-card.active {
-  background: #0d3826;
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(13, 56, 38, 0.26);
-}
-
-.mobile-cat-card.active .mobile-cat-label {
-  color: #ffffff;
-  font-weight: 700;
-}
-
-/* Inactive cards */
-.mobile-cat-card:not(.active) {
-  background: #f8faf8;
-  border: 1px solid #e7ede9;
-  color: #0d3826;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-}
-
-.mobile-cat-card:not(.active) .mobile-cat-label {
-  color: #1b3829;
-  font-weight: 500;
-}
-
-.mobile-cat-label {
+.mobile-cat-label-inside {
   font-size: 11px;
-  text-align: center;
-  line-height: 1.1;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
   margin: 0;
+  text-align: center;
 }
 
 .mobile-cat-indicator {
-  width: 28px;
-  height: 3.5px;
-  background: #0d3826;
+  width: 32px;
+  height: 4px;
+  background: #0b3824;
   border-radius: 999px;
-  margin-top: 2px;
+  margin-top: 4px;
+}
+
+/* Inactive cards: white squircle with icon only, label outside below */
+.mobile-cat-card.inactive {
+  width: 58px;
+  height: 50px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #edf2ee;
+  color: #0b3824;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-cat-card.inactive:active {
+  transform: scale(0.94);
+}
+
+.mobile-cat-label-outside {
+  font-size: 11px;
+  font-weight: 500;
+  color: #112d1f;
+  text-align: center;
+  margin-top: 6px;
+  line-height: 1.1;
 }
 
 /* Address modal bottom sheet */
@@ -1302,7 +1320,9 @@
    ============================================================================== */
 @media (min-width: 961px) {
   .mobile-hero-top {
-    padding: 22px 32px 42px 32px;
+    padding: 24px 32px 54px 32px;
+    background-size: 780px auto;
+    background-position: right 50px bottom -10px;
   }
 
   .mobile-brand-img {
