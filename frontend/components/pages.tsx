@@ -15,7 +15,7 @@ export function HomePage() {
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
-  const { showNotice, addToCart, wishlist, toggleWishlist } = useStorefront();
+  const { showNotice } = useStorefront();
   const sliderRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -52,8 +52,8 @@ export function HomePage() {
 
   const slide = (direction: "left" | "right") => {
     if (!sliderRef.current) return;
-    const cardWidth = 285;
-    const offset = sliderRef.current.clientWidth > 700 ? cardWidth * 2 : cardWidth;
+    // Card widths are fluid (4 per row on desktop), so move by one full view
+    const offset = sliderRef.current.clientWidth;
     sliderRef.current.scrollBy({
       left: direction === "left" ? -offset : offset,
       behavior: "smooth"
@@ -136,45 +136,11 @@ export function HomePage() {
     </section>
 
     <section className="featured-products-section">
-      {/* Bottom Corner Decorative Ribbon Waves with Metallic Gold Accent */}
-      <svg className="featured-corner-bl" viewBox="0 0 320 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="featuredWaveGoldBL" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#d4af37" />
-            <stop offset="50%" stopColor="#f3e5ab" />
-            <stop offset="100%" stopColor="#c6a15b" />
-          </linearGradient>
-          <linearGradient id="featuredWaveGreenBL" x1="0%" y1="0%" x2="40%" y2="100%">
-            <stop offset="0%" stopColor="#14462e" />
-            <stop offset="100%" stopColor="#0b2b1a" />
-          </linearGradient>
-        </defs>
-        <path d="M 0 15 C 90 25 200 88 320 90 L 0 90 Z" fill="url(#featuredWaveGreenBL)" />
-        <path d="M 0 15 C 90 25 200 88 320 90" stroke="url(#featuredWaveGoldBL)" strokeWidth="3" strokeLinecap="round" />
-      </svg>
-      <svg className="featured-corner-br" viewBox="0 0 320 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="featuredWaveGoldBR" x1="100%" y1="0%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#d4af37" />
-            <stop offset="50%" stopColor="#f3e5ab" />
-            <stop offset="100%" stopColor="#c6a15b" />
-          </linearGradient>
-          <linearGradient id="featuredWaveGreenBR" x1="100%" y1="0%" x2="60%" y2="100%">
-            <stop offset="0%" stopColor="#14462e" />
-            <stop offset="100%" stopColor="#0b2b1a" />
-          </linearGradient>
-        </defs>
-        <path d="M 0 90 C 120 88 230 25 320 15 L 320 90 Z" fill="url(#featuredWaveGreenBR)" />
-        <path d="M 0 90 C 120 88 230 25 320 15" stroke="url(#featuredWaveGoldBR)" strokeWidth="3" strokeLinecap="round" />
-      </svg>
-
-      <div className="container featured-products-container">
-        {/* Header with Featured Products title and View All / arrow */}
+      <div className="featured-products-container">
         <div className="featured-header">
-          <div className="featured-title-wrap">
-            <span className="featured-gold-rule" />
+          <div>
+            <span className="featured-eyebrow">Handpicked for you</span>
             <h2 className="featured-title">Featured Products</h2>
-            <span className="featured-gold-rule" />
           </div>
           <Link href="/shop" className="featured-view-all" aria-label="View all featured products">
             <ChevronRight size={22} className="view-all-arrow" />
@@ -193,41 +159,9 @@ export function HomePage() {
           </button>
 
           <div className="featured-cards-grid" ref={sliderRef}>
-            {featuredProductsList.map((product) => {
-              const isSaved = wishlist.includes(product.id);
-              return (
-                <div key={product.id} className="featured-product-card">
-                  <div className="featured-card-media">
-                    <Link href={buildProductUrl(product, { ref: "hcs_hp_featured" })} className="featured-media-link">
-                      <img src={product.image} alt={product.name} />
-                    </Link>
-                    <button
-                      className={`featured-wishlist-btn ${isSaved ? "saved" : ""}`}
-                      onClick={() => toggleWishlist(product.id)}
-                      aria-label={isSaved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
-                    >
-                      <Heart size={16} fill={isSaved ? "#d12c2c" : "none"} color={isSaved ? "#d12c2c" : "#2b332d"} />
-                    </button>
-                  </div>
-
-                  <div className="featured-card-body">
-                    <h3 className="featured-product-name">
-                      <Link href={buildProductUrl(product, { ref: "hcs_hp_featured" })}>{product.name}</Link>
-                    </h3>
-                    <div className="featured-product-price">
-                      {formatInr(product.price)}
-                    </div>
-
-                    <div className="featured-card-actions">
-                      <AnimatedAddToCart
-                        onAdd={() => addToCart(product, 1, false)}
-                        className="button-full"
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {featuredProductsList.map((product) => (
+              <ProductCard key={product.id} product={product} refTag="hcs_hp_featured" />
+            ))}
           </div>
 
           <button
