@@ -1091,15 +1091,6 @@
   white-space: nowrap;
 }
 
-.luxury-cat-indicator {
-  display: block;
-  width: 32px;
-  height: 3.5px;
-  border-radius: 9999px;
-  background: #072a1b;
-  margin-top: 4px;
-}
-
 /* Mobile Curved Bottom Sheet & Squircle Category Cards */
 .mobile-curved-sheet {
   display: block;
@@ -1195,15 +1186,6 @@
   /* Two-word names ("Cue Accessories") wrap under the card instead of colliding */
   max-width: 72px;
   line-height: 1.2;
-}
-
-.mobile-cat-indicator {
-  display: block;
-  width: 30px;
-  height: 3.5px;
-  border-radius: 9999px;
-  background: #072a1b;
-  margin-top: 5px;
 }
 
 /* Address modal bottom sheet */
@@ -1568,12 +1550,6 @@
   .luxury-cat-label {
     font-size: 13.5px;
     font-weight: 500;
-  }
-
-  .luxury-cat-indicator {
-    width: 28px;
-    height: 3px;
-    margin-top: 4px;
   }
 
   .mobile-address-overlay {
