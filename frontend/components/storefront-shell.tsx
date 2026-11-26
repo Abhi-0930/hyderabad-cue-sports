@@ -383,7 +383,6 @@ function CategoryRailView({ variant, activeId }: { variant: "desktop" | "mobile"
                 <IconComponent color={isActive ? "#ffffff" : "#0b3824"} className="luxury-cat-icon" />
                 <span className="luxury-cat-label">{cat.label}</span>
               </div>
-              {isActive && <span className="luxury-cat-indicator" />}
             </Link>
           );
         })}
@@ -410,7 +409,6 @@ function CategoryRailView({ variant, activeId }: { variant: "desktop" | "mobile"
                 <span className="mobile-cat-outside-label">{cat.label}</span>
               </>
             )}
-            {isActive && <span className="mobile-cat-indicator" />}
           </Link>
         );
       })}
