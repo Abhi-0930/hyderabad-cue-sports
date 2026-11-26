@@ -1078,11 +1078,6 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }
 
-.luxury-cat-capsule.inactive:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-}
-
 .luxury-cat-icon {
   flex-shrink: 0;
   width: 20px;
@@ -1143,7 +1138,9 @@
 
 /* Active category card: dark forest green rounded card */
 .mobile-cat-card.active {
-  width: 68px;
+  min-width: 68px;
+  padding: 0 8px;
+  box-sizing: border-box;
   height: 74px;
   border-radius: 20px;
   background: #072a1b;
@@ -1161,6 +1158,7 @@
 }
 
 .mobile-cat-card-label {
+  white-space: nowrap;
   font-size: 11.5px;
   font-weight: 700;
   color: #ffffff;
@@ -1182,10 +1180,6 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.mobile-cat-card.inactive:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
 
 .mobile-cat-card.inactive .mobile-cat-card-icon {
   width: 24px;
@@ -1198,8 +1192,9 @@
   font-weight: 600;
   color: #1e293b;
   text-align: center;
-  white-space: nowrap;
-  line-height: 1;
+  /* Two-word names ("Cue Accessories") wrap under the card instead of colliding */
+  max-width: 72px;
+  line-height: 1.2;
 }
 
 .mobile-cat-indicator {
