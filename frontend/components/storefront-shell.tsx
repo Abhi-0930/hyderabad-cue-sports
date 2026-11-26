@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { createContext, Suspense, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Check,
@@ -274,41 +274,55 @@ function BallRackIcon({ className = "", color = "currentColor" }: { className?: 
   );
 }
 
-function AccessoriesBoxIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+/* Wall scoreboard: frame, two bead rails and a score window */
+function ScoreboardIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
   return (
     <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <path d="M14 3.5L24 9V19.5L14 25L4 19.5V9L14 3.5Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
-      <path d="M14 14.5L24 9" stroke={color} strokeWidth="1.6" />
-      <path d="M14 14.5V25" stroke={color} strokeWidth="1.6" />
-      <path d="M14 14.5L4 9" stroke={color} strokeWidth="1.6" />
+      <rect x="3" y="5" width="22" height="18" rx="2" stroke={color} strokeWidth="1.8" />
+      <line x1="6.5" y1="10.5" x2="21.5" y2="10.5" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="6.5" y1="17.5" x2="21.5" y2="17.5" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      <circle cx="9" cy="10.5" r="1.5" fill={color} />
+      <circle cx="12.5" cy="10.5" r="1.5" fill={color} />
+      <circle cx="18" cy="17.5" r="1.5" fill={color} />
+      <path d="M11 14H17" stroke={color} strokeWidth="1.2" strokeLinecap="round" strokeDasharray="1.5 1.5" />
     </svg>
   );
 }
 
-function LightingLampIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+/* Table corner seen from above: two cushion rails meeting at a pocket with its net */
+function TablePocketIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
   return (
     <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <line x1="14" y1="3" x2="14" y2="9" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M5 16C5.5 11.2 9.2 8.5 14 8.5C18.8 8.5 22.5 11.2 23 16" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
-      <line x1="4" y1="16" x2="24" y2="16" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="14" cy="18.5" r="1.6" fill={color} />
-      <line x1="14" y1="20" x2="14" y2="23" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M11 3.5H25M3.5 11V25" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M11 9H25M9 11V25" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      <circle cx="7" cy="7" r="4.2" stroke={color} strokeWidth="1.8" />
+      <path d="M5 5.5L9 9M5.2 8.6L8.6 5.2" stroke={color} strokeWidth="1.1" strokeLinecap="round" />
     </svg>
   );
 }
 
-function MoreTrophyIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+/* Cube of cue chalk with the cupped top where the tip is chalked */
+function ChalkIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
   return (
     <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <path d="M6 9H4C2.9 9 2 8.1 2 7V5C2 3.9 2.9 3 4 3H6" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
-      <path d="M22 9H24C25.1 9 26 8.1 26 7V5C26 3.9 25.1 3 24 3H22" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
-      <path d="M6 3H22V10C22 14.4 18.4 18 14 18C9.6 18 6 14.4 6 10V3Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
-      <path d="M14 18V22" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M9 25H19" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
-      <line x1="11" y1="22" x2="17" y2="22" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M14 4L23.5 8.5V19.5L14 24L4.5 19.5V8.5L14 4Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M4.5 8.5L14 13L23.5 8.5M14 13V24" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+      <ellipse cx="14" cy="8.5" rx="4" ry="1.9" stroke={color} strokeWidth="1.4" />
     </svg>
   );
 }
+
+/* Hanging canopy light over the table */
+function TableLightIcon({ className = "", color = "currentColor" }: { className?: string; color?: string }) {
+  return (
+    <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <path d="M14 3V8" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M5 16C5.5 11.2 9.2 8.5 14 8.5C18.8 8.5 22.5 11.2 23 16H5Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M9 20L8 23M14 20V23.5M19 20L20 23" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 
 const defaultDeliveryAddresses = [
   { id: "addr-1", title: "1226 University Dr", subtitle: "Banjara Hills, Hyderabad 500034" },
@@ -317,44 +331,105 @@ const defaultDeliveryAddresses = [
   { id: "addr-4", title: "Financial District", subtitle: "Nanakramguda, Gachibowli 500032" },
 ];
 
-const mobileCategories = [
-  {
-    id: "tables",
-    label: "Tables",
-    href: "/shop?category=Snooker+Tables",
-    icon: SnookerTableIcon,
-  },
-  {
-    id: "cues",
-    label: "Cues",
-    href: "/shop?category=Cues",
-    icon: CrossedCuesIcon,
-  },
-  {
-    id: "balls",
-    label: "Balls",
-    href: "/shop?category=Table+Accessories&query=balls",
-    icon: BallRackIcon,
-  },
-  {
-    id: "accessories",
-    label: "Accessories",
-    href: "/shop?category=Table+Accessories",
-    icon: AccessoriesBoxIcon,
-  },
-  {
-    id: "lighting",
-    label: "Lighting",
-    href: "/shop?category=Table+Accessories&query=lights",
-    icon: LightingLampIcon,
-  },
-  {
-    id: "more",
-    label: "More",
-    href: "/shop",
-    icon: MoreTrophyIcon,
-  },
-];
+/* Navbar categories — the product groups Hyderabad Cue Sports sells.
+   Each pill links to an existing catalogue category, narrowed by a search word
+   where the group is a subset of it (same convention as the dropdown menus).
+   Products for "Table Parts" are tagged "table parts" in lib/products.ts. */
+type NavCategory = {
+  id: string;
+  label: string;
+  icon: typeof SnookerTableIcon;
+  category: string;
+  /** ?category= values (lower-case) that count as this pill */
+  matches: string[];
+  query?: string;
+};
+
+const mobileCategories: (NavCategory & { href: string })[] = ([
+  { id: "tables", label: "Tables", icon: SnookerTableIcon, category: "Snooker Tables", matches: ["snooker tables"] },
+  { id: "table-parts", label: "Table Parts", icon: TablePocketIcon, category: "Table Accessories", matches: ["table accessories"], query: "table parts" },
+  { id: "balls", label: "Balls", icon: BallRackIcon, category: "Table Accessories", matches: ["table accessories"], query: "balls" },
+  // "Cue Equipment" also pulls in products filed as "Cues" (see ShopPage filter)
+  { id: "cues", label: "Cues", icon: CrossedCuesIcon, category: "Cue Equipment", matches: ["cue equipment", "cues"] },
+  { id: "cue-accessories", label: "Cue Accessories", icon: ChalkIcon, category: "Cue Equipment", matches: ["cue equipment", "cues"], query: "cue accessories" },
+  { id: "scoreboards", label: "Scoreboards", icon: ScoreboardIcon, category: "Scoreboards", matches: ["scoreboards"] },
+  { id: "table-lights", label: "Table Lights", icon: TableLightIcon, category: "Table Accessories", matches: ["table accessories"], query: "lights" },
+] as NavCategory[]).map((c) => ({
+  ...c,
+  href: `/shop?${new URLSearchParams(c.query ? { category: c.category, query: c.query } : { category: c.category })}`,
+}));
+
+/** Which navbar pill is active. Reads the URL via hooks (not window), so the
+ *  server and browser render the same thing and it updates on every navigation. */
+function useActiveCategory(): string | null {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  if (pathname !== "/shop") return null;
+  const cat = (searchParams.get("category") || "").toLowerCase();
+  const query = (searchParams.get("query") || "").toLowerCase();
+  return mobileCategories.find((c) => c.matches.includes(cat) && (c.query ?? "") === query)?.id ?? null;
+}
+
+function CategoryRailView({ variant, activeId }: { variant: "desktop" | "mobile"; activeId: string | null }) {
+  if (variant === "desktop") {
+    return (
+      <div className="luxury-cat-rail">
+        {mobileCategories.map((cat) => {
+          const isActive = activeId === cat.id;
+          const IconComponent = cat.icon;
+          return (
+            <Link key={cat.id} href={cat.href} className={`luxury-cat-pill-item ${isActive ? "active" : ""}`} aria-label={cat.label}>
+              <div className={`luxury-cat-capsule ${isActive ? "active" : "inactive"}`}>
+                <IconComponent color={isActive ? "#ffffff" : "#0b3824"} className="luxury-cat-icon" />
+                <span className="luxury-cat-label">{cat.label}</span>
+              </div>
+              {isActive && <span className="luxury-cat-indicator" />}
+            </Link>
+          );
+        })}
+      </div>
+    );
+  }
+  return (
+    <div className="mobile-cat-rail">
+      {mobileCategories.map((cat) => {
+        const isActive = activeId === cat.id;
+        const IconComponent = cat.icon;
+        return (
+          <Link key={cat.id} href={cat.href} className={`mobile-cat-item ${isActive ? "active" : ""}`} aria-label={cat.label}>
+            {isActive ? (
+              <div className="mobile-cat-card active">
+                <IconComponent color="#ffffff" className="mobile-cat-card-icon" />
+                <span className="mobile-cat-card-label">{cat.label}</span>
+              </div>
+            ) : (
+              <>
+                <div className="mobile-cat-card inactive">
+                  <IconComponent color="#072a1b" className="mobile-cat-card-icon" />
+                </div>
+                <span className="mobile-cat-outside-label">{cat.label}</span>
+              </>
+            )}
+            {isActive && <span className="mobile-cat-indicator" />}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+function ActiveCategoryRail({ variant }: { variant: "desktop" | "mobile" }) {
+  return <CategoryRailView variant={variant} activeId={useActiveCategory()} />;
+}
+
+/* useSearchParams needs a Suspense boundary; the fallback is the same rail with nothing highlighted */
+function CategoryRail({ variant }: { variant: "desktop" | "mobile" }) {
+  return (
+    <Suspense fallback={<CategoryRailView variant={variant} activeId={null} />}>
+      <ActiveCategoryRail variant={variant} />
+    </Suspense>
+  );
+}
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -370,23 +445,6 @@ export function SiteHeader() {
   const [addressModalOpen, setAddressModalOpen] = useState(false);
   const [customPincode, setCustomPincode] = useState("");
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  const activeMobileCat = useMemo(() => {
-    if (pathname === "/shop") {
-      if (typeof window !== "undefined") {
-        const sp = new URLSearchParams(window.location.search);
-        const cat = (sp.get("category") || "").toLowerCase();
-        const q = (sp.get("query") || "").toLowerCase();
-        if (cat.includes("cue")) return "cues";
-        if (q.includes("ball")) return "balls";
-        if (q.includes("light")) return "lighting";
-        if (cat.includes("accessor")) return "accessories";
-        if (cat.includes("table")) return "tables";
-      }
-      return "more";
-    }
-    return "tables";
-  }, [pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -561,29 +619,7 @@ export function SiteHeader() {
 
               {/* Row 3 on Desktop: Horizontal Category Capsule Rail (Hidden on Mobile) */}
               <div className="desktop-cat-rail-container">
-                <div className="luxury-cat-rail">
-                  {mobileCategories.map((cat) => {
-                    const isActive = activeMobileCat === cat.id;
-                    const IconComponent = cat.icon;
-                    return (
-                      <Link
-                        key={cat.id}
-                        href={cat.href}
-                        className={`luxury-cat-pill-item ${isActive ? "active" : ""}`}
-                        aria-label={cat.label}
-                      >
-                        <div className={`luxury-cat-capsule ${isActive ? "active" : "inactive"}`}>
-                          <IconComponent
-                            color={isActive ? "#ffffff" : "#0b3824"}
-                            className="luxury-cat-icon"
-                          />
-                          <span className="luxury-cat-label">{cat.label}</span>
-                        </div>
-                        {isActive && <span className="luxury-cat-indicator" />}
-                      </Link>
-                    );
-                  })}
-                </div>
+                <CategoryRail variant="desktop" />
               </div>
             </div>
           </div>
@@ -611,35 +647,7 @@ export function SiteHeader() {
             </form>
 
             {/* Mobile SQUIRCLE Category Cards Rail */}
-            <div className="mobile-cat-rail">
-              {mobileCategories.map((cat) => {
-                const isActive = activeMobileCat === cat.id;
-                const IconComponent = cat.icon;
-                return (
-                  <Link
-                    key={cat.id}
-                    href={cat.href}
-                    className={`mobile-cat-item ${isActive ? "active" : ""}`}
-                    aria-label={cat.label}
-                  >
-                    {isActive ? (
-                      <div className="mobile-cat-card active">
-                        <IconComponent color="#ffffff" className="mobile-cat-card-icon" />
-                        <span className="mobile-cat-card-label">{cat.label}</span>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="mobile-cat-card inactive">
-                          <IconComponent color="#072a1b" className="mobile-cat-card-icon" />
-                        </div>
-                        <span className="mobile-cat-outside-label">{cat.label}</span>
-                      </>
-                    )}
-                    {isActive && <span className="mobile-cat-indicator" />}
-                  </Link>
-                );
-              })}
-            </div>
+            <CategoryRail variant="mobile" />
           </div>
 
         {/* Address Modal Bottom Sheet */}
