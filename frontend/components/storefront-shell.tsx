@@ -472,26 +472,21 @@ export function SiteHeader() {
         {/* Luxury Brand Header (Matching Design Mockup across Desktop and Mobile) */}
         <div className="luxury-header-shell mobile-luxury-header-shell">
           {/* Top Green Hero Bar with Snooker Table Background */}
+          {/* Luxury Hero Navigation Shell */}
           <div className="mobile-hero-top">
             <div className="mobile-hero-gradient-overlay" />
             <div className="mobile-hero-content">
-              {/* Row 1: Delivery Location on Left, User & Cart Buttons on Right */}
+              {/* Row 1: Logo on Left, User & Cart Buttons on Right */}
               <div className="mobile-hero-top-row">
-                <div className="mobile-delivery-box">
-                  <div className="mobile-delivering-label">
-                    <MapPin size={13} className="mobile-map-pin" />
-                    <span>Delivering to</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setAddressModalOpen(true)}
-                    className="mobile-address-toggle"
-                    aria-label="Change delivery location"
-                  >
-                    <span>{selectedAddress}</span>
-                    <ChevronDown size={14} strokeWidth={2.5} />
-                  </button>
-                </div>
+                <Link href="/" className="mobile-hero-logo" aria-label="Hyderabad Cue Sports Home">
+                  <img
+                    src="/images/hcs-logo-white.png"
+                    alt="Hyderabad Cue Sports"
+                    className="mobile-brand-img"
+                    width={150}
+                    height={44}
+                  />
+                </Link>
 
                 <div className="mobile-hero-actions">
                   <button
@@ -523,82 +518,127 @@ export function SiteHeader() {
                 </div>
               </div>
 
-              {/* Row 2: HCS Brand Logo */}
-              <div className="mobile-hero-brand-row">
-                <Link href="/" className="mobile-hero-logo" aria-label="Hyderabad Cue Sports Home">
-                  <img
-                    src="/images/hcs-logo-white.png"
-                    alt="Hyderabad Cue Sports"
-                    className="mobile-brand-img"
-                    width={150}
-                    height={44}
-                  />
-                </Link>
+              {/* Row 2: Location Delivery Box (+ Desktop Search Pill) */}
+              <div className="mobile-hero-mid-row">
+                <div className="mobile-delivery-box">
+                  <div className="mobile-delivering-label">
+                    <MapPin size={13} className="mobile-map-pin" />
+                    <span>Delivering to</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAddressModalOpen(true)}
+                    className="mobile-address-toggle"
+                    aria-label="Change delivery location"
+                  >
+                    <span>{selectedAddress}</span>
+                    <ChevronDown size={14} strokeWidth={2.5} />
+                  </button>
+                </div>
+
+                {/* Desktop Search Pill (Hidden on Mobile) */}
+                <div className="desktop-search-wrapper">
+                  <form className="mobile-pill-search desktop-pill-search" onSubmit={submitSearch}>
+                    <Search size={19} className="mobile-search-icon" />
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Search for Snooker Tables, Cues..."
+                      aria-label="Search catalog"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => router.push(buildShopUrl({ ref: "filter" }))}
+                      className="mobile-search-filter-icon"
+                      aria-label="Filters"
+                    >
+                      <SlidersHorizontal size={19} strokeWidth={2.2} />
+                    </button>
+                  </form>
+                </div>
               </div>
 
-              {/* Row 3: Floating Search Pill Bar on Green Hero */}
-              <form className="mobile-pill-search" onSubmit={submitSearch}>
-                <Search size={19} className="mobile-search-icon" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search for Snooker Tables, Cues..."
-                  aria-label="Search catalog"
-                />
-                <button
-                  type="button"
-                  onClick={() => router.push(buildShopUrl({ ref: "mobile_filter" }))}
-                  className="mobile-search-filter-icon"
-                  aria-label="Filters"
-                >
-                  <SlidersHorizontal size={19} strokeWidth={2.2} />
-                </button>
-              </form>
+              {/* Row 3 on Desktop: Horizontal Category Capsule Rail (Hidden on Mobile) */}
+              <div className="desktop-cat-rail-container">
+                <div className="luxury-cat-rail">
+                  {mobileCategories.map((cat) => {
+                    const isActive = activeMobileCat === cat.id;
+                    const IconComponent = cat.icon;
+                    return (
+                      <Link
+                        key={cat.id}
+                        href={cat.href}
+                        className={`luxury-cat-pill-item ${isActive ? "active" : ""}`}
+                        aria-label={cat.label}
+                      >
+                        <div className={`luxury-cat-capsule ${isActive ? "active" : "inactive"}`}>
+                          <IconComponent
+                            color={isActive ? "#ffffff" : "#0b3824"}
+                            className="luxury-cat-icon"
+                          />
+                          <span className="luxury-cat-label">{cat.label}</span>
+                        </div>
+                        {isActive && <span className="luxury-cat-indicator" />}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Soft Linen Curved Sheet with Categories */}
+          {/* Mobile Curved Bottom Sheet (Hidden on Desktop) */}
           <div className="mobile-curved-sheet">
-            <div className="mobile-curved-sheet-inner">
-              {/* Category Quick Rail */}
-              <div className="mobile-cat-rail">
-                {mobileCategories.map((cat) => {
-                  const isActive = activeMobileCat === cat.id;
-                  const IconComponent = cat.icon;
-                  return (
-                    <Link
-                      key={cat.id}
-                      href={cat.href}
-                      className={`mobile-cat-item ${isActive ? "active" : ""}`}
-                      aria-label={cat.label}
-                    >
-                      {isActive ? (
-                        <>
-                          <div className="mobile-cat-card active">
-                            <IconComponent
-                              color="#ffffff"
-                              className="mobile-cat-svg"
-                            />
-                            <span className="mobile-cat-label-inside">{cat.label}</span>
-                          </div>
-                          <span className="mobile-cat-indicator" />
-                        </>
-                      ) : (
-                        <>
-                          <div className="mobile-cat-card inactive">
-                            <IconComponent
-                              color="#0b3824"
-                              className="mobile-cat-svg"
-                            />
-                          </div>
-                          <span className="mobile-cat-label-outside">{cat.label}</span>
-                        </>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
+            {/* Mobile Search Pill Bar inside Sheet */}
+            <form className="mobile-pill-search" onSubmit={submitSearch}>
+              <Search size={19} className="mobile-search-icon" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search for Snooker Tables, Cues..."
+                aria-label="Search catalog"
+              />
+              <button
+                type="button"
+                onClick={() => router.push(buildShopUrl({ ref: "mobile_filter" }))}
+                className="mobile-search-filter-icon"
+                aria-label="Filters"
+              >
+                <SlidersHorizontal size={19} strokeWidth={2.2} />
+              </button>
+            </form>
+
+            {/* Mobile SQUIRCLE Category Cards Rail */}
+            <div className="mobile-cat-rail">
+              {mobileCategories.map((cat) => {
+                const isActive = activeMobileCat === cat.id;
+                const IconComponent = cat.icon;
+                return (
+                  <Link
+                    key={cat.id}
+                    href={cat.href}
+                    className={`mobile-cat-item ${isActive ? "active" : ""}`}
+                    aria-label={cat.label}
+                  >
+                    {isActive ? (
+                      <div className="mobile-cat-card active">
+                        <IconComponent color="#ffffff" className="mobile-cat-card-icon" />
+                        <span className="mobile-cat-card-label">{cat.label}</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mobile-cat-card inactive">
+                          <IconComponent color="#072a1b" className="mobile-cat-card-icon" />
+                        </div>
+                        <span className="mobile-cat-outside-label">{cat.label}</span>
+                      </>
+                    )}
+                    {isActive && <span className="mobile-cat-indicator" />}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
