@@ -1044,6 +1044,16 @@
   cursor: pointer;
 }
 
+/* No box outline after a mouse click; keyboard users still get a ring */
+.luxury-cat-pill-item:focus {
+  outline: none;
+}
+
+.luxury-cat-pill-item:focus-visible .luxury-cat-capsule {
+  outline: 2px solid #1f8a4c;
+  outline-offset: 2px;
+}
+
 .luxury-cat-capsule {
   display: inline-flex;
   align-items: center;
@@ -1418,49 +1428,157 @@
     display: block !important;
   }
 
+  /* Tall photographic header that fades to white behind the category pills.
+     All sizes scale with viewport width (designed at 1536px) and clamp at the ends. */
   .mobile-hero-top {
-    padding: 24px 44px 22px 44px;
+    padding: 14px clamp(24px, 3vw, 48px) 8px;
     background-size: cover;
-    background-position: right top;
+    background-position: center 42%;
+    background-color: #ffffff;
+  }
+
+  .mobile-hero-gradient-overlay {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.85) 78%, #ffffff 100%),
+      linear-gradient(90deg, rgba(7, 36, 20, 0.45) 0%, rgba(7, 36, 20, 0.15) 40%, rgba(7, 36, 20, 0) 65%);
+  }
+
+  .mobile-hero-content {
+    max-width: 1400px;
+  }
+
+  .mobile-hero-top-row {
+    align-items: center;
   }
 
   .mobile-brand-img {
-    height: 44px;
+    height: 36px;
+    max-width: none;
+  }
+
+  .mobile-hero-actions {
+    gap: 10px;
   }
 
   .mobile-hero-circle-btn {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
+    background: rgba(7, 36, 20, 0.28);
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
   }
 
+  .mobile-hero-circle-btn svg {
+    width: 19px;
+    height: 19px;
+    stroke-width: 1.7;
+  }
+
+  .mobile-hero-badge {
+    top: -4px;
+    right: -4px;
+    background: #1f8a4c;
+  }
+
+  /* Location on the left, search bar centred on the page */
   .mobile-hero-mid-row {
-    margin-top: 20px;
-    justify-content: flex-start;
-    gap: 32px;
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 560px) 1fr;
+    align-items: center;
+    gap: clamp(20px, 3vw, 40px);
+  }
+
+  .mobile-delivery-box {
+    gap: 1px;
+    flex-shrink: 0;
+  }
+
+  .mobile-delivering-label {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 11.5px;
+  }
+
+  .mobile-delivering-label .mobile-map-pin {
+    color: #ffffff;
+  }
+
+  .mobile-address-toggle {
+    font-size: 15px;
+  }
+
+  .desktop-search-wrapper {
+    grid-column: 2;
+    min-width: 0;
   }
 
   .desktop-pill-search {
-    width: 480px;
-    max-width: 480px;
-    height: 46px;
+    width: 100%;
+    max-width: none;
+    height: 42px;
+    padding: 0 16px;
+    gap: 10px;
+    border: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   }
 
-  .luxury-cat-rail-container {
-    margin-top: 22px;
+  .desktop-pill-search .mobile-search-icon,
+  .desktop-pill-search .mobile-search-filter-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .desktop-pill-search input {
+    font-size: 14px;
+  }
+
+  .desktop-cat-rail-container {
+    max-width: none;
+    margin-top: 14px;
   }
 
   .luxury-cat-rail {
     justify-content: flex-start;
-    gap: 14px;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 2px 2px 4px;
+  }
+
+  /* Centre the pills; auto margins (unlike justify-content: center) stay
+     scrollable instead of clipping the first pill if the row ever overflows */
+  .luxury-cat-pill-item:first-child {
+    margin-left: auto;
+  }
+
+  .luxury-cat-pill-item:last-child {
+    margin-right: auto;
   }
 
   .luxury-cat-capsule {
-    height: 46px;
-    padding: 0 22px;
+    justify-content: center;
+    height: 38px;
+    padding: 0 18px;
+    gap: 8px;
+  }
+
+  .luxury-cat-capsule.inactive {
+    border: 1px solid rgba(7, 42, 27, 0.08);
+    box-shadow: 0 2px 10px rgba(7, 42, 27, 0.08);
+  }
+
+  .luxury-cat-icon {
+    width: 18px;
+    height: 18px;
   }
 
   .luxury-cat-label {
-    font-size: 14px;
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+
+  .luxury-cat-indicator {
+    width: 28px;
+    height: 3px;
+    margin-top: 4px;
   }
 
   .mobile-address-overlay {
