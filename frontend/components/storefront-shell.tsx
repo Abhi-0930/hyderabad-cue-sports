@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { createContext, Suspense, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
+  ArrowUp,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -43,7 +44,8 @@ type StorefrontContextValue = {
   cartOpen: boolean;
   notice: string;
   user: AuthUser | null;
-  addToCart: (product: Product, quantity?: number, openSidebar?: boolean) => void;
+  /** openSidebar=false shows a toast instead, unless notify=false (the floating cart bar is the feedback) */
+  addToCart: (product: Product, quantity?: number, openSidebar?: boolean, notify?: boolean) => void;
   updateQuantity: (id: string, delta: number) => void;
   removeFromCart: (id: string) => void;
   toggleWishlist: (id: string) => void;
@@ -160,7 +162,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     cartOpen,
     notice,
     user,
-    addToCart: (product, quantity = 1, openSidebar = true) => {
+    addToCart: (product, quantity = 1, openSidebar = true, notify = true) => {
       setCart((current) => {
         const existing = current.find((item) => item.id === product.id);
         if (existing) return current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item);
@@ -168,7 +170,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
       });
       if (openSidebar) {
         setCartOpen(true);
-      } else {
+      } else if (notify) {
         toast.success(`Added ${product.name} to bag`, {
           action: {
             label: "View bag",
@@ -443,16 +445,43 @@ export function SiteHeader() {
   const [customPincode, setCustomPincode] = useState("");
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  // Sticky search: the compact bar (search + account + cart) switches on the moment the
+  // header's own search box reaches the bar's search position, so the search box appears
+  // to simply stop at the top while the location and category rows scroll away.
+  const headerRef = useRef<HTMLDivElement>(null);
+  const compactSearchRef = useRef<HTMLFormElement>(null);
+  const [showCompactBar, setShowCompactBar] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 30);
+      const header = headerRef.current;
+      if (!header) return setShowCompactBar(false);
+      // Whichever header search is on screen (desktop pill or the mobile one)
+      const headerSearch = Array.from(header.querySelectorAll<HTMLElement>(".mobile-pill-search")).find((el) => el.offsetWidth > 0);
+      if (!headerSearch) return setShowCompactBar(header.getBoundingClientRect().bottom <= 0);
+      // Where the bar's search box sits from the top of the screen (offsetTop ignores transforms)
+      const stickTop = compactSearchRef.current?.offsetTop ?? 11;
+      setShowCompactBar(headerSearch.getBoundingClientRect().top <= stickTop);
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [pathname]);
 
   if (pathname === "/login") return null;
+
+  const handleAccountClick = (ref: string) => {
+    if (!user) {
+      router.push(buildLoginUrl({ ref }));
+    } else {
+      setAccountMenuOpen((prev) => !prev);
+    }
+  };
 
   const navigationCategories = [
     {
@@ -523,9 +552,39 @@ export function SiteHeader() {
 
   return (
     <>
+      {/* Compact sticky bar: slides down once the main header is out of view */}
+      <div className={`hcs-compact-bar ${showCompactBar ? "is-visible" : ""}`} inert={!showCompactBar} aria-hidden={!showCompactBar}>
+        <div className="hcs-compact-inner">
+          <Link href="/" className="hcs-compact-logo" aria-label="Hyderabad Cue Sports Home">
+            <img src="/images/hcs-logo-white.png" alt="Hyderabad Cue Sports" width={120} height={35} />
+          </Link>
+
+          <form className="hcs-compact-search" role="search" onSubmit={submitSearch} ref={compactSearchRef}>
+            <Search size={19} aria-hidden="true" />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search for Snooker Tables, Cues..."
+              aria-label="Search catalog"
+            />
+          </form>
+
+          <div className="hcs-compact-actions">
+            <button type="button" className="hcs-compact-btn" aria-label="Account" onClick={() => handleAccountClick("compact_header")}>
+              <UserRound size={19} strokeWidth={1.8} />
+            </button>
+            <button type="button" className="hcs-compact-btn" aria-label={`Cart with ${cartCount} items`} onClick={openCart}>
+              <ShoppingCart size={19} strokeWidth={1.8} />
+              {cartCount > 0 && <span className="hcs-compact-badge">{cartCount > 99 ? "99+" : cartCount}</span>}
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className={`hcs-sticky-header ${isScrolled ? "scrolled" : ""}`}>
         {/* Luxury Brand Header (Matching Design Mockup across Desktop and Mobile) */}
-        <div className="luxury-header-shell mobile-luxury-header-shell">
+        <div className="luxury-header-shell mobile-luxury-header-shell" ref={headerRef}>
           {/* Top Green Hero Bar with Snooker Table Background */}
           {/* Luxury Hero Navigation Shell */}
           <div className="mobile-hero-top">
@@ -548,13 +607,7 @@ export function SiteHeader() {
                     type="button"
                     className="mobile-hero-circle-btn"
                     aria-label="Account"
-                    onClick={() => {
-                      if (!user) {
-                        router.push(buildLoginUrl({ ref: "mobile_header" }));
-                      } else {
-                        setAccountMenuOpen((prev) => !prev);
-                      }
-                    }}
+                    onClick={() => handleAccountClick("mobile_header")}
                   >
                     <UserRound size={19} color="#ffffff" strokeWidth={1.8} />
                   </button>
@@ -919,16 +972,101 @@ export function ToastNotice() {
   return null;
 }
 
+/** Zepto/BigBasket-style bar pinned to the bottom while the bag has items:
+ *  thumbnails, item count + subtotal, and "View cart" which opens the bag drawer. */
+export function FloatingCartBar() {
+  const { cart, cartOpen, openCart } = useStorefront();
+  const pathname = usePathname();
+  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const visible = count > 0 && !cartOpen && pathname !== "/login";
+  const shownSubtotal = useCountUp(subtotal);
+
+  // Bounce the bar when an added item "lands" (timed to the fly-to-cart animation).
+  // Alternating two identical keyframe classes restarts the CSS animation each time.
+  const prevCount = useRef(count);
+  const [bumps, setBumps] = useState(0);
+  useEffect(() => {
+    const grew = count > prevCount.current;
+    prevCount.current = count;
+    if (!grew) return;
+    const timer = setTimeout(() => setBumps((n) => n + 1), prefersReducedMotion() ? 0 : FLY_DURATION_MS - 60);
+    return () => clearTimeout(timer);
+  }, [count]);
+
+  // Lets CSS lift the WhatsApp button above the bar on small screens
+  useEffect(() => {
+    document.body.toggleAttribute("data-cart-bar", visible);
+    return () => document.body.removeAttribute("data-cart-bar");
+  }, [visible]);
+
+  if (!visible) return null;
+  const thumbs = cart.slice(-3).reverse();
+  const bumpClass = bumps === 0 ? "" : bumps % 2 ? "bump-a" : "bump-b";
+  return (
+    <button type="button" className={`floating-cart-bar ${bumpClass}`} onClick={openCart} aria-label={`View cart: ${count} ${count === 1 ? "item" : "items"}, ${formatInr(subtotal)}`}>
+      <span className="fcb-thumbs" aria-hidden="true">
+        {thumbs.map((item) => <img key={item.id} src={item.image} alt="" />)}
+      </span>
+      <span className="fcb-info">
+        <strong>
+          <span className="fcb-count">
+            <span key={count}>{count}</span>
+          </span>{" "}
+          {count === 1 ? "item" : "items"}
+        </strong>
+        <span>{formatInr(shownSubtotal)}</span>
+      </span>
+      <span className="fcb-cta" aria-hidden="true">
+        <ArrowRight size={18} strokeWidth={2.4} />
+      </span>
+    </button>
+  );
+}
+
+/** Zomato/Swiggy-style "↑ Back to top" pill, centred just under the sticky top bar.
+ *  Shows once you're well down the page and start scrolling back up; hides while
+ *  scrolling down (so it never covers what you're reading) and near the top. */
+const BACK_TO_TOP_SHOW_AFTER = 700; // px scrolled before it can appear
+const BACK_TO_TOP_HIDE_BELOW = 400; // always hidden this close to the top
+
 export function BackToTop() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
+
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 520);
-    window.addEventListener("scroll", onScroll);
+    setVisible(false);
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      if (Math.abs(delta) < 4) return; // ignore tiny jitters
+      if (y < BACK_TO_TOP_HIDE_BELOW) setVisible(false);
+      else if (delta < 0 && y > BACK_TO_TOP_SHOW_AFTER) setVisible(true);
+      else if (delta > 0) setVisible(false);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [pathname]);
+
   if (pathname === "/login") return null;
-  return visible ? <button className="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top"><ChevronRight size={17} /></button> : null;
+  return (
+    <button
+      type="button"
+      className={`back-to-top-pill ${visible ? "is-visible" : ""}`}
+      onClick={() => {
+        setVisible(false);
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+      }}
+      aria-label="Back to top"
+      aria-hidden={!visible}
+      tabIndex={visible ? 0 : -1}
+    >
+      <ArrowUp size={15} strokeWidth={2.4} aria-hidden="true" />
+      Back to top
+    </button>
+  );
 }
 
 export function SiteFooter() {
@@ -938,11 +1076,193 @@ export function SiteFooter() {
   return <footer className="site-footer" id="contact"><div className="footer-main container"><div className="footer-brand"><Link href="/" className="wordmark wordmark-light"><span className="wordmark-mark">HCS</span><span><strong>HYDERABAD</strong><em>CUE SPORTS</em></span></Link><p>A considered home for premium snooker tables and the objects that make the game feel like yours.</p><div className="footer-socials"><button aria-label="Instagram"><Instagram size={17} /></button><button aria-label="Email" onClick={() => showNotice("Sample email support: support@example.com")}><Mail size={17} /></button></div></div><div className="footer-column"><h4>Shop</h4><Link href="/shop">All Snooker Tables</Link><Link href="/shop?size=8+FT">8 FT Tables</Link><Link href="/shop?size=10+FT">10 FT Tables</Link><Link href="/shop?size=12+FT">12 FT Tables</Link><Link href="/shop?type=accessory">Accessories</Link></div><div className="footer-column"><h4>Information</h4><Link href="/#about">About Us</Link><button onClick={() => showNotice("Shipping information is placeholder content for this demo.")}>Shipping Information</button><button onClick={() => showNotice("Return policy is placeholder content for this demo.")}>Return Policy</button><button onClick={() => showNotice("Privacy policy is placeholder content for this demo.")}>Privacy Policy</button><button onClick={() => showNotice("Terms are placeholder content for this demo.")}>Terms &amp; Conditions</button></div><div className="footer-column"><h4>Customer Support</h4><button onClick={() => showNotice("Sample WhatsApp support: +91 00000 00000")}>WhatsApp Support</button><button onClick={() => showNotice("Sample email support: support@example.com")}>Email Support</button><button onClick={() => showNotice("FAQ content will be added with the final catalogue.")}>Frequently Asked Questions</button><div className="footer-contact-card"><Truck size={17} /><span>Serving customers across India<br /><small>Direct shipping &amp; professional installation available</small></span></div></div></div><div className="footer-bottom container"><span>© 2026 HYDERABAD CUE SPORTS. Demo brand experience.</span><span className="payment-icons"><span>UPI</span><span>VISA</span><span>•••</span></span><button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Back to top <ChevronRight size={14} /></button></div></footer>;
 }
 
-export function ProductCard({ product, onQuickView }: { product: Product; onQuickView: (product: Product) => void }) {
-  const { wishlist, toggleWishlist, addToCart } = useStorefront();
+/** Product card used on the homepage carousel, the shop grid and "You may also like":
+ *  framed photo + heart, name, then price with a compact ADD button. */
+export function ProductCard({ product, refTag = "hcs_cat_item" }: { product: Product; refTag?: string; onQuickView?: (product: Product) => void }) {
+  const { wishlist, toggleWishlist } = useStorefront();
   const isSaved = wishlist.includes(product.id);
-  const productHref = buildProductUrl(product, { ref: "hcs_cat_item" });
-  return <article className="product-card"><div className="product-image-wrap"><Link href={productHref} className="product-image-link"><img src={product.image} alt={product.name} /><span className="image-wash" /></Link>{product.badge && <span className="product-badge">{product.badge}</span>}<button className={`wishlist-button ${isSaved ? "saved" : ""}`} onClick={() => toggleWishlist(product.id)} aria-label={isSaved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}><Heart size={18} fill={isSaved ? "currentColor" : "none"} /></button><button className="quick-view-button" onClick={() => onQuickView(product)}>Quick view <ArrowRight size={14} /></button></div><div className="product-card-body"><Link href={productHref}><span className="product-kicker">{product.size} · {product.category}</span><h3>{product.name}</h3></Link><div className="product-card-meta"><div><strong>{formatInr(product.price)}</strong>{product.compareAt && <del>{formatInr(product.compareAt)}</del>}</div><span className={`availability ${product.availability.toLowerCase().replaceAll(" ", "-")}`}>{product.availability}</span></div><button className="text-button" onClick={() => addToCart(product)}>Add to bag <ArrowRight size={15} /></button></div></article>;
+  const productHref = buildProductUrl(product, { ref: refTag });
+  return (
+    <article className="product-card">
+      <div className="product-image-wrap">
+        <Link href={productHref} className="product-image-link">
+          <img src={product.image} alt={product.name} />
+        </Link>
+        <button
+          className={`wishlist-button ${isSaved ? "saved" : ""}`}
+          onClick={() => toggleWishlist(product.id)}
+          aria-label={isSaved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+        >
+          <Heart size={19} strokeWidth={1.8} fill={isSaved ? "currentColor" : "none"} />
+        </button>
+      </div>
+      <div className="product-card-body">
+        <Link href={productHref} className="product-card-title">
+          <h3>{product.name}</h3>
+        </Link>
+        <div className="product-card-meta">
+          <strong>{formatInr(product.price)}</strong>
+          <CompactAddButton product={product} />
+        </div>
+      </div>
+    </article>
+  );
+}
+
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** How long the photo takes to fly into the cart bar; the bar bounces when it lands. */
+const FLY_DURATION_MS = 700;
+
+/**
+ * BigBasket/Zepto-style "fly to cart": a copy of the product photo shrinks and
+ * travels in an arc from the card to the floating cart bar's thumbnails.
+ * The outer box moves sideways while the inner image rises then drops, so the
+ * two motions combine into a curved path.
+ */
+function flyToCart(source: HTMLImageElement | null | undefined) {
+  if (!source || prefersReducedMotion()) return;
+  const from = source.getBoundingClientRect();
+  if (!from.width || !from.height) return;
+
+  // Aim at the bar's first thumbnail; on the first add the bar isn't mounted yet,
+  // so aim where it will appear (bottom centre pill, ~137px wide with one item).
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const thumbs = document.querySelector(".fcb-thumbs")?.getBoundingClientRect();
+  const barBottom = vw <= 960 ? 56 : 64; // matches .floating-cart-bar bottom (before safe-area)
+  const toX = thumbs ? thumbs.left + 16 : vw / 2 - 68 + 23;
+  const toY = thumbs ? thumbs.top + thumbs.height / 2 : vh - barBottom - 23;
+
+  // Small round thumbnail (not the full photo); ends near the bar's 38px thumbnail size
+  const size = 56;
+  const startX = from.left + from.width / 2;
+  const startY = from.top + from.height / 2;
+  const dx = toX - startX;
+  const dy = toY - startY;
+  const lift = Math.min(110, 40 + Math.abs(dy) * 0.2);
+
+  const ghost = document.createElement("div");
+  ghost.className = "fly-to-cart-ghost";
+  Object.assign(ghost.style, {
+    left: `${startX - size / 2}px`,
+    top: `${startY - size / 2}px`,
+    width: `${size}px`,
+    height: `${size}px`,
+  });
+  const img = document.createElement("img");
+  img.src = source.currentSrc || source.src;
+  img.alt = "";
+  ghost.appendChild(img);
+  document.body.appendChild(ghost);
+
+  ghost.animate([{ transform: "translateX(0)" }, { transform: `translateX(${dx}px)` }], {
+    duration: FLY_DURATION_MS,
+    easing: "cubic-bezier(0.3, 0.6, 0.4, 1)",
+  });
+  const fall = img.animate(
+    [
+      { transform: "translateY(0) scale(0.6)", opacity: 0, easing: "cubic-bezier(0.2, 0.6, 0.4, 1)" },
+      { transform: "translateY(-6px) scale(1)", opacity: 1, offset: 0.12, easing: "cubic-bezier(0.2, 0.6, 0.4, 1)" },
+      { transform: `translateY(${-lift}px) scale(0.95)`, opacity: 1, offset: 0.35, easing: "cubic-bezier(0.5, 0, 0.75, 0.4)" },
+      { transform: `translateY(${dy}px) scale(0.6)`, opacity: 0.85 },
+    ],
+    { duration: FLY_DURATION_MS },
+  );
+  const cleanup = () => ghost.remove();
+  fall.onfinish = cleanup;
+  fall.oncancel = cleanup;
+  // Backup in case the finish event is delayed (e.g. the tab is in the background)
+  window.setTimeout(cleanup, FLY_DURATION_MS + 300);
+}
+
+/** Eases a number from its previous value to the new one (for the cart total). */
+function useCountUp(value: number, duration = 450) {
+  const [display, setDisplay] = useState(value);
+  const shownRef = useRef(value);
+  useEffect(() => {
+    const from = shownRef.current;
+    if (from === value) return;
+    if (prefersReducedMotion()) {
+      shownRef.current = value;
+      setDisplay(value);
+      return;
+    }
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const next = Math.round(from + (value - from) * eased);
+      shownRef.current = next;
+      setDisplay(next);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value, duration]);
+  return display;
+}
+
+/** Small "ADD" button (Zepto/Blinkit style). Once the item is in the bag it
+ *  becomes a − qty + stepper; going below 1 removes it from the bag.
+ *  ADD and + send the product photo flying into the cart bar. */
+export function CompactAddButton({ product }: { product: Product }) {
+  const { cart, addToCart, updateQuantity, removeFromCart } = useStorefront();
+  const quantity = cart.find((item) => item.id === product.id)?.quantity ?? 0;
+
+  // Direction of the last change, so the number slides up on + and down on −
+  const prevQuantity = useRef(quantity);
+  const direction = quantity >= prevQuantity.current ? "up" : "down";
+  useEffect(() => {
+    prevQuantity.current = quantity;
+  }, [quantity]);
+
+  const cardImage = (el: HTMLElement) =>
+    el.closest(".product-card")?.querySelector<HTMLImageElement>(".product-image-wrap img");
+
+  if (quantity === 0) {
+    return (
+      <button
+        type="button"
+        className="compact-add-btn"
+        onClick={(e) => {
+          flyToCart(cardImage(e.currentTarget));
+          addToCart(product, 1, false, false);
+        }}
+        aria-label={`Add ${product.name} to bag`}
+      >
+        <Plus size={14} strokeWidth={2.4} />
+        ADD
+      </button>
+    );
+  }
+
+  return (
+    <div className="compact-stepper" role="group" aria-label={`${product.name} quantity`}>
+      <button
+        type="button"
+        onClick={() => (quantity === 1 ? removeFromCart(product.id) : updateQuantity(product.id, -1))}
+        aria-label={quantity === 1 ? `Remove ${product.name} from bag` : "Decrease quantity"}
+      >
+        <Minus size={14} strokeWidth={2.4} />
+      </button>
+      <span className="compact-stepper-qty" aria-live="polite">
+        <span key={quantity} className={`qty-roll-${direction}`}>{quantity}</span>
+      </span>
+      <button
+        type="button"
+        onClick={(e) => {
+          flyToCart(cardImage(e.currentTarget));
+          updateQuantity(product.id, 1);
+        }}
+        aria-label="Increase quantity"
+      >
+        <Plus size={14} strokeWidth={2.4} />
+      </button>
+    </div>
+  );
 }
 
 export function QuickViewModal({ product, onClose }: { product: Product | null; onClose: () => void }) {
