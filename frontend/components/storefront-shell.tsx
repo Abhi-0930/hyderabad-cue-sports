@@ -23,7 +23,6 @@ import {
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
-  SlidersHorizontal,
   Sparkles,
   Target,
   Trophy,
@@ -603,14 +602,6 @@ export function SiteHeader() {
                       placeholder="Search for Snooker Tables, Cues..."
                       aria-label="Search catalog"
                     />
-                    <button
-                      type="button"
-                      onClick={() => router.push(buildShopUrl({ ref: "filter" }))}
-                      className="mobile-search-filter-icon"
-                      aria-label="Filters"
-                    >
-                      <SlidersHorizontal size={19} strokeWidth={2.2} />
-                    </button>
                   </form>
                 </div>
               </div>
@@ -634,14 +625,6 @@ export function SiteHeader() {
                 placeholder="Search for Snooker Tables, Cues..."
                 aria-label="Search catalog"
               />
-              <button
-                type="button"
-                onClick={() => router.push(buildShopUrl({ ref: "mobile_filter" }))}
-                className="mobile-search-filter-icon"
-                aria-label="Filters"
-              >
-                <SlidersHorizontal size={19} strokeWidth={2.2} />
-              </button>
             </form>
 
             {/* Mobile SQUIRCLE Category Cards Rail */}
