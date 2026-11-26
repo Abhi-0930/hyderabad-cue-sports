@@ -511,9 +511,9 @@ export function SiteHeader() {
                     onClick={openCart}
                   >
                     <ShoppingCart size={19} color="#ffffff" strokeWidth={1.8} />
-                    <span className="mobile-hero-badge">
-                      {cartCount > 0 ? cartCount : 2}
-                    </span>
+                    {cartCount > 0 && (
+                      <span className="mobile-hero-badge">{cartCount > 99 ? "99+" : cartCount}</span>
+                    )}
                   </button>
                 </div>
               </div>
