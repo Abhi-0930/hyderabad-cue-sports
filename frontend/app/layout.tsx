@@ -1,7 +1,19 @@
 import type { Metadata, Viewport } from "next";
+import { Poppins } from "next/font/google";
 import "./globals.css";
-import { BackToTop, CartDrawer, FloatingWhatsApp, SiteFooter, SiteHeader, StorefrontProvider } from "@/components/storefront-shell";
+import { BackToTop, CartDrawer, FloatingCartBar, FloatingWhatsApp, SiteFooter, SiteHeader, StorefrontProvider } from "@/components/storefront-shell";
 import { Toaster } from "sonner";
+
+/* The only font on the site. Next.js downloads Poppins at build time and serves
+   it from this site (no request to Google from the visitor's browser), so it
+   always shows. Weights: 400 body · 500 subheadings & product names · 600 headings & prices. */
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-poppins",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -16,13 +28,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className={poppins.variable}>
+      <body className={poppins.className}>
         <StorefrontProvider>
           <SiteHeader />
           <main>{children}</main>
           <SiteFooter />
           <CartDrawer />
+          <FloatingCartBar />
           <Toaster
             position="top-center"
             duration={3200}
