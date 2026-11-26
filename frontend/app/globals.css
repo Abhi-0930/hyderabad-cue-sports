@@ -997,17 +997,6 @@
   font-weight: 400;
 }
 
-.mobile-search-filter-icon {
-  border: none;
-  background: transparent;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #143e2a;
-  cursor: pointer;
-  flex-shrink: 0;
-}
 
 /* Desktop Horizontal Category Capsule Rail */
 .desktop-cat-rail-container,
@@ -1498,8 +1487,7 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   }
 
-  .desktop-pill-search .mobile-search-icon,
-  .desktop-pill-search .mobile-search-filter-icon svg {
+  .desktop-pill-search .mobile-search-icon {
     width: 18px;
     height: 18px;
   }
