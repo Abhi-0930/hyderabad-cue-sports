@@ -287,21 +287,14 @@ export function HomePage() {
   </>;
 }
 
-function FilterGroup({ title, children, open = true }: { title: string; children: React.ReactNode; open?: boolean }) {
-  return <details className="filter-group" open={open}><summary>{title}<ChevronDown size={16} /></summary><div className="filter-group-body">{children}</div></details>;
-}
-
 export function ShopPage() {
+  // No filter sidebar: what's shown comes only from the link (navbar pills,
+  // search, homepage cards), so a plain /shop always means "all products".
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("category") ?? "all";
-  const initialSize = searchParams.get("size") ?? "all";
-  const initialType = searchParams.get("type") ?? "all";
+  const category = searchParams.get("category") ?? "all";
+  const size = searchParams.get("size") ?? "all";
+  const type = searchParams.get("type") ?? "all";
   const query = (searchParams.get("query") ?? "").toLowerCase();
-  const [size, setSize] = useState(initialSize);
-  const [type, setType] = useState(initialType);
-  const [category, setCategory] = useState(initialCategory);
-  const [availability, setAvailability] = useState("all");
-  const [price, setPrice] = useState("all");
   const [sort, setSort] = useState("featured");
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
   const [liveProducts, setLiveProducts] = useState<Product[]>(products);
@@ -314,16 +307,6 @@ export function ShopPage() {
     });
   }, []);
 
-  // Sync state if URL query params change (e.g. clicking top navbar links)
-  useEffect(() => {
-    const cat = searchParams.get("category");
-    if (cat) setCategory(cat);
-    const sz = searchParams.get("size");
-    if (sz) setSize(sz);
-    const tp = searchParams.get("type");
-    if (tp) setType(tp);
-  }, [searchParams]);
-
   const filteredProducts = useMemo(() => {
     let result = liveProducts.filter((product) => {
       const matchesQuery = !query || `${product.name} ${product.category} ${product.size} ${product.tags.join(" ")}`.toLowerCase().includes(query);
@@ -332,26 +315,17 @@ export function ShopPage() {
       const matchesCategory = category === "all" ||
         product.category.toLowerCase() === category.toLowerCase() ||
         (category.toLowerCase() === "cue equipment" && (product.category.toLowerCase() === "cues" || product.tags.includes("cue equipment")));
-      const matchesAvailability = availability === "all" || product.availability === availability;
-      const matchesPrice = price === "all" || (
-        price === "under-5k" ? product.price < 5000 :
-        price === "5k-50k" ? product.price >= 5000 && product.price <= 50000 :
-        price === "50k-200k" ? product.price > 50000 && product.price <= 200000 :
-        product.price > 200000
-      );
-      return matchesQuery && matchesSize && matchesType && matchesCategory && matchesAvailability && matchesPrice;
+      return matchesQuery && matchesSize && matchesType && matchesCategory;
     });
     if (sort === "low") result = [...result].sort((a, b) => a.price - b.price);
     if (sort === "high") result = [...result].sort((a, b) => b.price - a.price);
     if (sort === "new") result = [...result].reverse();
     return result;
-  }, [availability, category, liveProducts, price, query, size, sort, type]);
-
-  const clearFilters = () => { setSize("all"); setType("all"); setCategory("all"); setAvailability("all"); setPrice("all"); };
+  }, [category, liveProducts, query, size, sort, type]);
 
   return <>
     <section className="shop-hero"><div className="container shop-hero-inner"><div><span className="eyebrow">The collection · Official catalogue</span><h1>Explore our <em>cue sports collection.</em></h1><p>Premium snooker tables, cue equipment, table accessories, and scoreboards crafted for players across India.</p></div><div className="shop-hero-stat"><span>01 — 16</span><strong>Official<br />catalog range</strong></div></div></section>
-    <section className="shop-section section"><div className="container"><div className="shop-toolbar"><div><span className="result-count">Showing {filteredProducts.length} of {liveProducts.length} products</span>{query && <span className="query-chip">Search: {query}<X size={12} /></span>}</div><div className="toolbar-actions"><label className="sort-control"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="new">Newest Arrivals</option></select><ChevronDown size={15} /></label></div></div><div className="shop-layout"><aside className="filter-sidebar"><div className="filter-sidebar-header"><div><span className="eyebrow">Refine</span><h3>Filter collection</h3></div><button className="clear-filters" onClick={clearFilters}>Clear all</button></div><FilterGroup title="Product category"><label className="radio-label"><input type="radio" name="category" checked={category === "all"} onChange={() => setCategory("all")} />All products<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "snooker tables"} onChange={() => setCategory("Snooker Tables")} />Snooker tables<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "cues" || category.toLowerCase() === "cue equipment"} onChange={() => setCategory("Cues")} />Cue equipment<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "table accessories"} onChange={() => setCategory("Table Accessories")} />Table accessories<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "scoreboards"} onChange={() => setCategory("Scoreboards")} />Scoreboards<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "hoodies"} onChange={() => setCategory("Hoodies")} />Hoodies<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "t-shirts"} onChange={() => setCategory("T-Shirts")} />T-Shirts<span /></label><label className="radio-label"><input type="radio" name="category" checked={category.toLowerCase() === "cue cases"} onChange={() => setCategory("Cue Cases")} />Cue cases<span /></label></FilterGroup><FilterGroup title="Table size"><label className="check-label"><input type="checkbox" checked={size === "8 FT"} onChange={() => setSize(size === "8 FT" ? "all" : "8 FT")} /><span className="custom-check"><Check size={12} /></span>8 FT</label><label className="check-label"><input type="checkbox" checked={size === "10 FT"} onChange={() => setSize(size === "10 FT" ? "all" : "10 FT")} /><span className="custom-check"><Check size={12} /></span>10 FT</label><label className="check-label"><input type="checkbox" checked={size === "12 FT"} onChange={() => setSize(size === "12 FT" ? "all" : "12 FT")} /><span className="custom-check"><Check size={12} /></span>12 FT</label></FilterGroup><FilterGroup title="Price range"><label className="radio-label"><input type="radio" name="price" checked={price === "all"} onChange={() => setPrice("all")} />All prices<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "under-5k"} onChange={() => setPrice("under-5k")} />Under ₹5,000<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "5k-50k"} onChange={() => setPrice("5k-50k")} />₹5,000 — ₹50,000<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "50k-200k"} onChange={() => setPrice("50k-200k")} />₹50,000 — ₹2,00,000<span /></label><label className="radio-label"><input type="radio" name="price" checked={price === "over-200k"} onChange={() => setPrice("over-200k")} />Over ₹2,00,000<span /></label></FilterGroup><FilterGroup title="Availability"><label className="radio-label"><input type="radio" name="availability" checked={availability === "all"} onChange={() => setAvailability("all")} />All availability<span /></label><label className="radio-label"><input type="radio" name="availability" checked={availability === "In stock"} onChange={() => setAvailability("In stock")} />In stock<span /></label><label className="radio-label"><input type="radio" name="availability" checked={availability === "Made to order"} onChange={() => setAvailability("Made to order")} />Made to order<span /></label><label className="radio-label"><input type="radio" name="availability" checked={availability === "Low stock"} onChange={() => setAvailability("Low stock")} />Low stock<span /></label></FilterGroup></aside><div className="shop-results">{filteredProducts.length > 0 ? <div className="product-grid shop-product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div> : <div className="empty-state"><div className="empty-state-mark"><Search size={24} /></div><span className="eyebrow">No matching pieces</span><h2>Nothing in this frame.</h2><p>Try a different size, category or price range to see more of our collection.</p><button className="button button-dark" onClick={clearFilters}>Clear filters <ArrowRight size={16} /></button></div>}</div></div></div></section>
+    <section className="shop-section section"><div className="container"><div className="shop-toolbar"><div><span className="result-count">Showing {filteredProducts.length} of {liveProducts.length} products</span>{query && <span className="query-chip">Search: {query}<X size={12} /></span>}</div><div className="toolbar-actions"><label className="sort-control"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="new">Newest Arrivals</option></select><ChevronDown size={15} /></label></div></div><div className="shop-layout"><div className="shop-results">{filteredProducts.length > 0 ? <div className="product-grid shop-product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div> : <div className="empty-state"><div className="empty-state-mark"><Search size={24} /></div><span className="eyebrow">No matching pieces</span><h2>Nothing in this frame.</h2><p>Try a different category or search to see more of our collection.</p><Link href="/shop" className="button button-dark">View all products <ArrowRight size={16} /></Link></div>}</div></div></div></section>
     <section className="shop-note"><div className="container shop-note-inner"><Sparkles size={18} /><p><strong>Every product, price and specification on this page is illustrative demo content.</strong> The catalogue is designed to be edited when final business information is available.</p></div></section>
     <QuickViewModal product={quickProduct} onClose={() => setQuickProduct(null)} />
   </>;
