@@ -107,7 +107,7 @@ export const products: Product[] = [
       { label: "Cut", value: "Bed cloth + 6 cushion rails" },
       { label: "Compatibility", value: "12 FT, 10 FT, or 8 FT tables" }
     ],
-    tags: ["cloth", "baize", "accessories", "table accessories", "featured"]
+    tags: ["cloth", "baize", "accessories", "table accessories", "table parts", "featured"]
   },
   {
     id: "classic-12",
@@ -429,7 +429,7 @@ export const products: Product[] = [
       { label: "Finish", value: "SpillGuard stain-resistant finish" },
       { label: "Compatibility", value: "Fits full-size 12 FT tournament tables" }
     ],
-    tags: ["table accessories", "cloth", "strachan", "official", "12 FT"]
+    tags: ["table accessories", "table parts", "cloth", "strachan", "official", "12 FT"]
   },
   {
     id: "tournament-table-lights",
