@@ -1958,6 +1958,14 @@
   padding: 0 !important;
 }
 
+/* Desktop: inset the heading + buttons from the card's left edge
+   (stays within the white fade, which is solid up to ~32% of the card) */
+@media (min-width: 961px) {
+  .hero-copy {
+    margin-left: clamp(32px, 4.5vw, 64px) !important;
+  }
+}
+
 .hero-copy h1 {
   font-family: var(--serif) !important;
   font-weight: 500 !important;
