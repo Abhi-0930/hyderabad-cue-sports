@@ -9,12 +9,11 @@ import { ArrowLink, ProductCard, QuickViewModal, SectionHeading, SliderArrows, u
 import { AnimatedAddToCart } from "@/components/animated-add-to-cart";
 import { PromoBannerCarousel } from "@/components/promo-banner-carousel";
 import { ShopByEquipment } from "@/components/shop-by-equipment";
+import { ConsultationPanel, CustomerReviews, NewsletterSignup, ShopBySize } from "@/components/home-sections";
 import { buildProductUrl, verifyProductUrlSignature } from "@/lib/url";
 
 export function HomePage() {
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
   const { showNotice } = useStorefront();
   const sliderRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -58,13 +57,6 @@ export function HomePage() {
       left: direction === "left" ? -offset : offset,
       behavior: "smooth"
     });
-  };
-
-  const submitNewsletter = (event: FormEvent) => {
-    event.preventDefault();
-    if (!email.trim()) return;
-    setSubscribed(true);
-    showNotice("Thank you — you are on the VIP updates list.", "success");
   };
 
   return <>
@@ -138,10 +130,7 @@ export function HomePage() {
     <section className="featured-products-section">
       <div className="featured-products-container">
         <div className="featured-header">
-          <div>
-            <span className="featured-eyebrow">Handpicked for you</span>
-            <h2 className="featured-title">Featured Products</h2>
-          </div>
+          <h2 className="featured-title">Featured Products</h2>
           <Link href="/shop" className="featured-view-all" aria-label="View all featured products">
             <ChevronRight size={22} className="view-all-arrow" />
           </Link>
@@ -212,11 +201,12 @@ export function HomePage() {
       </div>
     </section>
 
-    <section className="statement-banner"><div className="statement-banner-image"><img src="/images/snooker-detail.jpg" alt="Close view of a professional snooker table" /></div><div className="statement-banner-content container"><span className="eyebrow">Make space for the game</span><h2>Create your perfect <em>snooker space.</em></h2><p>Explore premium snooker tables for homes, clubs and professional playing environments.</p><Link href="/shop" className="button button-light">Explore collection <ArrowRight size={16} /></Link></div></section>
+    <section className="statement-banner"><div className="statement-banner-image"><img src="/images/snooker-detail.jpg" alt="Close view of a professional snooker table" /></div><div className="statement-banner-content"><h2>Create your perfect <em>snooker space.</em></h2><p>Explore premium snooker tables for homes, clubs and professional playing environments.</p><Link href="/shop" className="statement-banner-cta">Explore collection <ArrowRight size={17} /></Link></div></section>
 
-    <section className="section testimonials-section"><div className="container"><SectionHeading eyebrow="Words from the room" title="A quiet confidence in every detail" /><div className="testimonials-grid"><blockquote><div className="testimonial-stars"><Star size={14} fill="currentColor" /><Star size={14} fill="currentColor" /><Star size={14} fill="currentColor" /><Star size={14} fill="currentColor" /><Star size={14} fill="currentColor" /></div><p>“The proportions, the finish, the way the table settles into the room — this is the feeling we wanted.”</p><footer><span className="testimonial-avatar">AR</span><span><strong>Sample client name</strong><small>Illustrative testimonial · Delhi</small></span></footer></blockquote><blockquote><div className="testimonial-stars"><Star size={14} fill="currentColor" /><Star size={14} fill="currentColor" /><Star size={14} fill="currentColor" /><Star size={14} fill="currentColor" /><Star size={14} fill="currentColor" /></div><p>“A more considered way to shop for the centrepiece of the playing room. Everything feels calm and clear.”</p><footer><span className="testimonial-avatar">MK</span><span><strong>Sample client name</strong><small>Illustrative testimonial · Mumbai</small></span></footer></blockquote><div className="testimonial-aside"><span className="eyebrow">The standard we are setting</span><strong>Make the room feel ready before the first break.</strong><ArrowLink href="/shop">Browse the range</ArrowLink></div></div></div></section>
-
-    <section className="newsletter-section"><div className="container newsletter-inner"><div><span className="eyebrow">Stay in the frame</span><h2>Stay connected with <em>Hyderabad Cue Sports.</em></h2><p>Get updates about new collections, products and announcements.</p></div>{subscribed ? <div className="newsletter-success"><Check size={18} /><strong>You’re on the list.</strong><span>We’ll keep the next frame close.</span></div> : <form className="newsletter-form" onSubmit={submitNewsletter}><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Your email address" aria-label="Email address" required /><button type="submit" className="button button-dark">Subscribe <ArrowRight size={16} /></button><small>Demo form · no email is sent</small></form>}</div></section>
+    <ShopBySize />
+    <CustomerReviews />
+    <ConsultationPanel />
+    <NewsletterSignup />
     <QuickViewModal product={quickProduct} onClose={() => setQuickProduct(null)} />
   </>;
 }
