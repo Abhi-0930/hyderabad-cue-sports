@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BadgeCheck, ChevronLeft, ChevronRight, MessageCircle, Minus, Plus, ShieldCheck, ShoppingCart, Star, Zap } from "lucide-react";
 import { formatInr, Product, products } from "@/lib/products";
 import { getProductReviews, summarizeReviews } from "@/lib/reviews";
-import { buildProductUrl } from "@/lib/url";
+import { buildLoginUrl, buildProductUrl } from "@/lib/url";
 import { mobileCategories, ProductCard, useStorefront, whatsappUrl } from "@/components/storefront-shell";
 
 /* ---------------------------------------------------------------
@@ -75,7 +76,7 @@ function Stars({ value, size = 14 }: { value: number; size?: number }) {
   );
 }
 
-function RelatedRail({ title, items }: { title: string; items: Product[] }) {
+export function RelatedRail({ title, items }: { title: string; items: Product[] }) {
   const railRef = useRef<HTMLDivElement>(null);
   if (!items.length) return null;
   const slide = (dir: 1 | -1) => railRef.current?.scrollBy({ left: dir * railRef.current.clientWidth, behavior: "smooth" });
@@ -96,7 +97,14 @@ function RelatedRail({ title, items }: { title: string; items: Product[] }) {
 }
 
 export function ProductDetailView({ product }: { product: Product }) {
-  const { addToCart } = useStorefront();
+  const { addToCart, user } = useStorefront();
+  const router = useRouter();
+
+  // Buy now: put it in the cart and go straight to checkout (guests sign in first)
+  const buyNow = () => {
+    addToCart(product, quantity, false, false);
+    router.push(user ? "/checkout" : buildLoginUrl({ ref: "hcs_pdp_buy_now", next: "/checkout" }));
+  };
   const [quantity, setQuantity] = useState(1);
   const reviews = useMemo(() => getProductReviews(product), [product]);
   const summary = useMemo(() => summarizeReviews(reviews), [reviews]);
@@ -195,7 +203,7 @@ export function ProductDetailView({ product }: { product: Product }) {
             <button type="button" className="pd-add" onClick={() => addToCart(product, quantity, false)}>
               <ShoppingCart size={18} /> Add to cart
             </button>
-            <button type="button" className="pd-buy-now" onClick={() => addToCart(product, quantity, true, false)}>
+            <button type="button" className="pd-buy-now" onClick={buyNow}>
               <Zap size={18} /> Buy now
             </button>
           </div>
