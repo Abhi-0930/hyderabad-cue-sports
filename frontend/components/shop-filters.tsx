@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArrowDownWideNarrow, ArrowUpNarrowWide, SlidersHorizontal, ThumbsUp, TrendingUp, X } from "lucide-react";
 import type { Product } from "@/lib/products";
+import { matchesQuery } from "@/lib/search";
 import { mobileCategories } from "@/components/storefront-shell";
 
 /* ---------------------------------------------------------------
@@ -58,7 +59,7 @@ const isBestSeller = (p: Product) =>
 export function applyShopFilters(list: Product[], f: ShopFilters): Product[] {
   const range = PRICE_RANGES.find((r) => r.id === f.price);
   const filtered = list.filter((product) => {
-    const matchesQuery = !f.query || `${product.name} ${product.category} ${product.size} ${product.tags.join(" ")}`.toLowerCase().includes(f.query);
+    const matchesSearch = matchesQuery(product, f.query);
     const matchesSize = f.size === "all" || product.size === f.size;
     const matchesType = f.type === "all" || product.type === f.type;
     const cat = f.category.toLowerCase();
@@ -67,7 +68,7 @@ export function applyShopFilters(list: Product[], f: ShopFilters): Product[] {
       (cat === "cue equipment" && (product.category.toLowerCase() === "cues" || product.tags.includes("cue equipment")));
     const matchesPrice = !range || (product.price >= range.min && product.price < range.max);
     const matchesStock = !f.inStock || product.availability !== "Made to order";
-    return matchesQuery && matchesSize && matchesType && matchesCategory && matchesPrice && matchesStock;
+    return matchesSearch && matchesSize && matchesType && matchesCategory && matchesPrice && matchesStock;
   });
 
   if (f.sort === "price-asc") return [...filtered].sort((a, b) => a.price - b.price);
