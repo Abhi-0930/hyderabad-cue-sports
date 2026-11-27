@@ -62,13 +62,6 @@ export const defaultEquipmentList: EquipmentItem[] = [
     image: "/images/snooker-detail.jpg",
     href: "/shop?category=Table+Accessories",
   },
-  {
-    id: "cases-storage",
-    title: "Cue Cases & Bags",
-    priceTag: "From ₹4,500",
-    image: "/images/snooker-collection.jpg",
-    href: "/shop?category=Cues",
-  },
 ];
 
 interface ShopByEquipmentProps {
