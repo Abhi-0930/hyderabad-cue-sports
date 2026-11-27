@@ -5,15 +5,20 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { AuthCard } from "@/components/auth-modal";
 import { useStorefront } from "@/components/storefront-shell";
+import { safeNextPath } from "@/lib/url";
 
 export default function LoginPage() {
   const router = useRouter();
   const { user, setUser } = useStorefront();
   const backActionRef = useRef<(() => boolean) | null>(null);
 
+  // Where to go after signing in (e.g. back to checkout); same-site paths only
+  const nextPath = () =>
+    (typeof window !== "undefined" && safeNextPath(new URLSearchParams(window.location.search).get("next"))) || "/";
+
   useEffect(() => {
     if (user) {
-      router.replace("/");
+      router.replace(nextPath());
     }
   }, [user, router]);
 
@@ -52,7 +57,7 @@ export default function LoginPage() {
           }}
           onSuccess={(loggedInUser) => {
             setUser(loggedInUser);
-            router.push("/");
+            router.replace(nextPath());
           }}
         />
       </div>
