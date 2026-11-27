@@ -95,7 +95,7 @@ export function HomePage() {
               <div className="category-showcase-overlay" />
             </div>
             <div className="category-showcase-content">
-              <span>Snooker Tables <ArrowRight size={15} /></span>
+              <span>Snooker Tables</span>
             </div>
           </Link>
           <Link href="/shop?category=Cue+Equipment" className="category-showcase-card">
@@ -104,7 +104,7 @@ export function HomePage() {
               <div className="category-showcase-overlay" />
             </div>
             <div className="category-showcase-content">
-              <span>Cue Equipment <ArrowRight size={15} /></span>
+              <span>Cue Equipment</span>
             </div>
           </Link>
           <Link href="/shop?category=Table+Accessories" className="category-showcase-card">
@@ -113,7 +113,7 @@ export function HomePage() {
               <div className="category-showcase-overlay" />
             </div>
             <div className="category-showcase-content">
-              <span>Table Accessories <ArrowRight size={15} /></span>
+              <span>Table Accessories</span>
             </div>
           </Link>
           <Link href="/shop?category=Scoreboards" className="category-showcase-card">
@@ -122,7 +122,7 @@ export function HomePage() {
               <div className="category-showcase-overlay" />
             </div>
             <div className="category-showcase-content">
-              <span>Scoreboards <ArrowRight size={15} /></span>
+              <span>Scoreboards</span>
             </div>
           </Link>
         </div>
