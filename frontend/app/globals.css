@@ -7485,7 +7485,7 @@ body {
 
   /* Cart pill sits just above the bar */
   .floating-cart-bar:not(#_) {
-    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(118px + env(safe-area-inset-bottom, 0px));
   }
 }
 
