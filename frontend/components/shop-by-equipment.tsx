@@ -8,7 +8,6 @@ export interface EquipmentItem {
   id: string;
   title: string;
   priceTag: string;
-  badge?: string;
   image: string;
   href: string;
 }
@@ -18,7 +17,6 @@ export const defaultEquipmentList: EquipmentItem[] = [
     id: "snooker-tables",
     title: "Snooker Tables",
     priceTag: "From ₹1,49,000",
-    badge: "Tournament Slate",
     image: "/images/categories/snooker-tables.jpg",
     href: "/shop?category=Snooker+Tables",
   },
@@ -26,7 +24,6 @@ export const defaultEquipmentList: EquipmentItem[] = [
     id: "cue-sticks",
     title: "Professional Cues",
     priceTag: "From ₹14,500",
-    badge: "Master Crafted",
     image: "/images/products/featured-cue-stick.jpg",
     href: "/shop?category=Cues",
   },
@@ -34,7 +31,6 @@ export const defaultEquipmentList: EquipmentItem[] = [
     id: "match-balls",
     title: "Match Ball Sets",
     priceTag: "From ₹6,800",
-    badge: "Official Match",
     image: "/images/products/featured-balls-15.jpg",
     href: "/shop?category=Table+Accessories",
   },
@@ -42,7 +38,6 @@ export const defaultEquipmentList: EquipmentItem[] = [
     id: "table-cloth",
     title: "Table Cloth & Baize",
     priceTag: "From ₹7,200",
-    badge: "Fast Pace Baize",
     image: "/images/products/featured-table-cloth.jpg",
     href: "/shop?category=Table+Accessories",
   },
@@ -50,7 +45,6 @@ export const defaultEquipmentList: EquipmentItem[] = [
     id: "scoreboards",
     title: "Scoreboards",
     priceTag: "From ₹18,900",
-    badge: "Club Essential",
     image: "/images/categories/scoreboards.jpg",
     href: "/shop?category=Scoreboards",
   },
@@ -58,7 +52,6 @@ export const defaultEquipmentList: EquipmentItem[] = [
     id: "table-accessories",
     title: "Racks & Accessories",
     priceTag: "From ₹2,400",
-    badge: "Match Accessories",
     image: "/images/categories/table-accessories.jpg",
     href: "/shop?category=Table+Accessories",
   },
@@ -66,7 +59,6 @@ export const defaultEquipmentList: EquipmentItem[] = [
     id: "table-lighting",
     title: "Table Lighting",
     priceTag: "From ₹18,500",
-    badge: "Glare-Free",
     image: "/images/snooker-detail.jpg",
     href: "/shop?category=Table+Accessories",
   },
@@ -74,7 +66,6 @@ export const defaultEquipmentList: EquipmentItem[] = [
     id: "cases-storage",
     title: "Cue Cases & Bags",
     priceTag: "From ₹4,500",
-    badge: "Gear Protection",
     image: "/images/snooker-collection.jpg",
     href: "/shop?category=Cues",
   },
@@ -162,9 +153,6 @@ export function ShopByEquipment({
                     className="equipment-card-img"
                     loading="lazy"
                   />
-                  {item.badge && (
-                    <span className="equipment-badge-pill">{item.badge}</span>
-                  )}
                 </div>
 
                 {/* Card Body: Price Tag + Title (Clean, NO supporting text) */}
