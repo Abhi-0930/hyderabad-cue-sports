@@ -162,10 +162,18 @@ export function buildHomeUrl(options?: { fullUrl?: boolean }): string {
  * Builds the canonical Login URL with tracking query parameters.
  * Deterministic across SSR and client hydration.
  */
-export function buildLoginUrl(options?: { fullUrl?: boolean; ref?: string }): string {
+/** Only same-site paths are allowed as a return address after login */
+export function safeNextPath(raw: string | null | undefined): string | null {
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/\\") || raw.startsWith("/login")) return null;
+  return raw;
+}
+
+export function buildLoginUrl(options?: { fullUrl?: boolean; ref?: string; next?: string }): string {
   const searchParams = new URLSearchParams({
     ref: options?.ref || "hcs_header_nav",
   });
+  const next = safeNextPath(options?.next);
+  if (next) searchParams.set("next", next);
   const relativePath = `/login?${searchParams.toString()}`;
   if (options?.fullUrl) {
     return `${getSiteBaseUrl()}${relativePath}`;
