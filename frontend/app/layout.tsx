@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { BackToTop, CartDrawer, FloatingCartBar, FloatingWhatsApp, SiteFooter, SiteHeader, StorefrontProvider } from "@/components/storefront-shell";
+import { BackToTop, CartDrawer, FloatingCartBar, SiteFooter, SiteHeader, StorefrontProvider } from "@/components/storefront-shell";
 import { Toaster } from "sonner";
 
 /* The only font on the site. Next.js downloads Poppins at build time and serves
@@ -46,7 +46,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             }}
           />
           <BackToTop />
-          <FloatingWhatsApp />
         </StorefrontProvider>
       </body>
     </html>
