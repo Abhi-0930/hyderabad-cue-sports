@@ -10,6 +10,7 @@ import { AnimatedAddToCart } from "@/components/animated-add-to-cart";
 import { PromoBannerCarousel } from "@/components/promo-banner-carousel";
 import { ShopByEquipment } from "@/components/shop-by-equipment";
 import { ConsultationPanel, CustomerReviews, NewsletterSignup, ShopBySize } from "@/components/home-sections";
+import { applyShopFilters, readShopFilters, ShopToolbar } from "@/components/shop-filters";
 import { buildProductUrl, verifyProductUrlSignature } from "@/lib/url";
 
 export function HomePage() {
@@ -212,13 +213,10 @@ export function HomePage() {
 }
 
 export function ShopPage() {
-  // No filter sidebar: what's shown comes only from the link (navbar pills,
-  // search, homepage cards), so a plain /shop always means "all products".
+  // Filters and sort come from the URL (navbar, search, homepage links and
+  // the Filters panel all just change the link).
   const searchParams = useSearchParams();
-  const category = searchParams.get("category") ?? "all";
-  const size = searchParams.get("size") ?? "all";
-  const type = searchParams.get("type") ?? "all";
-  const query = (searchParams.get("query") ?? "").toLowerCase();
+  const filters = readShopFilters(searchParams);
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
   const [liveProducts, setLiveProducts] = useState<Product[]>(products);
 
@@ -230,21 +228,13 @@ export function ShopPage() {
     });
   }, []);
 
-  const filteredProducts = useMemo(() => {
-    return liveProducts.filter((product) => {
-      const matchesQuery = !query || `${product.name} ${product.category} ${product.size} ${product.tags.join(" ")}`.toLowerCase().includes(query);
-      const matchesSize = size === "all" || product.size === size;
-      const matchesType = type === "all" || product.type === type;
-      const matchesCategory = category === "all" ||
-        product.category.toLowerCase() === category.toLowerCase() ||
-        (category.toLowerCase() === "cue equipment" && (product.category.toLowerCase() === "cues" || product.tags.includes("cue equipment")));
-      return matchesQuery && matchesSize && matchesType && matchesCategory;
-    });
-  }, [category, liveProducts, query, size, type]);
+  const filterKey = searchParams.toString();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const filteredProducts = useMemo(() => applyShopFilters(liveProducts, filters), [liveProducts, filterKey]);
 
   return <>
     <section className="shop-section">
-      <div className="shop-body"><div className="shop-layout"><div className="shop-results">{filteredProducts.length > 0 ? <div className="product-grid shop-product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div> : <div className="shop-empty"><span className="shop-empty-icon"><Search size={26} /></span><h2>No products here yet</h2><p>Try another category or search for something else.</p><Link href="/shop" className="shop-empty-btn">View all products <ArrowRight size={16} /></Link></div>}</div></div></div></section>
+      <div className="shop-body"><ShopToolbar allProducts={liveProducts} resultCount={filteredProducts.length} /><div className="shop-layout"><div className="shop-results">{filteredProducts.length > 0 ? <div className="product-grid shop-product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div> : <div className="shop-empty"><span className="shop-empty-icon"><Search size={26} /></span><h2>No products here yet</h2><p>Try another category or search for something else.</p><Link href="/shop" className="shop-empty-btn">View all products <ArrowRight size={16} /></Link></div>}</div></div></div></section>
     <QuickViewModal product={quickProduct} onClose={() => setQuickProduct(null)} />
   </>;
 }
