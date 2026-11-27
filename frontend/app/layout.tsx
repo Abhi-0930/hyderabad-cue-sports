@@ -36,9 +36,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <SiteFooter />
           <CartDrawer />
           <FloatingCartBar />
+          {/* One notification at a time (see showToast in storefront-shell) */}
           <Toaster
             position="top-center"
-            duration={3200}
+            duration={2800}
+            visibleToasts={1}
             offset="14px"
             mobileOffset="12px"
             toastOptions={{
