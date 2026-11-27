@@ -1075,23 +1075,14 @@ export function BackToTop() {
   );
 }
 
-/* Pages that aren't built yet show a short notice instead of a dead link */
-const FOOTER_HELP_LINKS = [
-  { label: "Shipping information", notice: "Shipping information will be added soon." },
-  { label: "Returns & refunds", notice: "Return policy will be added soon." },
-  { label: "FAQs", notice: "FAQs will be added soon." },
-];
-const FOOTER_COMPANY_LINKS = [
-  { label: "About us", notice: "About page will be added soon." },
-  { label: "Privacy policy", notice: "Privacy policy will be added soon." },
-  { label: "Terms & conditions", notice: "Terms will be added soon." },
-];
-// Placeholder contact details — replace with the real ones
-const FOOTER_EMAIL = "support@hyderabadcuesports.com";
+/* Footer only lists links that work; pages that don't exist yet are left out */
+const FOOTER_SIZE_LINKS = ["8 FT", "10 FT", "12 FT"].map((size) => ({
+  label: `${size} tables`,
+  href: `/shop?${new URLSearchParams({ category: "Snooker Tables", size })}`,
+}));
 
 export function SiteFooter() {
   const pathname = usePathname();
-  const { showNotice } = useStorefront();
   if (pathname === "/login") return null;
   const year = new Date().getFullYear();
 
@@ -1109,25 +1100,10 @@ export function SiteFooter() {
               <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp</a>
             </li>
             <li>
-              <Mail size={16} aria-hidden="true" />
-              <a href={`mailto:${FOOTER_EMAIL}`}>{FOOTER_EMAIL}</a>
-            </li>
-            <li>
               <MapPin size={16} aria-hidden="true" />
               <span>Hyderabad, Telangana, India</span>
             </li>
           </ul>
-          <div className="hcs-footer-socials">
-            <button type="button" aria-label="Instagram" onClick={() => showNotice("Instagram page will be linked soon.")}>
-              <Instagram size={18} />
-            </button>
-            <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-              <MessageCircle size={18} />
-            </a>
-            <a href={`mailto:${FOOTER_EMAIL}`} aria-label="Email">
-              <Mail size={18} />
-            </a>
-          </div>
         </div>
 
         <nav className="hcs-footer-col" aria-label="Shop">
@@ -1137,18 +1113,10 @@ export function SiteFooter() {
           ))}
         </nav>
 
-        <nav className="hcs-footer-col" aria-label="Help">
-          <h4>Help</h4>
-          {FOOTER_HELP_LINKS.map((l) => (
-            <button key={l.label} type="button" onClick={() => showNotice(l.notice)}>{l.label}</button>
-          ))}
-          <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">Contact us</a>
-        </nav>
-
-        <nav className="hcs-footer-col" aria-label="Company">
-          <h4>Company</h4>
-          {FOOTER_COMPANY_LINKS.map((l) => (
-            <button key={l.label} type="button" onClick={() => showNotice(l.notice)}>{l.label}</button>
+        <nav className="hcs-footer-col" aria-label="Shop by size">
+          <h4>Shop by size</h4>
+          {FOOTER_SIZE_LINKS.map((l) => (
+            <Link key={l.label} href={l.href}>{l.label}</Link>
           ))}
         </nav>
       </div>
