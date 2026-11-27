@@ -2243,20 +2243,10 @@
 
 .featured-header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 20px;
-}
-
-.featured-eyebrow {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #c6a15b;
 }
 
 .featured-title {
@@ -3212,21 +3202,6 @@
 
 .equipment-card:hover .equipment-card-img {
   transform: none !important;
-}
-
-.equipment-badge-pill {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: rgba(9, 38, 24, 0.88);
-  backdrop-filter: blur(4px);
-  color: #dfc181;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  padding: 3px 9px;
-  border-radius: 999px;
-  text-transform: uppercase;
 }
 
 .equipment-card-body {
@@ -5139,6 +5114,809 @@ body {
 
 
 /* =========================================================
+   SHOP BY EQUIPMENT — themed panel (Flipkart/Amazon-style section background)
+   Felt-green → cream → soft gold gradient with soft green/gold corner glows.
+   No icons or illustrations — white cards sit on top. Pairs with the gold "Everything you need" panel.
+   ========================================================= */
+
+.shop-equipment-section .shop-equipment-container {
+  position: relative;
+  padding: 22px 24px 24px;
+  border: 1.5px solid rgba(23, 75, 53, 0.12);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(31, 138, 76, 0.18), transparent 42%),
+    radial-gradient(circle at 0% 100%, rgba(198, 161, 91, 0.26), transparent 48%),
+    linear-gradient(160deg, #e2f0e6 0%, #f3f8f3 40%, #fbf8ef 78%, #f4e8c9 100%);
+  box-shadow: 0 6px 28px rgba(17, 58, 39, 0.07);
+}
+
+.shop-equipment-section .equipment-card {
+  border-color: rgba(23, 75, 53, 0.08);
+  box-shadow: 0 4px 14px rgba(23, 75, 53, 0.08);
+}
+
+@media (max-width: 960px) {
+  .shop-equipment-section .shop-equipment-container {
+    width: auto;
+    margin: 0 12px;
+    padding: 18px 14px 18px;
+    border-radius: 16px;
+    overflow: hidden; /* cards bleed to the panel edge while swiping */
+  }
+}
+
+@media (max-width: 600px) {
+  .shop-equipment-section .shop-equipment-rail {
+    padding-bottom: 6px;
+  }
+}
+
+/* =========================================================
+   "CREATE YOUR PERFECT SNOOKER SPACE" BANNER — polished
+   Same rounded panel language as the sections above; deep-green fade from the
+   left for legible text, gold CTA. Overrides the older banner rules.
+   ========================================================= */
+
+.statement-banner:not(#_) {
+  height: auto !important;
+  min-height: 380px;
+  max-width: 1240px !important;
+  margin: 28px auto !important;
+  display: flex;
+  align-items: center;
+  border: 0 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 34px rgba(7, 36, 20, 0.16) !important;
+}
+
+.statement-banner .statement-banner-image img {
+  object-position: right center;
+  filter: saturate(0.95);
+}
+
+.statement-banner:not(#_)::after {
+  background:
+    linear-gradient(90deg, rgba(8, 38, 24, 0.94) 0%, rgba(12, 50, 32, 0.82) 34%, rgba(16, 60, 40, 0.35) 62%, rgba(16, 60, 40, 0) 82%),
+    linear-gradient(0deg, rgba(8, 38, 24, 0.35) 0%, rgba(8, 38, 24, 0) 40%);
+}
+
+.statement-banner .statement-banner-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  margin: 0;
+  padding: 48px 0 48px clamp(28px, 5vw, 64px);
+  align-self: center;
+}
+
+.statement-banner .statement-banner-content h2 {
+  max-width: 520px;
+  margin: 0 0 14px;
+  font-size: clamp(30px, 3.4vw, 44px);
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.statement-banner .statement-banner-content h2 em {
+  color: #e2c98f;
+  font-style: italic;
+}
+
+.statement-banner .statement-banner-content p {
+  max-width: 420px;
+  margin: 0 0 26px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+/* Solid brand-gold call to action */
+.statement-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 22px 0 24px;
+  border-radius: 12px;
+  background: #c6a15b;
+  color: #0f3323;
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+}
+
+@media (max-width: 960px) {
+  .statement-banner:not(#_) {
+    min-height: 360px;
+    margin: 18px 12px 22px !important;
+    border-radius: 16px !important;
+    align-items: flex-end;
+  }
+  /* Phones: text sits at the bottom over a darker bottom-up fade */
+  .statement-banner:not(#_)::after {
+    background: linear-gradient(0deg, rgba(8, 38, 24, 0.95) 0%, rgba(8, 38, 24, 0.78) 45%, rgba(8, 38, 24, 0.2) 80%, rgba(8, 38, 24, 0.05) 100%);
+  }
+  .statement-banner .statement-banner-image img {
+    object-position: 70% center;
+  }
+  .statement-banner .statement-banner-content {
+    align-self: flex-end;
+    padding: 120px 22px 26px;
+  }
+  .statement-banner .statement-banner-content h2 {
+    font-size: 28px;
+  }
+  .statement-banner .statement-banner-content p {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .statement-banner-cta {
+    height: 46px;
+  }
+}
+
+/* =========================================================
+   HOMEPAGE — sections after the snooker-space banner
+   (components/home-sections.tsx): trust strip, shop by size, reviews,
+   consultation, newsletter. Same panel language as the sections above.
+   ========================================================= */
+
+.home-section {
+  margin: 30px auto;
+}
+
+.home-section-inner,
+.home-consult-panel,
+.home-newsletter-panel {
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.home-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.home-section-title {
+  margin: 0;
+  font-size: clamp(21px, 2.3vw, 26px);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: #174b35;
+}
+
+.home-section-sub {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #5f6b63;
+}
+
+/* ---- Themed background panels (like Shop by Equipment / Everything you need) ---- */
+.home-panel {
+  padding: 22px 24px 24px;
+  border-radius: 20px;
+  box-shadow: 0 6px 28px rgba(17, 58, 39, 0.07);
+}
+
+.home-panel-green {
+  border: 1.5px solid rgba(23, 75, 53, 0.12);
+  background:
+    radial-gradient(circle at 88% 0%, rgba(31, 138, 76, 0.18), transparent 42%),
+    radial-gradient(circle at 0% 100%, rgba(198, 161, 91, 0.26), transparent 48%),
+    linear-gradient(160deg, #e2f0e6 0%, #f3f8f3 40%, #fbf8ef 78%, #f4e8c9 100%);
+}
+
+.home-panel-gold {
+  border: 1.5px solid rgba(198, 161, 91, 0.4);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(198, 161, 91, 0.28), transparent 45%),
+    radial-gradient(circle at 0% 100%, rgba(31, 138, 76, 0.1), transparent 45%),
+    linear-gradient(160deg, #fdf9ee 0%, #f9f1db 55%, #f1e2bb 100%);
+}
+
+/* ---- Shop tables by size ---- */
+.home-sizes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.home-size-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e3e9e5;
+  border-radius: 20px;
+  box-shadow: 0 6px 22px rgba(17, 58, 39, 0.07);
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-size-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: #0f2a1c;
+}
+
+/* Photo is taken out of flow so every card's image area is exactly 16:10,
+   whatever the source image's own proportions */
+.home-size-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.home-size-chip {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 51, 35, 0.88);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.home-size-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 62px 18px 18px; /* right side leaves room for the arrow */
+}
+
+.home-size-body strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1c2a22;
+}
+
+.home-size-price {
+  font-size: 15px;
+  font-weight: 600;
+  color: #174b35;
+}
+
+.home-size-arrow {
+  position: absolute;
+  right: 16px;
+  bottom: 20px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #eef5f0;
+  color: #174b35;
+}
+
+/* ---- Customer reviews ---- */
+.home-reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.home-review-card {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 22px 22px 20px;
+  background: #ffffff;
+  border: 1px solid #efe6cf;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(120, 92, 30, 0.06);
+}
+
+.home-review-stars {
+  display: flex;
+  gap: 3px;
+  color: #c6a15b;
+}
+
+.home-review-card blockquote {
+  flex: 1;
+  margin: 14px 0 18px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #2b332d;
+}
+
+.home-review-card figcaption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #ece7d8;
+}
+
+.home-review-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #174b35;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.home-review-card figcaption strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1c2a22;
+}
+
+.home-review-card figcaption small {
+  display: block;
+  font-size: 12.5px;
+  color: #66736b;
+}
+
+/* ---- Free consultation ---- */
+.home-consult-panel {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  align-items: center;
+  gap: 32px;
+  padding: 38px 40px;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(198, 161, 91, 0.22), transparent 45%),
+    linear-gradient(120deg, #0c3322 0%, #145036 60%, #1a5d40 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 34px rgba(7, 36, 20, 0.16);
+}
+
+.home-consult-copy h2 {
+  margin: 0 0 10px;
+  font-size: clamp(24px, 2.6vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+}
+
+.home-consult-copy p {
+  max-width: 470px;
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.home-consult-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.home-consult-whatsapp,
+.home-consult-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-consult-whatsapp {
+  background: #25d366;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+}
+
+.home-consult-secondary {
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+}
+
+.home-consult-guide {
+  padding: 20px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.home-consult-guide-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e2c98f;
+}
+
+.home-consult-guide ul {
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.home-consult-guide li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 14px;
+}
+
+.home-consult-guide li strong {
+  font-weight: 600;
+}
+
+.home-consult-guide li span {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.home-consult-guide small {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ---- Newsletter ---- */
+.home-newsletter {
+  margin-bottom: 40px;
+}
+
+.home-newsletter-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 36px;
+  border: 1.5px solid rgba(198, 161, 91, 0.4);
+  border-radius: 20px;
+  background: linear-gradient(120deg, #fdf9ee 0%, #f8efd6 60%, #f1e2bb 100%);
+}
+
+.home-newsletter-copy h2 {
+  margin: 0 0 6px;
+  font-size: clamp(20px, 2.2vw, 25px);
+  line-height: 1.2;
+  color: #174b35;
+}
+
+.home-newsletter-copy p {
+  max-width: 460px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #5f6b63;
+}
+
+.home-newsletter-form {
+  flex-shrink: 0;
+  display: flex;
+  gap: 10px;
+  width: min(440px, 100%);
+}
+
+.home-newsletter-form input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #e0d6bb;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #1c2a22;
+  font-size: 14px;
+  outline: none;
+}
+
+.home-newsletter-form input:focus {
+  border-color: #174b35;
+  box-shadow: 0 0 0 3px rgba(23, 75, 53, 0.12);
+}
+
+.home-newsletter-form button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 12px;
+  background: #174b35;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.home-newsletter-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #174b35;
+}
+
+.home-newsletter-done span {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #174b35;
+  color: #ffffff;
+}
+
+/* ---- Tablet & phone ---- */
+@media (max-width: 960px) {
+  .home-section {
+    margin: 22px auto;
+  }
+  .home-section-inner,
+  .home-consult-panel,
+  .home-newsletter-panel {
+    width: calc(100% - 24px);
+  }
+  .home-panel {
+    padding: 18px 14px 16px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  /* Size cards and reviews become swipe rails with the next card peeking in */
+  .home-sizes-grid,
+  .home-reviews-grid {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin: 0 -14px;
+    padding: 2px 14px 8px;
+    scroll-padding-left: 14px;
+    scrollbar-width: none;
+  }
+  .home-sizes-grid::-webkit-scrollbar,
+  .home-reviews-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .home-size-card,
+  .home-review-card {
+    flex: 0 0 80%;
+    scroll-snap-align: start;
+  }
+  .home-size-card {
+    border-radius: 16px;
+  }
+  .home-review-card {
+    border-radius: 16px;
+    padding: 18px;
+  }
+
+  .home-consult-panel {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 26px 20px;
+    border-radius: 16px;
+  }
+  .home-consult-actions a {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .home-newsletter-panel {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 24px 20px;
+    border-radius: 16px;
+  }
+  .home-newsletter-form {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .home-newsletter-form {
+    flex-direction: column;
+  }
+  /* In the stacked layout "flex: 1" would squash the field's height — keep it 48px */
+  .home-newsletter-form input {
+    flex: none;
+    height: 48px;
+  }
+  .home-newsletter-form button {
+    justify-content: center;
+  }
+}
+
+/* =========================================================
+   FOOTER — deep green with a thin gold top line
+   ========================================================= */
+
+.hcs-footer {
+  margin-top: 8px;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(198, 161, 91, 0.12), transparent 40%),
+    linear-gradient(180deg, #0f3a28 0%, #0b2e1f 100%);
+  border-top: 3px solid #c6a15b;
+}
+
+.hcs-footer-main {
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 56px 0 44px;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+
+.hcs-footer-logo img {
+  display: block;
+  height: 42px;
+  width: auto;
+}
+
+.hcs-footer-brand > p {
+  max-width: 330px;
+  margin: 18px 0 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hcs-footer-contact {
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hcs-footer-contact li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hcs-footer-contact svg {
+  flex-shrink: 0;
+  color: #e2c98f;
+}
+
+.hcs-footer-contact a {
+  color: inherit;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.hcs-footer-socials {
+  display: flex;
+  gap: 10px;
+}
+
+.hcs-footer-socials a,
+.hcs-footer-socials button {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.hcs-footer-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.hcs-footer-col h4 {
+  margin: 4px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #e2c98f;
+}
+
+.hcs-footer-col a,
+.hcs-footer-col button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 14px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hcs-footer-bottom {
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 20px 0 88px; /* bottom room keeps the floating WhatsApp button off the payment badges */
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hcs-footer-pay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hcs-footer-pay span {
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+@media (max-width: 960px) {
+  .hcs-footer-main {
+    width: calc(100% - 40px);
+    padding: 40px 0 30px;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 24px;
+  }
+  .hcs-footer-brand {
+    grid-column: 1 / -1;
+  }
+  .hcs-footer-bottom {
+    width: calc(100% - 40px);
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 96px; /* clear of the floating WhatsApp / cart buttons */
+  }
+}
+
+@media (max-width: 420px) {
+  .hcs-footer-main {
+    grid-template-columns: 1fr 1fr;
+  }
+  .hcs-footer-col a,
+  .hcs-footer-col button {
+    font-size: 13.5px;
+  }
+}
+
+/* =========================================================
    TYPOGRAPHY — Poppins everywhere (both --serif and --sans point to it)
    Headings 600 · Subheadings 500 · Body 400 · Product names 500 · Prices 600
    Kept last so it wins over the older per-component weights.
@@ -5174,7 +5952,6 @@ h6:not(#_) {
 
 /* Subheadings: small labels above titles, card subtitles, category names */
 .eyebrow:not(#_),
-.featured-eyebrow:not(#_),
 .featured-product-kicker:not(#_),
 .product-kicker:not(#_),
 .promo-kicker-text:not(#_),
@@ -5183,7 +5960,6 @@ h6:not(#_) {
 .hcs-auth-subtitle:not(#_),
 .amazon-deal-name:not(#_),
 .amazon-deal-subtext:not(#_),
-.equipment-badge-pill:not(#_),
 .mobile-delivering-label:not(#_) {
   font-weight: 500 !important;
 }
