@@ -5981,6 +5981,402 @@ body {
 }
 
 /* =========================================================
+   INNER PAGES (everything except the homepage): slim pinned navbar only.
+   The big photo header, delivery location and category pills are hidden;
+   its popups (account menu, delivery location) still work.
+   ========================================================= */
+
+.hcs-sticky-header.is-inner .mobile-hero-top,
+.hcs-sticky-header.is-inner .mobile-curved-sheet {
+  display: none !important;
+}
+
+/* Always visible, never slides away */
+.hcs-compact-bar.is-pinned {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Reserves the bar's height so content starts below it (height set from JS) */
+.hcs-compact-spacer {
+  height: 65px;
+}
+
+/* Phones/tablets: two rows like Amazon/Flipkart — logo + actions, then full-width search */
+@media (max-width: 960px) {
+  .hcs-compact-bar.is-pinned .hcs-compact-inner {
+    height: auto;
+    padding: 10px 16px 12px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "logo actions"
+      "search search";
+    row-gap: 10px;
+  }
+  .hcs-compact-bar.is-pinned .hcs-compact-logo {
+    display: inline-flex;
+    grid-area: logo;
+  }
+  .hcs-compact-bar.is-pinned .hcs-compact-logo img {
+    height: 26px;
+  }
+  .hcs-compact-bar.is-pinned .hcs-compact-search {
+    grid-area: search;
+  }
+  .hcs-compact-bar.is-pinned .hcs-compact-actions {
+    grid-area: actions;
+  }
+  .hcs-compact-spacer {
+    height: 117px;
+  }
+}
+
+/* =========================================================
+   SHOP TOOLBAR + FILTERS PANEL — Filters button, sort chips, result count;
+   the panel is a right-hand drawer on desktop and a bottom sheet on phones.
+   ========================================================= */
+
+.shop-filterbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  min-width: 0;
+}
+
+.shop-filter-btn:not(#_),
+.shop-filter-btn:not(#_):hover {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid #d3ded6;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #174b35;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.shop-filter-btn.has-active:not(#_) {
+  border-color: #174b35;
+  background: #eef5f0;
+}
+
+.shop-filter-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #c6a15b;
+  color: #0f3323;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.shop-filterbar-divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 24px;
+  background: #dfe6e1;
+}
+
+.shop-sort-chips {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.shop-sort-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.shop-sort-chip:not(#_),
+.shop-sort-chip:not(#_):hover {
+  flex-shrink: 0;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid #dfe6e1;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #3c4a42;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+.shop-sort-chip.is-active:not(#_) {
+  border-color: #174b35;
+  background: #174b35;
+  color: #ffffff;
+}
+
+.shop-result-count {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 13px;
+  color: #5f6b63;
+  white-space: nowrap;
+}
+
+/* ---- Panel ---- */
+.sf-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.sf-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 24, 16, 0.45);
+  animation: sf-fade 0.2s ease;
+}
+
+.sf-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  box-shadow: -18px 0 40px rgba(8, 24, 16, 0.18);
+  animation: sf-slide-in 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid #eef1ef;
+}
+
+.sf-head h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #174b35;
+}
+
+.sf-close:not(#_),
+.sf-close:not(#_):hover {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f2f5f3;
+  color: #174b35;
+}
+
+.sf-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 22px;
+}
+
+.sf-group {
+  padding: 18px 0;
+  border-bottom: 1px solid #eef1ef;
+}
+
+.sf-group:last-child {
+  border-bottom: 0;
+}
+
+.sf-group h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #1d2a23;
+}
+
+.sf-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sf-option:not(#_),
+.sf-option:not(#_):hover {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #d3ded6;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #2c3a32;
+  font-size: 13.5px;
+  font-weight: 400;
+  box-shadow: none;
+}
+
+.sf-option.is-selected:not(#_) {
+  border-color: #174b35;
+  background: #eef5f0;
+  color: #174b35;
+  font-weight: 500;
+  box-shadow: inset 0 0 0 1px #174b35;
+}
+
+/* Toggle switch */
+.sf-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: #2c3a32;
+  cursor: pointer;
+}
+
+.sf-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.sf-switch-track {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #d3ded6;
+  transition: background-color 0.2s ease;
+}
+
+.sf-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: left 0.2s ease;
+}
+
+.sf-switch input:checked + .sf-switch-track {
+  background: #174b35;
+}
+
+.sf-switch input:checked + .sf-switch-track::after {
+  left: 23px;
+}
+
+.sf-switch input:focus-visible + .sf-switch-track {
+  outline: 2px solid #c6a15b;
+  outline-offset: 2px;
+}
+
+.sf-foot {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+  padding: 14px 22px calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid #eef1ef;
+}
+
+.sf-clear:not(#_),
+.sf-clear:not(#_):hover,
+.sf-apply:not(#_),
+.sf-apply:not(#_):hover {
+  height: 46px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.sf-clear:not(#_),
+.sf-clear:not(#_):hover {
+  border: 1px solid #d3ded6;
+  background: #ffffff;
+  color: #174b35;
+}
+
+.sf-apply:not(#_),
+.sf-apply:not(#_):hover {
+  border: 0;
+  background: #174b35;
+  color: #ffffff;
+}
+
+@keyframes sf-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sf-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes sf-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (max-width: 960px) {
+  .shop-filterbar {
+    gap: 10px;
+    margin: 0 -12px 16px;
+    padding: 0 12px;
+  }
+  .shop-result-count {
+    display: none;
+  }
+  .shop-filterbar-divider {
+    height: 22px;
+  }
+  .sf-panel {
+    top: auto;
+    left: 0;
+    width: 100%;
+    max-height: 86vh;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -12px 40px rgba(8, 24, 16, 0.2);
+    animation-name: sf-slide-up;
+  }
+  .sf-head {
+    padding: 14px 18px;
+  }
+  .sf-body {
+    padding: 2px 18px;
+  }
+  .sf-foot {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sf-panel,
+  .sf-backdrop {
+    animation: none;
+  }
+}
+
+/* =========================================================
    TYPOGRAPHY — Poppins everywhere (both --serif and --sans point to it)
    Headings 600 · Subheadings 500 · Body 400 · Product names 500 · Prices 600
    Kept last so it wins over the older per-component weights.
