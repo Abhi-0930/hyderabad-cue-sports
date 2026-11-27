@@ -11,7 +11,6 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleDot,
-  Heart,
   Instagram,
   LogOut,
   Mail,
@@ -41,7 +40,8 @@ import { toast } from "sonner";
 type CartItem = Product & { quantity: number };
 type StorefrontContextValue = {
   cart: CartItem[];
-  wishlist: string[];
+  /** True once the saved cart has been read from this browser */
+  storageReady: boolean;
   cartOpen: boolean;
   notice: string;
   user: AuthUser | null;
@@ -49,7 +49,6 @@ type StorefrontContextValue = {
   addToCart: (product: Product, quantity?: number, openSidebar?: boolean, notify?: boolean) => void;
   updateQuantity: (id: string, delta: number) => void;
   removeFromCart: (id: string) => void;
-  toggleWishlist: (id: string) => void;
   openCart: () => void;
   closeCart: () => void;
   setUser: (user: AuthUser | null) => void;
@@ -60,6 +59,23 @@ type StorefrontContextValue = {
 
 const StorefrontContext = createContext<StorefrontContextValue | null>(null);
 
+/* ---------------------------------------------------------------------------
+   Notifications: one at a time. Every message reuses the same toast id, so a
+   new message replaces the one on screen instead of stacking up duplicates.
+   Use showToast() (or showNotice from the store) — never call toast() directly.
+--------------------------------------------------------------------------- */
+const TOAST_ID = "hcs-notice";
+type ToastKind = "default" | "success" | "error" | "warning" | "info";
+
+export function showToast(message: string, kind: ToastKind = "default", action?: { label: string; onClick: () => void }) {
+  const options = { id: TOAST_ID, action };
+  if (kind === "success") toast.success(message, options);
+  else if (kind === "error") toast.error(message, options);
+  else if (kind === "warning") toast.warning(message, options);
+  else if (kind === "info") toast.info(message, options);
+  else toast(message, options);
+}
+
 export function useStorefront() {
   const context = useContext(StorefrontContext);
   if (!context) throw new Error("useStorefront must be used inside StorefrontProvider");
@@ -68,16 +84,17 @@ export function useStorefront() {
 
 export function StorefrontProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [wishlist, setWishlist] = useState<string[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [storageReady, setStorageReady] = useState(false);
 
   useEffect(() => {
     const savedCart = window.localStorage.getItem("snookerboards-cart");
-    const savedWishlist = window.localStorage.getItem("snookerboards-wishlist");
     if (savedCart) setCart(JSON.parse(savedCart));
-    if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+    // The wishlist feature was removed — clear any list saved by older versions
+    window.localStorage.removeItem("snookerboards-wishlist");
+    setStorageReady(true);
 
     // Check active 30-day session cookie on load
     apiFetch<{ authenticated: boolean; user: AuthUser | null }>("/api/auth/me")
@@ -91,13 +108,13 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
       });
   }, []);
 
+  // Save only after the stored cart has been read; otherwise the initial empty
+  // cart would overwrite what the visitor saved (and get read back as empty)
   useEffect(() => {
+    if (!storageReady) return;
     window.localStorage.setItem("snookerboards-cart", JSON.stringify(cart));
-  }, [cart]);
+  }, [cart, storageReady]);
 
-  useEffect(() => {
-    window.localStorage.setItem("snookerboards-wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
 
   useEffect(() => {
     if (!notice) return;
@@ -159,7 +176,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
 
   const value = useMemo<StorefrontContextValue>(() => ({
     cart,
-    wishlist,
+    storageReady,
     cartOpen,
     notice,
     user,
@@ -172,28 +189,11 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
       if (openSidebar) {
         setCartOpen(true);
       } else if (notify) {
-        toast.success(`Added ${product.name} to bag`, {
-          action: {
-            label: "View bag",
-            onClick: () => setCartOpen(true),
-          },
-        });
+        showToast(`Added ${product.name} to bag`, "success", { label: "View bag", onClick: () => setCartOpen(true) });
       }
     },
     updateQuantity: (id, delta) => setCart((current) => current.map((item) => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item)),
     removeFromCart: (id) => setCart((current) => current.filter((item) => item.id !== id)),
-    toggleWishlist: (id) => {
-      setWishlist((current) => {
-        const exists = current.includes(id);
-        if (exists) {
-          toast("Item removed from your wishlist");
-          return current.filter((item) => item !== id);
-        } else {
-          toast.success("Item saved to your wishlist");
-          return [...current, id];
-        }
-      });
-    },
     openCart: () => setCartOpen(true),
     closeCart: () => setCartOpen(false),
     setUser: handleSetUser,
@@ -202,7 +202,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
         await apiFetch("/api/auth/logout", { method: "POST" });
       } finally {
         handleSetUser(null);
-        toast.success("You have been signed out.");
+        showToast("You have been signed out.", "success");
       }
     },
     logoutAll: async () => {
@@ -210,21 +210,11 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
         await apiFetch("/api/auth/logout-all", { method: "POST" });
       } finally {
         handleSetUser(null);
-        toast.success("Signed out from all devices.");
+        showToast("Signed out from all devices.", "success");
       }
     },
-    showNotice: (message, type = "info") => {
-      if (type === "success") {
-        toast.success(message);
-      } else if (type === "error") {
-        toast.error(message);
-      } else if (type === "warning") {
-        toast.warning(message);
-      } else {
-        toast.info(message);
-      }
-    },
-  }), [cart, wishlist, cartOpen, notice, user, handleSetUser]);
+    showNotice: (message, type = "info") => showToast(message, type),
+  }), [cart, storageReady, cartOpen, notice, user, handleSetUser]);
 
   return (
     <StorefrontContext.Provider value={value}>
@@ -439,7 +429,7 @@ function CategoryRail({ variant }: { variant: "desktop" | "mobile" }) {
 export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { cart, openCart, wishlist, showNotice, user, logout } = useStorefront();
+  const { cart, openCart, showNotice, user, logout } = useStorefront();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -717,7 +707,7 @@ export function SiteHeader() {
                       onClick={() => {
                         setSelectedAddress(addr.title);
                         setAddressModalOpen(false);
-                        toast.success(`Delivering to ${addr.title}`);
+                        showToast(`Delivering to ${addr.title}`, "success");
                       }}
                     >
                       <div className="mobile-address-meta">
@@ -748,7 +738,7 @@ export function SiteHeader() {
                     if (customPincode.trim()) {
                       setSelectedAddress(customPincode.trim());
                       setAddressModalOpen(false);
-                      toast.success(`Delivering to ${customPincode.trim()}`);
+                      showToast(`Delivering to ${customPincode.trim()}`, "success");
                       setCustomPincode("");
                     }
                   }}
@@ -1107,25 +1097,70 @@ export function SiteFooter() {
   );
 }
 
+/**
+ * Photos on a product card. Swipe (phones/trackpads) or tap a dot to move between
+ * the product's own gallery photos; dots only appear when there is more than one,
+ * and the current one is gold. Single-photo products render a plain image.
+ */
+function CardImageSlider({ product, href }: { product: Product; href: string }) {
+  const images = product.gallery?.length ? product.gallery : [product.image];
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
+  const onScroll = () => {
+    const el = trackRef.current;
+    if (!el || !el.clientWidth) return;
+    setActive(Math.round(el.scrollLeft / el.clientWidth));
+  };
+
+  const goTo = (index: number) => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.scrollTo({ left: index * el.clientWidth, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    setActive(index);
+  };
+
+  if (images.length < 2) {
+    return (
+      <Link href={href} className="product-image-link">
+        <img src={images[0]} alt={product.name} />
+      </Link>
+    );
+  }
+
+  return (
+    <>
+      <Link href={href} className="product-image-link" aria-label={product.name}>
+        <div className="pc-slides" ref={trackRef} onScroll={onScroll}>
+          {images.map((src, i) => (
+            <img key={`${src}-${i}`} src={src} alt={i === 0 ? product.name : `${product.name} — photo ${i + 1}`} loading={i === 0 ? undefined : "lazy"} draggable={false} />
+          ))}
+        </div>
+      </Link>
+      <div className="pc-dots" role="group" aria-label={`${product.name} photos`}>
+        {images.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            className={i === active ? "is-active" : ""}
+            aria-label={`Show photo ${i + 1} of ${images.length}`}
+            aria-current={i === active}
+            onClick={() => goTo(i)}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
 /** Product card used on the homepage carousel, the shop grid and "You may also like":
- *  framed photo + heart, name, then price with a compact ADD button. */
+ *  framed photo, name, then price with a compact ADD button. */
 export function ProductCard({ product, refTag = "hcs_cat_item" }: { product: Product; refTag?: string; onQuickView?: (product: Product) => void }) {
-  const { wishlist, toggleWishlist } = useStorefront();
-  const isSaved = wishlist.includes(product.id);
   const productHref = buildProductUrl(product, { ref: refTag });
   return (
     <article className="product-card">
       <div className="product-image-wrap">
-        <Link href={productHref} className="product-image-link">
-          <img src={product.image} alt={product.name} />
-        </Link>
-        <button
-          className={`wishlist-button ${isSaved ? "saved" : ""}`}
-          onClick={() => toggleWishlist(product.id)}
-          aria-label={isSaved ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
-        >
-          <Heart size={19} strokeWidth={1.8} fill={isSaved ? "currentColor" : "none"} />
-        </button>
+        <CardImageSlider product={product} href={productHref} />
       </div>
       <div className="product-card-body">
         <Link href={productHref} className="product-card-title">
@@ -1317,4 +1352,3 @@ export function SliderArrows({ onPrev, onNext }: { onPrev?: () => void; onNext?:
 
 export const catalogProducts = products;
 
-export { toast } from "sonner";
