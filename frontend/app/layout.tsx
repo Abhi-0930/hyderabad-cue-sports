@@ -22,8 +22,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Hyderabad Cue Sports — Premium Snooker Boards, Cues & Apparel",
-  description: "Official storefront for Hyderabad Cue Sports. Premium tournament snooker boards, hand-crafted cues, and streetwear club apparel.",
+  title: "Hyderabad Cue Sports — Premium Snooker Tables, Cues & Accessories",
+  description: "Hyderabad Cue Sports — premium snooker tables, cues, balls, table cloth, scoreboards and lighting, delivered and installed across India.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
