@@ -11,6 +11,7 @@ import { PromoBannerCarousel } from "@/components/promo-banner-carousel";
 import { ShopByEquipment } from "@/components/shop-by-equipment";
 import { ConsultationPanel, CustomerReviews, NewsletterSignup, ShopBySize } from "@/components/home-sections";
 import { applyShopFilters, readShopFilters, ShopToolbar } from "@/components/shop-filters";
+import { ProductDetailView } from "@/components/product-detail";
 import { buildProductUrl, verifyProductUrlSignature } from "@/lib/url";
 
 export function HomePage() {
@@ -260,16 +261,16 @@ export function ProductPage({
 
   const [loading, setLoading] = useState(!currentProduct);
   const [tamperedState, setTamperedState] = useState(Boolean(isTampered));
-  const { addToCart } = useStorefront();
-  const [selectedImage, setSelectedImage] = useState(currentProduct?.image ?? "");
 
   useEffect(() => {
+    // Opened another product (size chip, related product): show it straight away
+    const local = pid ? products.find((p) => p.id === pid) || (slug ? getProduct(slug) : undefined) : slug ? getProduct(slug) : undefined;
+    if (local) setCurrentProduct(local);
     if (slug) {
       fetchStorefrontProductBySlug(slug)
         .then((p) => {
           if (p) {
             setCurrentProduct(p);
-            setSelectedImage(p.image);
             if (signature && !verifyProductUrlSignature(p.id, p.slug, signature)) {
               setTamperedState(true);
             }
@@ -281,8 +282,6 @@ export function ProductPage({
   }, [slug, pid, signature]);
 
   const product = currentProduct;
-  const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState("details");
 
   if (tamperedState) {
     return (
@@ -311,12 +310,5 @@ export function ProductPage({
   }
 
   if (!product) return <section className="not-found section"><div className="container"><span className="eyebrow">404 · Product not found</span><h1>This frame is still being set.</h1><p>The product you are looking for is not part of the demo catalogue.</p><Link href="/shop" className="button button-dark">Back to collection <ArrowRight size={16} /></Link></div></section>;
-  const gallery = product.gallery?.length ? product.gallery : [product.image, "/images/snooker-room.jpg", "/images/snooker-detail.jpg"];
-  const related = products.filter((item) => item.id !== product.id && item.type === product.type).slice(0, 3);
-  return <>
-    <div className="product-breadcrumb container"><Link href="/">Home</Link><ArrowRight size={13} /><Link href="/shop">Collection</Link><ArrowRight size={13} /><span>{product.name}</span></div>
-    <section className="product-detail-section"><div className="container product-detail-layout"><div className="product-gallery"><div className="product-gallery-main"><img src={selectedImage} alt={product.name} /><span className="gallery-demo-label">Demo imagery</span></div><div className="product-thumbnails">{gallery.map((image, index) => <button key={`${image}-${index}`} className={selectedImage === image ? "active" : ""} onClick={() => setSelectedImage(image)}><img src={image} alt={`${product.name} view ${index + 1}`} /></button>)}</div></div><div className="product-detail-copy"><div className="detail-topline"><span className="eyebrow">{product.category} · {product.size}</span></div><h1>{product.name}</h1><div className="detail-rating"><span className="testimonial-stars"><Star size={13} fill="currentColor" /><Star size={13} fill="currentColor" /><Star size={13} fill="currentColor" /><Star size={13} fill="currentColor" /><Star size={13} fill="currentColor" /></span><span>Sample rating display · demo only</span></div><div className="detail-price-row"><strong>{formatInr(product.price)}</strong>{product.compareAt && <del>{formatInr(product.compareAt)}</del>}<span className="detail-demo">Demo price</span></div><p className="detail-description">{product.description}</p><div className="detail-select"><label htmlFor="size">Playing size</label><div className="select-wrap"><select id="size" defaultValue={product.size}><option>{product.size}</option><option>10 FT · sample option</option><option>12 FT · sample option</option></select><ChevronDown size={16} /></div><small>Size options are illustrative and can be connected to the final catalogue.</small></div><div className="detail-purchase-row"><div className="quantity-control quantity-control-large"><button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Decrease quantity"><Minus size={15} /></button><span>{quantity}</span><button onClick={() => setQuantity(quantity + 1)} aria-label="Increase quantity"><Plus size={15} /></button></div><AnimatedAddToCart onAdd={() => addToCart(product, quantity, false)} label="Add to bag" addedLabel="Added to bag" className="button-grow" /></div><div className="detail-service-grid"><div><ShieldCheck size={17} /><span><strong>{product.availability}</strong><small>Sample availability</small></span></div><div><Truck size={17} /><span><strong>India-wide service</strong><small>Delivery details to confirm</small></span></div><div><Ruler size={17} /><span><strong>Room planning</strong><small>Ask about sample guidance</small></span></div></div></div></div></section>
-    <section className="product-info-section"><div className="container"><div className="product-tabs"><button className={activeTab === "details" ? "active" : ""} onClick={() => setActiveTab("details")}>Product details</button><button className={activeTab === "specs" ? "active" : ""} onClick={() => setActiveTab("specs")}>Specifications</button><button className={activeTab === "delivery" ? "active" : ""} onClick={() => setActiveTab("delivery")}>Delivery &amp; support</button></div><div className="product-info-panel">{activeTab === "details" && <div className="info-columns"><div><span className="eyebrow">A considered centrepiece</span><h2>Made for the room around the game.</h2></div><div><p>{product.description}</p><ul>{product.details.map((detail) => <li key={detail}><Check size={15} />{detail}</li>)}</ul></div></div>}{activeTab === "specs" && <div className="spec-table">{product.specs.map((spec) => <div key={spec.label}><span>{spec.label}</span><strong>{spec.value}</strong></div>)}</div>}{activeTab === "delivery" && <div className="info-columns"><div><span className="eyebrow">Service promise</span><h2>Details to be shaped with you.</h2></div><div><p>Shipping, installation, return and support details shown here are placeholders for the client demonstration and should be replaced with the final business policy.</p><ul><li><Check size={15} />Sample support pathway</li><li><Check size={15} />Sample delivery planning</li><li><Check size={15} />Final policy copy to be added</li></ul></div></div>}</div></div></section>
-    <section className="section related-section"><div className="container"><SectionHeading eyebrow="Continue exploring" title="You may also like" /><div className="product-grid">{related.map((item) => <ProductCard key={item.id} product={item} onQuickView={() => undefined} />)}</div></div></section>
-  </>;
+  return <ProductDetailView product={product} />;
 }
