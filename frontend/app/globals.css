@@ -5765,7 +5765,7 @@ body {
   margin: 0 auto;
   padding: 56px 0 44px;
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  grid-template-columns: 1.6fr 1fr 1fr;
   gap: 40px;
 }
 
@@ -5784,7 +5784,7 @@ body {
 }
 
 .hcs-footer-contact {
-  margin: 0 0 22px;
+  margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
@@ -5809,26 +5809,6 @@ body {
   color: inherit;
   text-decoration: none;
   word-break: break-word;
-}
-
-.hcs-footer-socials {
-  display: flex;
-  gap: 10px;
-}
-
-.hcs-footer-socials a,
-.hcs-footer-socials button {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
-  cursor: pointer;
-  text-decoration: none;
 }
 
 .hcs-footer-col {
