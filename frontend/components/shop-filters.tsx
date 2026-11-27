@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { SlidersHorizontal, X } from "lucide-react";
+import { ArrowDownWideNarrow, ArrowUpNarrowWide, SlidersHorizontal, ThumbsUp, TrendingUp, X } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { mobileCategories } from "@/components/storefront-shell";
 
@@ -12,10 +12,10 @@ import { mobileCategories } from "@/components/storefront-shell";
    --------------------------------------------------------------- */
 
 export const SORT_OPTIONS = [
-  { id: "relevance", label: "Relevance" },
-  { id: "bestsellers", label: "Best sellers" },
-  { id: "price-asc", label: "Price: Low to High" },
-  { id: "price-desc", label: "Price: High to Low" },
+  { id: "relevance", label: "Relevance", icon: ThumbsUp },
+  { id: "bestsellers", label: "Best sellers", icon: TrendingUp },
+  { id: "price-asc", label: "Price: Low to High", icon: ArrowUpNarrowWide },
+  { id: "price-desc", label: "Price: High to Low", icon: ArrowDownWideNarrow },
 ] as const;
 
 export type SortId = (typeof SORT_OPTIONS)[number]["id"];
@@ -181,6 +181,7 @@ export function ShopToolbar({ allProducts, resultCount }: { allProducts: Product
       <div className="shop-sort-chips" role="group" aria-label="Sort products">
         {SORT_OPTIONS.map((o) => (
           <button key={o.id} type="button" className={`shop-sort-chip ${current.sort === o.id ? "is-active" : ""}`} aria-pressed={current.sort === o.id} onClick={() => setSort(o.id)}>
+            <o.icon size={14} strokeWidth={2} className="shop-sort-icon" aria-hidden="true" />
             {o.label}
           </button>
         ))}
