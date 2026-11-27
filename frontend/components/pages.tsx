@@ -219,7 +219,6 @@ export function ShopPage() {
   const size = searchParams.get("size") ?? "all";
   const type = searchParams.get("type") ?? "all";
   const query = (searchParams.get("query") ?? "").toLowerCase();
-  const [sort, setSort] = useState("featured");
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
   const [liveProducts, setLiveProducts] = useState<Product[]>(products);
 
@@ -232,7 +231,7 @@ export function ShopPage() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    let result = liveProducts.filter((product) => {
+    return liveProducts.filter((product) => {
       const matchesQuery = !query || `${product.name} ${product.category} ${product.size} ${product.tags.join(" ")}`.toLowerCase().includes(query);
       const matchesSize = size === "all" || product.size === size;
       const matchesType = type === "all" || product.type === type;
@@ -241,16 +240,11 @@ export function ShopPage() {
         (category.toLowerCase() === "cue equipment" && (product.category.toLowerCase() === "cues" || product.tags.includes("cue equipment")));
       return matchesQuery && matchesSize && matchesType && matchesCategory;
     });
-    if (sort === "low") result = [...result].sort((a, b) => a.price - b.price);
-    if (sort === "high") result = [...result].sort((a, b) => b.price - a.price);
-    if (sort === "new") result = [...result].reverse();
-    return result;
-  }, [category, liveProducts, query, size, sort, type]);
+  }, [category, liveProducts, query, size, type]);
 
   return <>
-    <section className="shop-hero"><div className="container shop-hero-inner"><div><span className="eyebrow">The collection · Official catalogue</span><h1>Explore our <em>cue sports collection.</em></h1><p>Premium snooker tables, cue equipment, table accessories, and scoreboards crafted for players across India.</p></div><div className="shop-hero-stat"><span>01 — 16</span><strong>Official<br />catalog range</strong></div></div></section>
-    <section className="shop-section section"><div className="container"><div className="shop-toolbar"><div><span className="result-count">Showing {filteredProducts.length} of {liveProducts.length} products</span>{query && <span className="query-chip">Search: {query}<X size={12} /></span>}</div><div className="toolbar-actions"><label className="sort-control"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="new">Newest Arrivals</option></select><ChevronDown size={15} /></label></div></div><div className="shop-layout"><div className="shop-results">{filteredProducts.length > 0 ? <div className="product-grid shop-product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div> : <div className="empty-state"><div className="empty-state-mark"><Search size={24} /></div><span className="eyebrow">No matching pieces</span><h2>Nothing in this frame.</h2><p>Try a different category or search to see more of our collection.</p><Link href="/shop" className="button button-dark">View all products <ArrowRight size={16} /></Link></div>}</div></div></div></section>
-    <section className="shop-note"><div className="container shop-note-inner"><Sparkles size={18} /><p><strong>Every product, price and specification on this page is illustrative demo content.</strong> The catalogue is designed to be edited when final business information is available.</p></div></section>
+    <section className="shop-section">
+      <div className="shop-body"><div className="shop-layout"><div className="shop-results">{filteredProducts.length > 0 ? <div className="product-grid shop-product-grid">{filteredProducts.map((product) => <ProductCard key={product.id} product={product} onQuickView={setQuickProduct} />)}</div> : <div className="shop-empty"><span className="shop-empty-icon"><Search size={26} /></span><h2>No products here yet</h2><p>Try another category or search for something else.</p><Link href="/shop" className="shop-empty-btn">View all products <ArrowRight size={16} /></Link></div>}</div></div></div></section>
     <QuickViewModal product={quickProduct} onClose={() => setQuickProduct(null)} />
   </>;
 }
