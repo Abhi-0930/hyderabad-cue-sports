@@ -5897,6 +5897,107 @@ body {
 }
 
 /* =========================================================
+   SHOP PAGE — product grid and empty state (no header box: products start
+   right under the navbar).
+   ========================================================= */
+
+.shop-section:not(#_) {
+  padding-top: 0;
+}
+
+.shop-body {
+  width: min(1240px, calc(100% - 32px));
+  margin: 24px auto 48px;
+}
+
+.shop-body .shop-product-grid:not(#_) {
+  gap: 22px 20px;
+}
+
+/* Nothing found */
+.shop-empty {
+  padding: 56px 20px;
+  border: 1.5px dashed #d3ded6;
+  border-radius: 20px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.shop-empty-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #eef5f0;
+  color: #174b35;
+}
+
+.shop-empty h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  color: #174b35;
+}
+
+.shop-empty p {
+  margin: 0 0 22px;
+  font-size: 14.5px;
+  color: #5f6b63;
+}
+
+.shop-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: #174b35;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 960px) {
+  .shop-body {
+    width: calc(100% - 24px);
+    margin-top: 16px;
+  }
+  .shop-body .shop-product-grid:not(#_) {
+    gap: 14px 12px;
+  }
+}
+
+/* =========================================================
+   SEARCH BARS — Amazon/Flipkart style: small radius, standard height.
+   Covers the header search (desktop + phone) and the sticky top-bar search;
+   header and sticky versions keep the same size so the sticky swap stays seamless.
+   ========================================================= */
+
+.mobile-pill-search:not(#_),
+.hcs-compact-search:not(#_) {
+  border-radius: 8px;
+  padding: 0 14px;
+  gap: 10px;
+}
+
+@media (min-width: 961px) {
+  .desktop-pill-search:not(#_),
+  .hcs-compact-search:not(#_) {
+    height: 40px;
+  }
+}
+
+@media (max-width: 960px) {
+  .mobile-curved-sheet .mobile-pill-search:not(#_),
+  .hcs-compact-search:not(#_) {
+    height: 44px;
+  }
+}
+
+/* =========================================================
    TYPOGRAPHY — Poppins everywhere (both --serif and --sans point to it)
    Headings 600 · Subheadings 500 · Body 400 · Product names 500 · Prices 600
    Kept last so it wins over the older per-component weights.
