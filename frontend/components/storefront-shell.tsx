@@ -974,7 +974,7 @@ export function SiteHeader() {
 }
 
 /* Phone/tablet bottom navigation (floating bar):
-   Home · Categories (All Categories page) · Shop (raised centre button) · Account · Cart */
+   Home · Categories (All Categories page) · Shop (raised centre button) · Cart · Account */
 function MobileBottomNav({ cartCount, onCart, onAccount, accountActive }: {
   cartCount: number;
   onCart: () => void;
@@ -1010,11 +1010,11 @@ function MobileBottomNav({ cartCount, onCart, onAccount, accountActive }: {
         <span className="mbn-center-circle"><Store size={24} strokeWidth={2} /></span>
         <span className="mbn-label">Shop</span>
       </Link>
-      <button type="button" className={`mbn-item ${current === "account" ? "is-active" : ""}`} onClick={onAccount}>
-        {content("Account", <UserRound size={22} strokeWidth={stroke("account")} />)}
-      </button>
       <button type="button" className="mbn-item" onClick={onCart} aria-label={`Cart with ${cartCount} ${cartCount === 1 ? "item" : "items"}`}>
         {content("Cart", <ShoppingCart size={22} strokeWidth={1.8} />, cartCount > 0 && <span className="mbn-badge">{cartCount > 99 ? "99+" : cartCount}</span>)}
+      </button>
+      <button type="button" className={`mbn-item ${current === "account" ? "is-active" : ""}`} onClick={onAccount}>
+        {content("Account", <UserRound size={22} strokeWidth={stroke("account")} />)}
       </button>
     </nav>
   );
@@ -1292,7 +1292,7 @@ function flyToCart(source: HTMLImageElement | null | undefined) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const thumbs = document.querySelector(".fcb-thumbs")?.getBoundingClientRect();
-  const barBottom = vw <= 960 ? 88 : 64; // matches .floating-cart-bar bottom (before safe-area)
+  const barBottom = vw <= 960 ? 118 : 64; // matches .floating-cart-bar bottom (before safe-area)
   const toX = thumbs ? thumbs.left + 16 : vw / 2 - 68 + 23;
   const toY = thumbs ? thumbs.top + thumbs.height / 2 : vh - barBottom - 23;
 
