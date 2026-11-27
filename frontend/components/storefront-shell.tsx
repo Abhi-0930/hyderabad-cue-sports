@@ -46,6 +46,8 @@ type StorefrontContextValue = {
   cart: CartItem[];
   /** True once the saved cart has been read from this browser */
   storageReady: boolean;
+  /** True once we know whether the visitor is signed in */
+  authReady: boolean;
   cartOpen: boolean;
   notice: string;
   user: AuthUser | null;
@@ -92,6 +94,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
   const [notice, setNotice] = useState("");
   const [user, setUser] = useState<AuthUser | null>(null);
   const [storageReady, setStorageReady] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     const savedCart = window.localStorage.getItem("snookerboards-cart");
@@ -109,7 +112,8 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
       })
       .catch(() => {
         // Backend offline; keep guest browsing active
-      });
+      })
+      .finally(() => setAuthReady(true));
   }, []);
 
   // Save only after the stored cart has been read; otherwise the initial empty
@@ -181,6 +185,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
   const value = useMemo<StorefrontContextValue>(() => ({
     cart,
     storageReady,
+    authReady,
     cartOpen,
     notice,
     user,
@@ -218,7 +223,7 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
       }
     },
     showNotice: (message, type = "info") => showToast(message, type),
-  }), [cart, storageReady, cartOpen, notice, user, handleSetUser]);
+  }), [cart, storageReady, authReady, cartOpen, notice, user, handleSetUser]);
 
   return (
     <StorefrontContext.Provider value={value}>
@@ -462,7 +467,11 @@ export function SiteHeader() {
   useEffect(() => {
     const bar = compactBarRef.current;
     if (isHome || !bar) return;
-    const update = () => setCompactBarHeight(bar.offsetHeight);
+    const update = () => {
+      setCompactBarHeight(bar.offsetHeight);
+      // Lets full-height pages (All Categories) fit exactly under the bar
+      document.documentElement.style.setProperty("--hcs-bar-h", `${bar.offsetHeight}px`);
+    };
     update();
     const observer = new ResizeObserver(update);
     observer.observe(bar);
@@ -964,8 +973,8 @@ export function SiteHeader() {
   );
 }
 
-/* Phone/tablet bottom navigation (Flipkart-style floating bar):
-   Home · Shop · Categories (bottom sheet) · Account · Cart */
+/* Phone/tablet bottom navigation (floating bar):
+   Home · Categories (All Categories page) · Shop (raised centre button) · Account · Cart */
 function MobileBottomNav({ cartCount, onCart, onAccount, accountActive }: {
   cartCount: number;
   onCart: () => void;
@@ -973,20 +982,11 @@ function MobileBottomNav({ cartCount, onCart, onAccount, accountActive }: {
   accountActive: boolean;
 }) {
   const pathname = usePathname();
-  const [sheetOpen, setSheetOpen] = useState(false);
+  if (pathname === "/checkout") return null; // checkout has its own bottom bar
 
-  useEffect(() => setSheetOpen(false), [pathname]);
-
-  useEffect(() => {
-    if (!sheetOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSheetOpen(false); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [sheetOpen]);
-
-  const current = sheetOpen ? "categories"
-    : accountActive || pathname === "/login" ? "account"
+  const current = accountActive || pathname === "/login" ? "account"
     : pathname === "/" ? "home"
+    : pathname === "/categories" ? "categories"
     : pathname === "/shop" ? "shop"
     : null;
 
@@ -998,17 +998,18 @@ function MobileBottomNav({ cartCount, onCart, onAccount, accountActive }: {
     </>
   );
 
-  return <>
+  return (
     <nav className="mobile-bottom-nav" aria-label="Main navigation">
       <Link href="/" className={`mbn-item ${current === "home" ? "is-active" : ""}`} aria-current={current === "home" ? "page" : undefined}>
         {content("Home", <House size={22} strokeWidth={stroke("home")} />)}
       </Link>
-      <Link href="/shop" className={`mbn-item ${current === "shop" ? "is-active" : ""}`} aria-current={current === "shop" ? "page" : undefined}>
-        {content("Shop", <Store size={22} strokeWidth={stroke("shop")} />)}
-      </Link>
-      <button type="button" className={`mbn-item ${current === "categories" ? "is-active" : ""}`} onClick={() => setSheetOpen(true)} aria-haspopup="dialog" aria-expanded={sheetOpen}>
+      <Link href="/categories" className={`mbn-item ${current === "categories" ? "is-active" : ""}`} aria-current={current === "categories" ? "page" : undefined}>
         {content("Categories", <LayoutGrid size={22} strokeWidth={stroke("categories")} />)}
-      </button>
+      </Link>
+      <Link href="/shop" className={`mbn-item mbn-center ${current === "shop" ? "is-active" : ""}`} aria-current={current === "shop" ? "page" : undefined}>
+        <span className="mbn-center-circle"><Store size={24} strokeWidth={2} /></span>
+        <span className="mbn-label">Shop</span>
+      </Link>
       <button type="button" className={`mbn-item ${current === "account" ? "is-active" : ""}`} onClick={onAccount}>
         {content("Account", <UserRound size={22} strokeWidth={stroke("account")} />)}
       </button>
@@ -1016,40 +1017,19 @@ function MobileBottomNav({ cartCount, onCart, onAccount, accountActive }: {
         {content("Cart", <ShoppingCart size={22} strokeWidth={1.8} />, cartCount > 0 && <span className="mbn-badge">{cartCount > 99 ? "99+" : cartCount}</span>)}
       </button>
     </nav>
-
-    {sheetOpen && (
-      <div className="mbn-sheet-root" role="dialog" aria-modal="true" aria-label="Categories">
-        <div className="mbn-sheet-backdrop" onClick={() => setSheetOpen(false)} />
-        <div className="mbn-sheet">
-          <div className="mbn-sheet-head">
-            <h2>Categories</h2>
-            <button type="button" className="mbn-sheet-close" onClick={() => setSheetOpen(false)} aria-label="Close categories"><X size={20} /></button>
-          </div>
-          <div className="mbn-sheet-grid">
-            {mobileCategories.map((cat) => {
-              const Icon = cat.icon;
-              return (
-                <Link key={cat.id} href={cat.href} className="mbn-cat" onClick={() => setSheetOpen(false)}>
-                  <span className="mbn-cat-icon"><Icon color="#0b3824" /></span>
-                  <span className="mbn-cat-label">{cat.label}</span>
-                </Link>
-              );
-            })}
-            <Link href="/shop" className="mbn-cat" onClick={() => setSheetOpen(false)}>
-              <span className="mbn-cat-icon"><LayoutGrid size={24} color="#0b3824" strokeWidth={1.8} /></span>
-              <span className="mbn-cat-label">All products</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    )}
-  </>;
+  );
 }
 
 export function CartDrawer() {
-  const { cart, cartOpen, closeCart, updateQuantity, removeFromCart, showNotice } = useStorefront();
+  const { cart, cartOpen, closeCart, updateQuantity, removeFromCart, user } = useStorefront();
+  const router = useRouter();
+  // Checkout needs an account: guests sign in first, then land back on checkout
+  const goToCheckout = () => {
+    closeCart();
+    router.push(user ? "/checkout" : buildLoginUrl({ ref: "hcs_cart_checkout", next: "/checkout" }));
+  };
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  return cartOpen ? <div className="cart-overlay" onClick={closeCart}><aside className="cart-drawer" onClick={(event) => event.stopPropagation()}><div className="cart-drawer-header"><div><span className="eyebrow">Your selection</span><h2>Shopping bag <span>{cart.length}</span></h2></div><button className="icon-button" onClick={closeCart} aria-label="Close shopping bag"><X size={21} /></button></div>{cart.length === 0 ? <div className="cart-empty"><div className="empty-mark"><ShoppingBag size={22} /></div><h3>Your bag is waiting</h3><p>Explore the collection and add something made for the room.</p><Link href="/shop" className="button button-dark" onClick={closeCart}>Shop tables <ArrowRight size={16} /></Link></div> : <><div className="cart-items">{cart.map((item) => <div className="cart-item" key={item.id}><img src={item.image} alt="" /><div className="cart-item-info"><div className="cart-item-row"><div><span className="product-kicker">{item.size} · {item.category}</span><h4>{item.name}</h4></div><button className="remove-button" onClick={() => removeFromCart(item.id)} aria-label={`Remove ${item.name}`}><X size={15} /></button></div><div className="cart-item-bottom"><div className="quantity-control"><button onClick={() => updateQuantity(item.id, -1)} aria-label="Decrease quantity"><Minus size={13} /></button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label="Increase quantity"><Plus size={13} /></button></div><strong>{formatInr(item.price * item.quantity)}</strong></div></div></div>)}</div><div className="cart-summary"><div className="cart-summary-line"><span>Subtotal</span><strong>{formatInr(subtotal)}</strong></div><p>Demo pricing shown in INR. Delivery, installation and taxes are confirmed at the final catalogue stage.</p><button className="button button-dark button-full" onClick={() => showNotice("Checkout is a demo pathway — connect your preferred commerce backend here.")}>Continue to checkout <ArrowRight size={16} /></button><div className="cart-trust"><ShieldCheck size={16} /><span>Secure demo shopping experience</span></div></div></>}</aside></div> : null;
+  return cartOpen ? <div className="cart-overlay" onClick={closeCart}><aside className="cart-drawer" onClick={(event) => event.stopPropagation()}><div className="cart-drawer-header"><div><span className="eyebrow">Your selection</span><h2>Shopping bag <span>{cart.length}</span></h2></div><button className="icon-button" onClick={closeCart} aria-label="Close shopping bag"><X size={21} /></button></div>{cart.length === 0 ? <div className="cart-empty"><div className="empty-mark"><ShoppingBag size={22} /></div><h3>Your bag is waiting</h3><p>Explore the collection and add something made for the room.</p><Link href="/shop" className="button button-dark" onClick={closeCart}>Shop tables <ArrowRight size={16} /></Link></div> : <><div className="cart-items">{cart.map((item) => <div className="cart-item" key={item.id}><img src={item.image} alt="" /><div className="cart-item-info"><div className="cart-item-row"><div><span className="product-kicker">{item.size} · {item.category}</span><h4>{item.name}</h4></div><button className="remove-button" onClick={() => removeFromCart(item.id)} aria-label={`Remove ${item.name}`}><X size={15} /></button></div><div className="cart-item-bottom"><div className="quantity-control"><button onClick={() => updateQuantity(item.id, -1)} aria-label="Decrease quantity"><Minus size={13} /></button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label="Increase quantity"><Plus size={13} /></button></div><strong>{formatInr(item.price * item.quantity)}</strong></div></div></div>)}</div><div className="cart-summary"><div className="cart-summary-line"><span>Subtotal</span><strong>{formatInr(subtotal)}</strong></div><p>Prices include taxes. Delivery and installation charges are confirmed with your order.</p><button className="button button-dark button-full" onClick={goToCheckout}>Continue to checkout <ArrowRight size={16} /></button></div></>}</aside></div> : null;
 }
 
 export function ToastNotice() {
@@ -1063,7 +1043,7 @@ export function FloatingCartBar() {
   const pathname = usePathname();
   const count = cart.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const visible = count > 0 && !cartOpen && pathname !== "/login";
+  const visible = count > 0 && !cartOpen && pathname !== "/login" && pathname !== "/checkout";
   const shownSubtotal = useCountUp(subtotal);
 
   // Bounce the bar when an added item "lands" (timed to the fly-to-cart animation).
@@ -1161,7 +1141,7 @@ const FOOTER_SIZE_LINKS = ["8 FT", "10 FT", "12 FT"].map((size) => ({
 
 export function SiteFooter() {
   const pathname = usePathname();
-  if (pathname === "/login") return null;
+  if (pathname === "/login" || pathname === "/categories") return null;
   const year = new Date().getFullYear();
 
   return (
