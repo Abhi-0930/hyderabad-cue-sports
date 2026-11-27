@@ -342,7 +342,7 @@ type NavCategory = {
   query?: string;
 };
 
-const mobileCategories: (NavCategory & { href: string })[] = ([
+export const mobileCategories: (NavCategory & { href: string })[] = ([
   { id: "tables", label: "Tables", icon: SnookerTableIcon, category: "Snooker Tables", matches: ["snooker tables"] },
   { id: "table-parts", label: "Table Parts", icon: TablePocketIcon, category: "Table Accessories", matches: ["table accessories"], query: "table parts" },
   { id: "balls", label: "Balls", icon: BallRackIcon, category: "Table Accessories", matches: ["table accessories"], query: "balls" },
@@ -448,9 +448,27 @@ export function SiteHeader() {
   const compactSearchRef = useRef<HTMLFormElement>(null);
   const [showCompactBar, setShowCompactBar] = useState(false);
 
+  // Only the homepage gets the full photo header. Every other page (product, shop, …)
+  // shows just the slim bar — logo, search, account, cart — pinned at the top, like
+  // Amazon/Flipkart. A spacer the bar's height keeps page content from sliding under it.
+  const isHome = pathname === "/";
+  const compactBarRef = useRef<HTMLDivElement>(null);
+  const [compactBarHeight, setCompactBarHeight] = useState(0);
+
+  useEffect(() => {
+    const bar = compactBarRef.current;
+    if (isHome || !bar) return;
+    const update = () => setCompactBarHeight(bar.offsetHeight);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, [isHome]);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 30);
+      if (!isHome) return setShowCompactBar(true);
       const header = headerRef.current;
       if (!header) return setShowCompactBar(false);
       // Whichever header search is on screen (desktop pill or the mobile one)
@@ -467,7 +485,7 @@ export function SiteHeader() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleScroll);
     };
-  }, [pathname]);
+  }, [pathname, isHome]);
 
   if (pathname === "/login") return null;
 
@@ -549,7 +567,12 @@ export function SiteHeader() {
   return (
     <>
       {/* Compact sticky bar: slides down once the main header is out of view */}
-      <div className={`hcs-compact-bar ${showCompactBar ? "is-visible" : ""}`} inert={!showCompactBar} aria-hidden={!showCompactBar}>
+      <div
+        ref={compactBarRef}
+        className={`hcs-compact-bar ${showCompactBar || !isHome ? "is-visible" : ""} ${isHome ? "" : "is-pinned"}`}
+        inert={isHome && !showCompactBar}
+        aria-hidden={isHome && !showCompactBar}
+      >
         <div className="hcs-compact-inner">
           <Link href="/" className="hcs-compact-logo" aria-label="Hyderabad Cue Sports Home">
             <img src="/images/hcs-logo-white.png" alt="Hyderabad Cue Sports" width={120} height={35} />
@@ -578,7 +601,11 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className={`hcs-sticky-header ${isScrolled ? "scrolled" : ""}`}>
+      {!isHome && <div className="hcs-compact-spacer" style={{ height: compactBarHeight || undefined }} aria-hidden="true" />}
+
+      {/* Full header (homepage only); on other pages only its popups (account menu,
+          delivery location) are used, so the visible parts are hidden with CSS */}
+      <div className={`hcs-sticky-header ${isScrolled ? "scrolled" : ""} ${isHome ? "" : "is-inner"}`}>
         {/* Luxury Brand Header (Matching Design Mockup across Desktop and Mobile) */}
         <div className="luxury-header-shell mobile-luxury-header-shell" ref={headerRef}>
           {/* Top Green Hero Bar with Snooker Table Background */}
@@ -1002,6 +1029,8 @@ const BACK_TO_TOP_HIDE_BELOW = 400; // always hidden this close to the top
 export function BackToTop() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
+  // Sit 12px under the sticky top bar, whatever its height (it's taller on phones)
+  const [top, setTop] = useState<number | null>(null);
 
   useEffect(() => {
     setVisible(false);
@@ -1011,8 +1040,11 @@ export function BackToTop() {
       const delta = y - lastY;
       if (Math.abs(delta) < 4) return; // ignore tiny jitters
       if (y < BACK_TO_TOP_HIDE_BELOW) setVisible(false);
-      else if (delta < 0 && y > BACK_TO_TOP_SHOW_AFTER) setVisible(true);
-      else if (delta > 0) setVisible(false);
+      else if (delta < 0 && y > BACK_TO_TOP_SHOW_AFTER) {
+        const bar = document.querySelector(".hcs-compact-bar.is-visible");
+        setTop(bar ? Math.round(bar.getBoundingClientRect().bottom) + 12 : null);
+        setVisible(true);
+      } else if (delta > 0) setVisible(false);
       lastY = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -1024,6 +1056,7 @@ export function BackToTop() {
     <button
       type="button"
       className={`back-to-top-pill ${visible ? "is-visible" : ""}`}
+      style={top !== null ? { top } : undefined}
       onClick={() => {
         setVisible(false);
         window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
