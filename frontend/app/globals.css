@@ -6376,6 +6376,32 @@ body {
   }
 }
 
+/* Sort chip icon: thin line icon in brand green, white on the active chip */
+.shop-sort-chip:not(#_) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shop-sort-icon {
+  flex-shrink: 0;
+  color: #174b35;
+}
+
+.shop-sort-chip.is-active .shop-sort-icon {
+  color: #ffffff;
+}
+
+/* Category row (phones/tablets): centred when it fits, still scrolls when it doesn't */
+@media (max-width: 960px) {
+  .mobile-cat-rail > :first-child {
+    margin-left: auto;
+  }
+  .mobile-cat-rail > :last-child {
+    margin-right: auto;
+  }
+}
+
 /* =========================================================
    TYPOGRAPHY — Poppins everywhere (both --serif and --sans point to it)
    Headings 600 · Subheadings 500 · Body 400 · Product names 500 · Prices 600
