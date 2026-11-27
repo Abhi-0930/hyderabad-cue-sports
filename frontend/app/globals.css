@@ -4234,8 +4234,8 @@ body {
 }
 
 /* =========================================================
-   APPLE DYNAMIC ISLAND TOAST NOTIFICATIONS
-   Native iOS Dynamic Island top-center pill with spring physics
+   NOTIFICATIONS (sonner) — top-centre "island" pill in the brand green.
+   Only one is ever shown (showToast reuses one id; Toaster visibleToasts=1).
    ========================================================= */
 
 [data-sonner-toaster] {
@@ -4247,191 +4247,162 @@ body {
   left: 50% !important;
   transform: translateX(-50%) !important;
   z-index: 999999 !important;
-  pointer-events: none;
   width: auto !important;
-  max-width: min(480px, calc(100vw - 24px)) !important;
+  max-width: min(460px, calc(100vw - 24px)) !important;
   display: flex !important;
   justify-content: center !important;
+  pointer-events: none;
 }
 
 [data-sonner-toast] {
   pointer-events: auto !important;
-  background: #000000 !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 28%, #000000 100%) !important;
-  background-color: #000000 !important;
-  color: #ffffff !important;
-  border-radius: 9999px !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  box-shadow: 
-    0 16px 38px -6px rgba(0, 0, 0, 0.78),
-    0 4px 12px rgba(0, 0, 0, 0.45),
-    inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
-  padding: 8px 18px 8px 10px !important;
-  min-height: 42px !important;
-  height: auto !important;
-  width: max-content !important;
-  max-width: min(440px, calc(100vw - 28px)) !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 10px !important;
+  width: max-content !important;
+  max-width: min(440px, calc(100vw - 28px)) !important;
+  min-height: 46px !important;
+  height: auto !important;
+  padding: 8px 10px 8px 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 999px !important;
+  background: #0f3323 !important;
+  color: #ffffff !important;
   font-family: var(--sans) !important;
-  
-  /* Apple Dynamic Island Spring transition */
-  --y: translate3d(0, -120%, 0) scale(0.68, 0.5);
+  box-shadow: 0 14px 34px -8px rgba(7, 36, 20, 0.55), 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+
+  /* Calm drop-in from the top (no bounce or blur) */
+  --y: translate3d(0, -16px, 0);
   opacity: 0;
-  filter: blur(4px);
   transform: var(--y);
-  transition: transform 0.52s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-              opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.32s ease,
-              height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-              box-shadow 0.25s ease !important;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.22s ease !important;
+}
+
+/* Text-only messages: a little more room on the right */
+[data-sonner-toast]:not(:has([data-button])) {
+  padding-right: 18px !important;
+}
+
+/* Plain island (no icon, no action): compact and evenly padded */
+[data-sonner-toast]:not(:has([data-icon] svg)):not(:has([data-button])) {
+  min-height: 40px !important;
+  padding: 9px 22px !important;
+  justify-content: center !important;
+}
+
+[data-sonner-toast]:not(:has([data-icon] svg)) [data-icon] {
+  display: none !important;
 }
 
 [data-sonner-toast][data-mounted="true"] {
-  --y: translate3d(0, 0, 0) scale(1, 1);
+  --y: translate3d(0, 0, 0);
   opacity: 1 !important;
-  filter: blur(0px) !important;
 }
 
 [data-sonner-toast][data-removed="true"] {
-  --y: translate3d(0, -135%, 0) scale(0.58, 0.38) !important;
+  --y: translate3d(0, -12px, 0) !important;
   opacity: 0 !important;
-  filter: blur(5px) !important;
-  transition: transform 0.34s cubic-bezier(0.4, 0, 1, 1),
-              opacity 0.22s ease,
-              filter 0.22s ease !important;
+  transition: transform 0.2s ease-in, opacity 0.18s ease-in !important;
 }
 
-/* Icon / Status badge (Dynamic Island left accessory - clean, no glow) */
+/* Status icon: solid circle with a white glyph */
 [data-sonner-toast] [data-icon] {
-  width: 25px !important;
-  height: 25px !important;
-  border-radius: 50% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
   flex-shrink: 0 !important;
+  width: 26px !important;
+  height: 26px !important;
   margin: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
   box-shadow: none !important;
-  animation: dynamicIslandIconPulse 0.48s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+  animation: none !important;
 }
 
-@keyframes dynamicIslandIconPulse {
-  0% {
-    transform: scale(0.35);
-    opacity: 0;
-  }
-  65% {
-    transform: scale(1.18);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+[data-sonner-toast][data-type="success"] [data-icon] {
+  background: #1f8a4c !important;
 }
 
-/* Success: Apple Emerald (clean, no glow) */
-[data-sonner-toast][data-type="success"] [data-icon],
-[data-sonner-toast] [data-icon]:has(svg) {
-  background: rgba(34, 197, 94, 0.22) !important;
-  color: #34d399 !important;
-  border: 1px solid rgba(52, 211, 153, 0.35) !important;
-  box-shadow: none !important;
-}
-
-/* Error: Apple Coral (clean, no glow) */
 [data-sonner-toast][data-type="error"] [data-icon] {
-  background: rgba(239, 68, 68, 0.22) !important;
-  color: #f87171 !important;
-  border: 1px solid rgba(248, 113, 113, 0.35) !important;
-  box-shadow: none !important;
+  background: #d12c2c !important;
 }
 
-/* Info / Default: Warm Gold Accent (clean, no glow) */
-[data-sonner-toast][data-type="info"] [data-icon],
-[data-sonner-toast][data-type="default"] [data-icon] {
-  background: rgba(212, 175, 55, 0.22) !important;
-  color: #fbbf24 !important;
-  border: 1px solid rgba(251, 191, 36, 0.35) !important;
-  box-shadow: none !important;
+[data-sonner-toast][data-type="warning"] [data-icon],
+[data-sonner-toast][data-type="info"] [data-icon] {
+  background: #c6a15b !important;
 }
 
 [data-sonner-toast] [data-icon] svg {
-  width: 14px !important;
-  height: 14px !important;
-  stroke-width: 2.3 !important;
+  width: 15px !important;
+  height: 15px !important;
+  color: #ffffff !important;
+  fill: currentColor;
 }
 
-/* Content & Title */
 [data-sonner-toast] [data-content] {
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
-  animation: dynamicIslandTextReveal 0.44s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-}
-
-@keyframes dynamicIslandTextReveal {
-  0% {
-    opacity: 0;
-    transform: scale(0.92);
-    filter: blur(2px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(0px);
-  }
+  min-width: 0 !important;
+  animation: none !important;
 }
 
 [data-sonner-toast] [data-title] {
-  font-size: 13px !important;
-  font-weight: 590 !important;
-  letter-spacing: -0.015em !important;
+  overflow: hidden !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0 !important;
   color: #ffffff !important;
-  line-height: 1.3 !important;
   white-space: nowrap !important;
   text-overflow: ellipsis !important;
-  overflow: hidden !important;
 }
 
 [data-sonner-toast] [data-description] {
-  font-size: 11px !important;
-  color: rgba(255, 255, 255, 0.65) !important;
   margin-top: 1px !important;
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
-/* Action button (Dynamic Island interactive pill) */
+/* Action ("View", "View bag"): small gold pill */
 [data-sonner-toast] [data-button] {
-  background: #242427 !important;
-  color: #ffffff !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.01em !important;
-  padding: 4px 12px !important;
-  height: 25px !important;
-  border-radius: 9999px !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  cursor: pointer !important;
-  margin-left: 6px !important;
   flex-shrink: 0 !important;
-  transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease !important;
+  height: 30px !important;
+  margin-left: 4px !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: #c6a15b !important;
+  color: #0f3323 !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  cursor: pointer !important;
+  transform: none !important;
+  transition: none !important;
 }
 
 [data-sonner-toast] [data-button]:hover {
-  background: #34343a !important;
-  border-color: rgba(255, 255, 255, 0.32) !important;
-  transform: scale(1.04) !important;
+  background: #c6a15b !important;
+  transform: none !important;
 }
 
-/* Close button - completely hidden for true Dynamic Island experience */
 [data-sonner-toast] [data-close-button] {
   display: none !important;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  [data-sonner-toast],
+  [data-sonner-toast][data-removed="true"] {
+    transition: opacity 0.15s ease !important;
+    --y: none !important;
+  }
+}
+
 /* =========================================================
-   PRODUCT CARD — framed photo + heart, name, price with a compact ADD
+   PRODUCT CARD — framed photo, name, price with a compact ADD
    Used by the homepage carousel, the shop grid and "You may also like".
    ========================================================= */
 
@@ -4461,23 +4432,6 @@ body {
   object-fit: cover;
   transform: none;
   transition: none;
-}
-
-.product-card .wishlist-button,
-.product-card .wishlist-button:hover {
-  top: 10px;
-  right: 10px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.94);
-  color: #174b35;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.product-card .wishlist-button.saved {
-  background: #ffffff;
-  color: #d12c2c;
 }
 
 .product-card .product-card-body {
@@ -4521,6 +4475,89 @@ body {
   font-size: 22px;
   letter-spacing: -0.01em;
   color: #174b35;
+}
+
+/* ---- Product card photo slider (CardImageSlider) ---- */
+
+/* Swipeable strip of the product's photos, one per "page" */
+.product-card .pc-slides {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain; /* swiping photos doesn't drag the surrounding carousel */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.product-card .pc-slides::-webkit-scrollbar {
+  display: none;
+}
+
+.product-card .pc-slides img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scroll-snap-align: start;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Dots (bottom-left): small white dots on a soft dark pill; the current photo is a gold bar */
+.product-card .pc-dots {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: rgba(10, 30, 20, 0.35);
+  backdrop-filter: blur(4px);
+}
+
+.product-card .pc-dots button,
+.product-card .pc-dots button:hover {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transform: none;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.product-card .pc-dots button.is-active {
+  width: 16px;
+  background: #c6a15b;
+}
+
+/* Bigger tap targets on touch screens without changing the look */
+@media (pointer: coarse) {
+  .product-card .pc-dots {
+    gap: 6px;
+  }
+  .product-card .pc-dots button {
+    position: relative;
+  }
+  .product-card .pc-dots button::after {
+    content: "";
+    position: absolute;
+    inset: -8px -4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card .pc-dots button {
+    transition: none;
+  }
 }
 
 /* Compact ADD button → − qty + stepper once in the bag */
@@ -4573,17 +4610,6 @@ body {
   .product-card .product-image-wrap {
     aspect-ratio: 1.15 / 1;
     border-radius: 12px;
-  }
-  .product-card .wishlist-button,
-  .product-card .wishlist-button:hover {
-    top: 7px;
-    right: 7px;
-    width: 32px;
-    height: 32px;
-  }
-  .product-card .wishlist-button svg {
-    width: 16px;
-    height: 16px;
   }
   .product-card .product-card-body {
     padding: 10px 5px 4px;
