@@ -617,37 +617,6 @@
   color: var(--gold);
 }
 
-/* Floating WhatsApp Button */
-.floating-whatsapp-btn {
-  position: fixed;
-  bottom: 26px;
-  right: 26px;
-  z-index: 85;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  background: #25D366;
-  color: #ffffff;
-  padding: 10px 18px 10px 12px;
-  border-radius: 999px;
-  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.42);
-  text-decoration: none;
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.floating-whatsapp-btn:hover {
-  box-shadow: 0 12px 32px rgba(37, 211, 102, 0.55);
-}
-.whatsapp-icon-circle {
-  display: grid;
-  place-items: center;
-}
-.whatsapp-floating-label {
-  display: inline-block;
-}
-
 /* Mobile Search Strip (Desktop: Hidden) */
 .mobile-search-strip {
   display: none;
@@ -1875,14 +1844,6 @@
   }
   .mobile-search-strip {
     padding: 4px 12px 8px 12px;
-  }
-  .floating-whatsapp-btn .whatsapp-floating-label {
-    display: none;
-  }
-  .floating-whatsapp-btn {
-    padding: 12px;
-    bottom: 20px;
-    right: 20px;
   }
 }
 
@@ -4882,14 +4843,10 @@ body {
   }
 }
 
-/* Small screens: lift WhatsApp (bottom-right) above the cart pill when it shows */
+/* Small screens: cart pill position */
 @media (max-width: 960px) {
   .floating-cart-bar {
     bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-  }
-  /* Pill top is at 56 + 46 = 102px; keep a gap above it */
-  body[data-cart-bar] .floating-whatsapp-btn {
-    bottom: calc(118px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
@@ -5842,7 +5799,7 @@ body {
 .hcs-footer-bottom {
   width: min(1240px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 20px 0 88px; /* bottom room keeps the floating WhatsApp button off the payment badges */
+  padding: 20px 0 26px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
@@ -5882,7 +5839,7 @@ body {
     width: calc(100% - 40px);
     flex-direction: column;
     align-items: flex-start;
-    padding-bottom: 96px; /* clear of the floating WhatsApp / cart buttons */
+    padding-bottom: 26px;
   }
 }
 
