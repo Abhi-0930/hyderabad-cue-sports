@@ -36,6 +36,7 @@ import { formatInr, Product, products } from "@/lib/products";
 import { apiFetch, type AuthUser } from "@/lib/api";
 import { buildProductUrl, buildShopUrl, buildLoginUrl } from "@/lib/url";
 import { toast } from "sonner";
+import { SearchBox } from "@/components/search-suggest";
 
 type CartItem = Product & { quantity: number };
 type StorefrontContextValue = {
@@ -559,10 +560,6 @@ export function SiteHeader() {
     },
   ];
 
-  const submitSearch = (event: React.FormEvent) => {
-    event.preventDefault();
-    router.push(buildShopUrl({ query: search.trim(), ref: "hcs_nav_search" }));
-  };
 
   return (
     <>
@@ -578,16 +575,15 @@ export function SiteHeader() {
             <img src="/images/hcs-logo-white.png" alt="Hyderabad Cue Sports" width={120} height={35} />
           </Link>
 
-          <form className="hcs-compact-search" role="search" onSubmit={submitSearch} ref={compactSearchRef}>
-            <Search size={19} aria-hidden="true" />
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search for Snooker Tables, Cues..."
-              aria-label="Search catalog"
-            />
-          </form>
+          <SearchBox
+            className="hcs-compact-search"
+            formRef={compactSearchRef}
+            inputType="search"
+            value={search}
+            onChange={setSearch}
+            categories={mobileCategories}
+            leading={<Search size={19} aria-hidden="true" />}
+          />
 
           <div className="hcs-compact-actions">
             <button type="button" className="hcs-compact-btn" aria-label="Account" onClick={() => handleAccountClick("compact_header")}>
@@ -669,16 +665,13 @@ export function SiteHeader() {
 
                 {/* Desktop Search Pill (Hidden on Mobile) */}
                 <div className="desktop-search-wrapper">
-                  <form className="mobile-pill-search desktop-pill-search" onSubmit={submitSearch}>
-                    <Search size={19} className="mobile-search-icon" />
-                    <input
-                      type="text"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder="Search for Snooker Tables, Cues..."
-                      aria-label="Search catalog"
-                    />
-                  </form>
+                  <SearchBox
+                    className="mobile-pill-search desktop-pill-search"
+                    value={search}
+                    onChange={setSearch}
+                    categories={mobileCategories}
+                    leading={<Search size={19} className="mobile-search-icon" />}
+                  />
                 </div>
               </div>
 
@@ -692,16 +685,13 @@ export function SiteHeader() {
           {/* Mobile Curved Bottom Sheet (Hidden on Desktop) */}
           <div className="mobile-curved-sheet">
             {/* Mobile Search Pill Bar inside Sheet */}
-            <form className="mobile-pill-search" onSubmit={submitSearch}>
-              <Search size={19} className="mobile-search-icon" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search for Snooker Tables, Cues..."
-                aria-label="Search catalog"
-              />
-            </form>
+            <SearchBox
+              className="mobile-pill-search"
+              value={search}
+              onChange={setSearch}
+              categories={mobileCategories}
+              leading={<Search size={19} className="mobile-search-icon" />}
+            />
 
             {/* Mobile SQUIRCLE Category Cards Rail */}
             <CategoryRail variant="mobile" />
@@ -859,15 +849,15 @@ export function SiteHeader() {
             </div>
 
             {/* Mobile Search */}
-            <form className="mobile-search-form" onSubmit={(e) => { submitSearch(e); setMobileOpen(false); }}>
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search tables, cues, scoreboards..."
-              />
-              <button type="submit" aria-label="Submit search"><Search size={16} /></button>
-            </form>
+            <SearchBox
+              className="mobile-search-form"
+              value={search}
+              onChange={setSearch}
+              categories={mobileCategories}
+              placeholder="Search tables, cues, scoreboards..."
+              trailing={<button type="submit" aria-label="Submit search"><Search size={16} /></button>}
+              onDone={() => setMobileOpen(false)}
+            />
 
             <div className="mobile-section-heading">Categories</div>
             <div className="mobile-category-accordion">
