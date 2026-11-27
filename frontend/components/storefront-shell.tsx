@@ -947,27 +947,6 @@ export function SiteHeader() {
   );
 }
 
-export function FloatingWhatsApp() {
-  const pathname = usePathname();
-  if (pathname === "/login") return null;
-  return (
-    <a
-      href={whatsappUrl()}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="floating-whatsapp-btn"
-      aria-label="Chat with Hyderabad Cue Sports on WhatsApp"
-    >
-      <div className="whatsapp-icon-circle">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-          <path d="M12.031 2C6.495 2 2 6.495 2 12.031c0 1.986.58 3.84 1.584 5.405L2.054 22l4.733-1.498A10.016 10.016 0 0 0 12.03 22c5.536 0 10.031-4.495 10.031-10.031C22.062 6.495 17.567 2 12.031 2zm0 18.297c-1.636 0-3.17-.46-4.48-1.258l-.321-.193-2.8 0.887.896-2.735-.21-.334A8.257 8.257 0 0 1 3.766 12.03c0-4.557 3.708-8.266 8.265-8.266 4.558 0 8.266 3.709 8.266 8.266 0 4.558-3.708 8.266-8.266 8.266zm4.53-6.177c-.248-.124-1.468-.724-1.696-.807-.228-.083-.393-.124-.559.124-.165.248-.642.807-.787.973-.145.165-.29.186-.538.062-.248-.124-1.047-.386-1.995-1.231-.738-.658-1.236-1.472-1.381-1.72-.145-.248-.015-.382.109-.505.112-.111.248-.29.372-.435.124-.145.166-.248.248-.414.083-.166.042-.311-.02-.435-.063-.124-.559-1.347-.766-1.845-.202-.484-.407-.418-.559-.426l-.477-.008c-.165 0-.435.062-.663.311-.228.248-.87 0.85-.87 2.073 0 1.223.89 2.405 1.014 2.571.125.166 1.752 2.675 4.245 3.751.593.256 1.056.409 1.417.524.595.19 1.137.163 1.565.099.477-.072 1.468-.6 1.675-1.18.207-.58.207-1.077.145-1.18-.062-.104-.228-.166-.476-.29z" />
-        </svg>
-      </div>
-      <span className="whatsapp-floating-label">WhatsApp Us</span>
-    </a>
-  );
-}
-
 export function CartDrawer() {
   const { cart, cartOpen, closeCart, updateQuantity, removeFromCart, showNotice } = useStorefront();
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -999,12 +978,6 @@ export function FloatingCartBar() {
     const timer = setTimeout(() => setBumps((n) => n + 1), prefersReducedMotion() ? 0 : FLY_DURATION_MS - 60);
     return () => clearTimeout(timer);
   }, [count]);
-
-  // Lets CSS lift the WhatsApp button above the bar on small screens
-  useEffect(() => {
-    document.body.toggleAttribute("data-cart-bar", visible);
-    return () => document.body.removeAttribute("data-cart-bar");
-  }, [visible]);
 
   if (!visible) return null;
   const thumbs = cart.slice(-3).reverse();
