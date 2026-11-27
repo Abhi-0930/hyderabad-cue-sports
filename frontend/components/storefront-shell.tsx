@@ -11,6 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleDot,
+  House,
+  LayoutGrid,
   Instagram,
   LogOut,
   Mail,
@@ -25,6 +27,7 @@ import {
   ShoppingBag,
   ShoppingCart,
   Sparkles,
+  Store,
   Target,
   Trophy,
   Truck,
@@ -950,8 +953,97 @@ export function SiteHeader() {
           </aside>
         </div>
       )}
+
+      <MobileBottomNav
+        cartCount={cartCount}
+        onCart={openCart}
+        onAccount={() => handleAccountClick("bottom_nav")}
+        accountActive={accountMenuOpen}
+      />
     </>
   );
+}
+
+/* Phone/tablet bottom navigation (Flipkart-style floating bar):
+   Home · Shop · Categories (bottom sheet) · Account · Cart */
+function MobileBottomNav({ cartCount, onCart, onAccount, accountActive }: {
+  cartCount: number;
+  onCart: () => void;
+  onAccount: () => void;
+  accountActive: boolean;
+}) {
+  const pathname = usePathname();
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  useEffect(() => setSheetOpen(false), [pathname]);
+
+  useEffect(() => {
+    if (!sheetOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSheetOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sheetOpen]);
+
+  const current = sheetOpen ? "categories"
+    : accountActive || pathname === "/login" ? "account"
+    : pathname === "/" ? "home"
+    : pathname === "/shop" ? "shop"
+    : null;
+
+  const stroke = (id: string) => (current === id ? 2.3 : 1.8);
+  const content = (label: string, icon: React.ReactNode, extra?: React.ReactNode) => (
+    <>
+      <span className="mbn-icon">{icon}{extra}</span>
+      <span className="mbn-label">{label}</span>
+    </>
+  );
+
+  return <>
+    <nav className="mobile-bottom-nav" aria-label="Main navigation">
+      <Link href="/" className={`mbn-item ${current === "home" ? "is-active" : ""}`} aria-current={current === "home" ? "page" : undefined}>
+        {content("Home", <House size={22} strokeWidth={stroke("home")} />)}
+      </Link>
+      <Link href="/shop" className={`mbn-item ${current === "shop" ? "is-active" : ""}`} aria-current={current === "shop" ? "page" : undefined}>
+        {content("Shop", <Store size={22} strokeWidth={stroke("shop")} />)}
+      </Link>
+      <button type="button" className={`mbn-item ${current === "categories" ? "is-active" : ""}`} onClick={() => setSheetOpen(true)} aria-haspopup="dialog" aria-expanded={sheetOpen}>
+        {content("Categories", <LayoutGrid size={22} strokeWidth={stroke("categories")} />)}
+      </button>
+      <button type="button" className={`mbn-item ${current === "account" ? "is-active" : ""}`} onClick={onAccount}>
+        {content("Account", <UserRound size={22} strokeWidth={stroke("account")} />)}
+      </button>
+      <button type="button" className="mbn-item" onClick={onCart} aria-label={`Cart with ${cartCount} ${cartCount === 1 ? "item" : "items"}`}>
+        {content("Cart", <ShoppingCart size={22} strokeWidth={1.8} />, cartCount > 0 && <span className="mbn-badge">{cartCount > 99 ? "99+" : cartCount}</span>)}
+      </button>
+    </nav>
+
+    {sheetOpen && (
+      <div className="mbn-sheet-root" role="dialog" aria-modal="true" aria-label="Categories">
+        <div className="mbn-sheet-backdrop" onClick={() => setSheetOpen(false)} />
+        <div className="mbn-sheet">
+          <div className="mbn-sheet-head">
+            <h2>Categories</h2>
+            <button type="button" className="mbn-sheet-close" onClick={() => setSheetOpen(false)} aria-label="Close categories"><X size={20} /></button>
+          </div>
+          <div className="mbn-sheet-grid">
+            {mobileCategories.map((cat) => {
+              const Icon = cat.icon;
+              return (
+                <Link key={cat.id} href={cat.href} className="mbn-cat" onClick={() => setSheetOpen(false)}>
+                  <span className="mbn-cat-icon"><Icon color="#0b3824" /></span>
+                  <span className="mbn-cat-label">{cat.label}</span>
+                </Link>
+              );
+            })}
+            <Link href="/shop" className="mbn-cat" onClick={() => setSheetOpen(false)}>
+              <span className="mbn-cat-icon"><LayoutGrid size={24} color="#0b3824" strokeWidth={1.8} /></span>
+              <span className="mbn-cat-label">All products</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    )}
+  </>;
 }
 
 export function CartDrawer() {
@@ -1220,7 +1312,7 @@ function flyToCart(source: HTMLImageElement | null | undefined) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const thumbs = document.querySelector(".fcb-thumbs")?.getBoundingClientRect();
-  const barBottom = vw <= 960 ? 56 : 64; // matches .floating-cart-bar bottom (before safe-area)
+  const barBottom = vw <= 960 ? 88 : 64; // matches .floating-cart-bar bottom (before safe-area)
   const toX = thumbs ? thumbs.left + 16 : vw / 2 - 68 + 23;
   const toY = thumbs ? thumbs.top + thumbs.height / 2 : vh - barBottom - 23;
 
