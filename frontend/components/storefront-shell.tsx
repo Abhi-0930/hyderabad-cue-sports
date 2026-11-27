@@ -16,6 +16,7 @@ import {
   LogOut,
   Mail,
   MapPin,
+  MessageCircle,
   Menu,
   Minus,
   Plus,
@@ -331,6 +332,11 @@ const defaultDeliveryAddresses = [
   { id: "addr-3", title: "Flat 4B, Sree Heights", subtitle: "Road No 12, Banjara Hills 500034" },
   { id: "addr-4", title: "Financial District", subtitle: "Nanakramguda, Gachibowli 500032" },
 ];
+
+/** Store WhatsApp number (placeholder until the real one is confirmed) — used by every WhatsApp button */
+export const WHATSAPP_NUMBER = "919999999999";
+export const whatsappUrl = (message = "Hi, I have an enquiry regarding Hyderabad Cue Sports") =>
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
 /* Navbar categories — the product groups Hyderabad Cue Sports sells.
    Each pill links to an existing catalogue category, narrowed by a search word
@@ -926,7 +932,7 @@ export function SiteHeader() {
 
             <div className="mobile-drawer-footer">
               <a
-                href="https://wa.me/919999999999?text=Hi%2C%20I%20have%20an%20enquiry%20regarding%20Hyderabad%20Cue%20Sports"
+                href={whatsappUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mobile-whatsapp-cta"
@@ -946,7 +952,7 @@ export function FloatingWhatsApp() {
   if (pathname === "/login") return null;
   return (
     <a
-      href="https://wa.me/919999999999?text=Hi%2C%20I%20have%20an%20enquiry%20regarding%20Hyderabad%20Cue%20Sports"
+      href={whatsappUrl()}
       target="_blank"
       rel="noopener noreferrer"
       className="floating-whatsapp-btn"
@@ -1069,11 +1075,95 @@ export function BackToTop() {
   );
 }
 
+/* Pages that aren't built yet show a short notice instead of a dead link */
+const FOOTER_HELP_LINKS = [
+  { label: "Shipping information", notice: "Shipping information will be added soon." },
+  { label: "Returns & refunds", notice: "Return policy will be added soon." },
+  { label: "FAQs", notice: "FAQs will be added soon." },
+];
+const FOOTER_COMPANY_LINKS = [
+  { label: "About us", notice: "About page will be added soon." },
+  { label: "Privacy policy", notice: "Privacy policy will be added soon." },
+  { label: "Terms & conditions", notice: "Terms will be added soon." },
+];
+// Placeholder contact details — replace with the real ones
+const FOOTER_EMAIL = "support@hyderabadcuesports.com";
+
 export function SiteFooter() {
   const pathname = usePathname();
   const { showNotice } = useStorefront();
   if (pathname === "/login") return null;
-  return <footer className="site-footer" id="contact"><div className="footer-main container"><div className="footer-brand"><Link href="/" className="wordmark wordmark-light"><span className="wordmark-mark">HCS</span><span><strong>HYDERABAD</strong><em>CUE SPORTS</em></span></Link><p>A considered home for premium snooker tables and the objects that make the game feel like yours.</p><div className="footer-socials"><button aria-label="Instagram"><Instagram size={17} /></button><button aria-label="Email" onClick={() => showNotice("Sample email support: support@example.com")}><Mail size={17} /></button></div></div><div className="footer-column"><h4>Shop</h4><Link href="/shop">All Snooker Tables</Link><Link href="/shop?size=8+FT">8 FT Tables</Link><Link href="/shop?size=10+FT">10 FT Tables</Link><Link href="/shop?size=12+FT">12 FT Tables</Link><Link href="/shop?type=accessory">Accessories</Link></div><div className="footer-column"><h4>Information</h4><Link href="/#about">About Us</Link><button onClick={() => showNotice("Shipping information is placeholder content for this demo.")}>Shipping Information</button><button onClick={() => showNotice("Return policy is placeholder content for this demo.")}>Return Policy</button><button onClick={() => showNotice("Privacy policy is placeholder content for this demo.")}>Privacy Policy</button><button onClick={() => showNotice("Terms are placeholder content for this demo.")}>Terms &amp; Conditions</button></div><div className="footer-column"><h4>Customer Support</h4><button onClick={() => showNotice("Sample WhatsApp support: +91 00000 00000")}>WhatsApp Support</button><button onClick={() => showNotice("Sample email support: support@example.com")}>Email Support</button><button onClick={() => showNotice("FAQ content will be added with the final catalogue.")}>Frequently Asked Questions</button><div className="footer-contact-card"><Truck size={17} /><span>Serving customers across India<br /><small>Direct shipping &amp; professional installation available</small></span></div></div></div><div className="footer-bottom container"><span>© 2026 HYDERABAD CUE SPORTS. Demo brand experience.</span><span className="payment-icons"><span>UPI</span><span>VISA</span><span>•••</span></span><button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Back to top <ChevronRight size={14} /></button></div></footer>;
+  const year = new Date().getFullYear();
+
+  return (
+    <footer className="hcs-footer" id="contact">
+      <div className="hcs-footer-main">
+        <div className="hcs-footer-brand">
+          <Link href="/" className="hcs-footer-logo" aria-label="Hyderabad Cue Sports Home">
+            <img src="/images/hcs-logo-white.png" alt="Hyderabad Cue Sports" width={150} height={44} />
+          </Link>
+          <p>Premium snooker tables, cues and accessories — chosen, delivered and set up for players across India.</p>
+          <ul className="hcs-footer-contact">
+            <li>
+              <MessageCircle size={16} aria-hidden="true" />
+              <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp</a>
+            </li>
+            <li>
+              <Mail size={16} aria-hidden="true" />
+              <a href={`mailto:${FOOTER_EMAIL}`}>{FOOTER_EMAIL}</a>
+            </li>
+            <li>
+              <MapPin size={16} aria-hidden="true" />
+              <span>Hyderabad, Telangana, India</span>
+            </li>
+          </ul>
+          <div className="hcs-footer-socials">
+            <button type="button" aria-label="Instagram" onClick={() => showNotice("Instagram page will be linked soon.")}>
+              <Instagram size={18} />
+            </button>
+            <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+              <MessageCircle size={18} />
+            </a>
+            <a href={`mailto:${FOOTER_EMAIL}`} aria-label="Email">
+              <Mail size={18} />
+            </a>
+          </div>
+        </div>
+
+        <nav className="hcs-footer-col" aria-label="Shop">
+          <h4>Shop</h4>
+          {mobileCategories.map((cat) => (
+            <Link key={cat.id} href={cat.href}>{cat.label}</Link>
+          ))}
+        </nav>
+
+        <nav className="hcs-footer-col" aria-label="Help">
+          <h4>Help</h4>
+          {FOOTER_HELP_LINKS.map((l) => (
+            <button key={l.label} type="button" onClick={() => showNotice(l.notice)}>{l.label}</button>
+          ))}
+          <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">Contact us</a>
+        </nav>
+
+        <nav className="hcs-footer-col" aria-label="Company">
+          <h4>Company</h4>
+          {FOOTER_COMPANY_LINKS.map((l) => (
+            <button key={l.label} type="button" onClick={() => showNotice(l.notice)}>{l.label}</button>
+          ))}
+        </nav>
+      </div>
+
+      <div className="hcs-footer-bottom">
+        <span>© {year} Hyderabad Cue Sports. All rights reserved.</span>
+        <span className="hcs-footer-pay" aria-label="Payment methods we accept">
+          <span>UPI</span>
+          <span>Visa</span>
+          <span>Mastercard</span>
+          <span>RuPay</span>
+        </span>
+      </div>
+    </footer>
+  );
 }
 
 /** Product card used on the homepage carousel, the shop grid and "You may also like":
